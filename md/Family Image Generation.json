@@ -1,0 +1,20 @@
+{
+  "tool": "built_in_image_gen",
+  "date": "2026-10-13",
+  "version": "v1",
+  "status": "owner_approved_for_practice",
+  "approvedAt": "2026-10-13",
+  "approvedVersion": "family-media-v2",
+  "assets": [
+    {
+      "file": "public/assessment/family/f01-v1.png",
+      "source": "C:/Users/Omarov/.codex/generated_images/01a1307a-bd63-7063-a669-a085df1da282/exec-47fc0186-ca40-42a9-93ff-b9976e4c0253.png",
+      "prompt": "Use case: scientific-educational. Asset for a Thai Grade 6 English vocabulary assessment. Create one clean standalone raster illustration showing an unmistakable small family: two adult parents and their two school-age children standing closely together with a gentle affectionate pose. All four people fully visible, friendly modern educational storybook style, natural human proportions, crisp distinct silhouettes and faces, everyday casual clothing, no uniforms or occupational accessories. Centered balanced square composition with generous padding. Isolated on a truly transparent background. No text, labels, letters, numbers, logos, symbols, school, hospital, furniture, pets, borders, decorative objects, or emoji. This is a question stimulus to distinguish family from teacher, hospital and school, not a poster or UI."
+    },
+    {
+      "file": "public/assessment/family/f06-v1.png",
+      "source": "C:/Users/Omarov/.codex/generated_images/01a1307a-bd63-7063-a669-a085df1da282/exec-7350bb18-5132-4d0d-bf94-fcbb3dd4ce1a.png",
+      "prompt": "Use case: scientific-educational. Asset for a Thai Grade 6 English vocabulary assessment. Create one standalone clean raster illustration of a modest welcoming detached family house, fully visible exterior in three-quarter front view. One small residential house with a simple pitched red roof, front door, two ordinary windows and a short porch, clearly recognizable as a home, no institutional features. Friendly modern educational storybook style with crisp edges, readable silhouette and gentle natural shading. Centered square composition with generous transparent padding around the entire building, no cropping. Truly transparent background. No people, text, letters, house numbers, labels, logos, hospital cross, school signs, shop windows, badges, emoji, decorative frame, scenery, other buildings, trees, vehicles or UI. This is the actual picture used to distinguish Home from Hospital, School and Park."
+    }
+  ]
+}

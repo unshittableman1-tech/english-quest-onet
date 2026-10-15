@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150">
+    <rect width="200" height="150" fill="#f0fff0"/>
+    <rect x="20" y="20" width="60" height="40" fill="#2e8b57"/> <!-- blackboard -->
+    <circle cx="100" cy="70" r="20" fill="#ffd700"/> <!-- face -->
+    <rect x="85" y="90" width="30" height="60" fill="#4682b4"/> <!-- body -->
+    <line x1="120" y1="100" x2="140" y2="150" stroke="#8b4513" stroke-width="4"/> <!-- broom -->
+    <path d="M130 150 L150 150 L145 130 Z" fill="#deb887"/>
+  </svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150">
+    <rect x="10" y="10" width="80" height="50" fill="#2c3e50"/> <!-- board -->
+    <text x="20" y="40" fill="#fff" font-size="12">A B C</text>
+    <circle cx="120" cy="40" r="15" fill="#e74c3c"/> <!-- teacher -->
+    <rect x="110" y="60" width="20" height="40" fill="#34495e"/>
+    <!-- students -->
+    <circle cx="40" cy="110" r="10" fill="#3498db"/><rect x="30" y="125" width="20" height="10" fill="#8e44ad"/>
+    <circle cx="80" cy="110" r="10" fill="#3498db"/><rect x="70" y="125" width="20" height="10" fill="#8e44ad"/>
+    <circle cx="120" cy="110" r="10" fill="#3498db"/><rect x="110" y="125" width="20" height="10" fill="#8e44ad"/>
+  </svg>

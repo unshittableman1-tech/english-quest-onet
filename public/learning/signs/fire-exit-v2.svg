@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 280" role="img" aria-labelledby="title desc">
+  <title id="title">Fire exit sign</title><desc id="desc">A person running from an open doorway toward a right-pointing exit arrow on a green sign.</desc>
+  <rect x="22" y="34" width="276" height="212" rx="18" fill="#159a62"/>
+  <path d="M52 65h84v148H52z" fill="#fff"/><path d="M65 78h58v135H65z" fill="#bfead5"/>
+  <circle cx="177" cy="91" r="15" fill="#fff"/>
+  <path d="m173 113-23 45 39 14m-16-59 39 31m-62 14-27 48m66-34 32 39" fill="none" stroke="#fff" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M205 85h61m0 0-24-23m24 23-24 23" fill="none" stroke="#fff" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="200" height="200">
+  <rect x="5" y="5" width="90" height="90" fill="#4CAF50" rx="10" />
+  <!-- Father -->
+  <circle cx="30" cy="40" r="8" fill="#FFFFFF" />
+  <path d="M 20 70 Q 30 50 40 70 Z" fill="#FFFFFF" />
+  <!-- Mother -->
+  <circle cx="70" cy="40" r="8" fill="#FFFFFF" />
+  <path d="M 60 70 Q 70 50 80 70 Z" fill="#FFFFFF" />
+  <!-- Child -->
+  <circle cx="50" cy="55" r="6" fill="#FFFFFF" />
+  <path d="M 42 75 Q 50 65 58 75 Z" fill="#FFFFFF" />
+</svg>

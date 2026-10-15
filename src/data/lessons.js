@@ -1,0 +1,218 @@
+// lessons.js — Mini Lesson content สำหรับแต่ละด่าน
+
+export const LESSONS = {
+  vocabulary: {
+    title: 'Vocabulary Village',
+    icon: '📚',
+    subtitle: 'คำศัพท์ยานพาหนะและสถานที่',
+    color: 'from-blue-600 to-cyan-500',
+    vocab: [
+      { en: 'car', th: 'รถยนต์', emoji: '🚗' },
+      { en: 'bus', th: 'รถบัส/รถเมล์', emoji: '🚌' },
+      { en: 'van', th: 'รถตู้', emoji: '🚐' },
+      { en: 'bicycle', th: 'รถจักรยาน', emoji: '🚲' },
+      { en: 'taxi', th: 'รถแท็กซี่', emoji: '🚕' },
+      { en: 'ship', th: 'เรือใหญ่', emoji: '🚢' },
+      { en: 'boat', th: 'เรือเล็ก', emoji: '⛵' },
+      { en: 'motorcycle', th: 'รถจักรยานยนต์', emoji: '🏍️' },
+      { en: 'train', th: 'รถไฟ', emoji: '🚂' },
+      { en: 'plane', th: 'เครื่องบิน', emoji: '✈️' },
+      { en: 'school', th: 'โรงเรียน', emoji: '🏫' },
+      { en: 'hospital', th: 'โรงพยาบาล', emoji: '🏥' },
+      { en: 'bank', th: 'ธนาคาร', emoji: '🏦' },
+      { en: 'post office', th: 'ที่ทำการไปรษณีย์', emoji: '📮' },
+      { en: 'airport', th: 'สนามบิน', emoji: '✈️' },
+      { en: 'market', th: 'ตลาด', emoji: '🏪' },
+      { en: 'restaurant', th: 'ร้านอาหาร', emoji: '🍽️' },
+      { en: 'coffee shop', th: 'ร้านกาแฟ', emoji: '☕' },
+    ],
+    aiTip: {
+      title: '💡 AI Tip: จำง่ายๆ',
+      tips: [
+        '"Air" = อากาศ → Airport = สนามบิน (ท่าเครื่องบิน)',
+        '"Bi" = สอง → Bicycle = รถสองล้อ',
+        '"Motor" = เครื่องยนต์ → Motorcycle = รถมีเครื่องยนต์',
+        'สถานที่มักลงท้ายด้วย "-al": Hospital, Residential',
+      ],
+    },
+  },
+
+  signs: {
+    title: 'Signs City',
+    icon: '🚦',
+    subtitle: 'ป้ายสัญลักษณ์ภาษาอังกฤษ',
+    color: 'from-red-600 to-orange-500',
+    vocab: [
+      { en: 'No Parking', th: 'ห้ามจอดรถ', emoji: '🚫' },
+      { en: 'No U-turn', th: 'ห้ามกลับรถ', emoji: '↩️' },
+      { en: 'No Horn', th: 'ห้ามบีบแตร', emoji: '📢' },
+      { en: 'Traffic Light', th: 'ไฟสัญญาณจราจร', emoji: '🚦' },
+      { en: 'School Zone', th: 'เขตโรงเรียน', emoji: '🏫' },
+      { en: 'Fire Exit', th: 'ทางออกฉุกเฉิน', emoji: '🚪' },
+      { en: 'Wet Floor', th: 'พื้นเปียก/ระวังลื่น', emoji: '⚠️' },
+      { en: 'No Photography', th: 'ห้ามถ่ายรูป', emoji: '📷' },
+      { en: 'No Pets Allowed', th: 'ห้ามนำสัตว์เข้า', emoji: '🐾' },
+      { en: 'Toilet', th: 'ห้องน้ำ', emoji: '🚻' },
+    ],
+    aiTip: {
+      title: '💡 AI Tip: กฎสำคัญ',
+      tips: [
+        'No + คำนาม/กริยา = "ห้าม..." เสมอ!',
+        'No Parking = ห้าม + จอดรถ',
+        'No U-turn = ห้าม + กลับรถ',
+        'Zone = เขตพื้นที่ → School Zone = เขตโรงเรียน',
+        'Exit = ทางออก → Fire Exit = ทางออกฉุกเฉิน',
+      ],
+    },
+  },
+
+  directions: {
+    title: 'Direction Maze',
+    icon: '🧭',
+    subtitle: 'คำบอกทิศทางและตำแหน่ง',
+    color: 'from-green-600 to-emerald-500',
+    vocab: [
+      { en: 'go straight', th: 'ตรงไป', emoji: '⬆️' },
+      { en: 'turn left', th: 'เลี้ยวซ้าย', emoji: '↰' },
+      { en: 'turn right', th: 'เลี้ยวขวา', emoji: '↱' },
+      { en: 'on the left', th: 'ทางซ้ายมือ', emoji: '👈' },
+      { en: 'on the right', th: 'ทางขวามือ', emoji: '👉' },
+      { en: 'next to', th: 'ติดกับ/ข้างๆ', emoji: '↔️' },
+      { en: 'opposite', th: 'ตรงข้าม', emoji: '⟺' },
+      { en: 'between', th: 'ระหว่าง', emoji: '↕️' },
+      { en: 'near', th: 'ใกล้', emoji: '📍' },
+      { en: 'behind', th: 'ด้านหลัง', emoji: '🔙' },
+    ],
+    aiTip: {
+      title: '💡 AI Tip: จำง่ายๆ',
+      tips: [
+        'Left = ซ้าย (มือซ้าย = มือที่เขียนน้อยกว่า)',
+        'Right = ขวา (มือขวาสำหรับคนส่วนใหญ่)',
+        'Between = ระหว่าง (ต้องมี 2 สิ่งเสมอ)',
+        'Opposite = ตรงข้าม (เผชิญหน้ากัน)',
+        'Near ↔ Far (ใกล้ ↔ ไกล)',
+      ],
+    },
+  },
+
+  market: {
+    title: 'Market Quest',
+    icon: '🛒',
+    subtitle: 'ภาษาในการซื้อขายสินค้า',
+    color: 'from-yellow-500 to-amber-400',
+    vocab: [
+      { en: 'How much is it?', th: 'ราคาเท่าไหร่?', emoji: '💰' },
+      { en: "It's __ baht.", th: 'ราคา __ บาท', emoji: '🏷️' },
+      { en: 'Can I have...?', th: 'ขอ...ได้ไหม?', emoji: '🙏' },
+      { en: 'Here you are.', th: 'นี่ไง (ยื่นให้)', emoji: '🤲' },
+      { en: "Here's your change.", th: 'นี่เงินทอน', emoji: '💸' },
+      { en: 'Too expensive!', th: 'แพงเกินไป!', emoji: '😱' },
+      { en: 'Do you have...?', th: 'มี...ไหม?', emoji: '❓' },
+      { en: 'Can you give me a discount?', th: 'ลดได้ไหม?', emoji: '🤝' },
+    ],
+    aiTip: {
+      title: '💡 AI Tip: ในตลาด',
+      tips: [
+        '"How much?" = ราคาเท่าไหร่? (ถามราคา)',
+        '"Can I have...?" = ขอ...ได้ไหม? (สุภาพ)',
+        '"Change" ในร้านค้า = เงินทอน (ไม่ใช่การเปลี่ยน)',
+        '"Expensive" = แพง | "Cheap" = ถูก',
+      ],
+    },
+  },
+
+  conversation: {
+    title: 'Conversation Café',
+    icon: '💬',
+    subtitle: 'บทสนทนาในสถานการณ์ต่างๆ',
+    color: 'from-purple-600 to-violet-500',
+    vocab: [
+      { en: 'Thank you.', th: 'ขอบคุณ', emoji: '🙏' },
+      { en: "You're welcome.", th: 'ด้วยความยินดี', emoji: '😊' },
+      { en: "I'm sorry.", th: 'ขอโทษ', emoji: '😔' },
+      { en: "That's all right.", th: 'ไม่เป็นไร', emoji: '👌' },
+      { en: 'Can I help you?', th: 'ช่วยอะไรได้ไหม?', emoji: '🤝' },
+      { en: 'Yes, please.', th: 'ได้เลยค่ะ/ครับ', emoji: '✅' },
+      { en: 'May I go out, please?', th: 'ขออนุญาตออกไปได้ไหม?', emoji: '🚪' },
+      { en: 'Yes, you may.', th: 'ได้เลย', emoji: '✔️' },
+      { en: "How much is it?", th: 'ราคาเท่าไหร่?', emoji: '💰' },
+      { en: "What's the matter?", th: 'เป็นอะไร?', emoji: '❓' },
+      { en: 'Nice to meet you.', th: 'ยินดีที่ได้รู้จัก', emoji: '🤗' },
+      { en: 'Can I borrow your pen?', th: 'ขอยืมปากกาได้ไหม?', emoji: '✏️' },
+    ],
+    aiTip: {
+      title: '💡 AI Tip: คู่สนทนา',
+      tips: [
+        'Thank you → You\'re welcome. (เป็นคู่)',
+        "I'm sorry → That's all right. (เป็นคู่)",
+        'May I...? → Yes, you may. (ขออนุญาต)',
+        'Nice to meet you → Nice to meet you, too. (ต้องใส่ too!)',
+      ],
+    },
+  },
+
+  reading: {
+    title: 'Reading Dungeon',
+    icon: '📖',
+    subtitle: 'ทักษะการอ่านและตอบคำถาม',
+    color: 'from-indigo-600 to-blue-700',
+    vocab: [
+      { en: 'Read the passage', th: 'อ่านบทความ', emoji: '📄' },
+      { en: 'Main idea', th: 'ใจความสำคัญ', emoji: '💡' },
+      { en: 'Details', th: 'รายละเอียด', emoji: '🔍' },
+      { en: 'Who / What / Where', th: 'ใคร / อะไร / ที่ไหน', emoji: '❓' },
+      { en: 'When / Why / How', th: 'เมื่อไหร่ / ทำไม / อย่างไร', emoji: '🤔' },
+    ],
+    aiTip: {
+      title: '💡 AI Tip: กลยุทธ์การอ่าน',
+      tips: [
+        'อ่านคำถามก่อน แล้วค่อยอ่าน passage',
+        'WHO = ใคร | WHAT = อะไร | WHERE = ที่ไหน',
+        'WHEN = เมื่อไหร่ | WHY = ทำไม',
+        'ขีดเส้นใต้ keyword ในคำถามก่อนหาคำตอบ',
+        'คำตอบมักพบในบทความโดยตรง!',
+      ],
+    },
+  },
+
+  grammar: {
+    title: 'Grammar Boss',
+    icon: '⚡',
+    subtitle: 'กฎไวยากรณ์ภาษาอังกฤษ',
+    color: 'from-pink-600 to-rose-500',
+    vocab: [
+      { en: 'Present Simple', th: 'ปัจจุบันกาล (ทั่วไป)', emoji: '🔵' },
+      { en: 'Present Continuous', th: 'ปัจจุบันกาล (กำลัง)', emoji: '🟡' },
+      { en: 'Past Simple', th: 'อดีตกาล', emoji: '🔴' },
+      { en: 'Present Perfect', th: 'อดีตที่เชื่อมปัจจุบัน', emoji: '🟣' },
+    ],
+    aiTip: {
+      title: '💡 AI Tip: จำ Tense ง่ายๆ',
+      tips: [
+        'every day / always = Present Simple',
+        'now / right now / at the moment = Present Continuous (am/is/are + V-ing)',
+        'yesterday / last week / ago = Past Simple (V2)',
+        'already / ever / never / just = Present Perfect (has/have + V3)',
+        'He/She/It + has | I/You/We/They + have',
+      ],
+    },
+  },
+
+  finalboss: {
+    title: 'O-NET Final Boss',
+    icon: '🏆',
+    subtitle: 'แบบทดสอบจำลอง O-NET',
+    color: 'from-amber-500 to-yellow-400',
+    vocab: [],
+    aiTip: {
+      title: '💡 เตรียมพร้อมสำหรับ O-NET!',
+      tips: [
+        '30 ข้อ เวลา 30 นาที',
+        'ผสมทุกหมวด: Vocabulary, Signs, Directions, Conversation, Reading, Grammar',
+        '≥70% = ผ่าน | ≥90% = เก่งมาก!',
+        'อ่านคำถามให้ละเอียดก่อนตอบ',
+        'จัดการเวลาให้ดี = 1 นาที/ข้อ',
+      ],
+    },
+  },
+};

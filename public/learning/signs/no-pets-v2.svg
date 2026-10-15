@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 280" role="img" aria-labelledby="title desc">
+  <title id="title">No pets sign</title><desc id="desc">A dog silhouette crossed by a red diagonal bar inside a prohibition circle.</desc>
+  <circle cx="160" cy="140" r="112" fill="#fff" stroke="#e33d45" stroke-width="18"/>
+  <path d="m100 112 22-28 15 31h55l17-28 13 43 22 18-17 24-24-10-3 49h-24l-7-42h-36l-7 42h-24l4-57-22-12z" fill="#263b59" stroke="#263b59" stroke-width="6" stroke-linejoin="round"/>
+  <circle cx="212" cy="127" r="4" fill="#fff"/>
+  <path d="M82 62 238 218" fill="none" stroke="#e33d45" stroke-width="20" stroke-linecap="round"/>
+</svg>

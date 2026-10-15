@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 280" role="img" aria-labelledby="title desc">
+  <title id="title">Toilet sign</title><desc id="desc">Clear male and female restroom figures separated by a vertical line on a blue square sign.</desc>
+  <rect x="32" y="24" width="256" height="232" rx="22" fill="#237eb8"/>
+  <circle cx="105" cy="78" r="18" fill="#fff"/><path d="M78 108h54v69h-13v60H94v-60H78z" fill="#fff"/>
+  <circle cx="215" cy="78" r="18" fill="#fff"/><path d="m215 106-43 91h27v40h32v-40h27z" fill="#fff"/>
+  <path d="M160 55v177" stroke="#fff" stroke-width="8" opacity=".9"/>
+</svg>

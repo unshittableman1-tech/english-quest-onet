@@ -1,0 +1,19 @@
+{
+  "tool": "built_in_image_gen",
+  "date": "2026-10-13",
+  "scope": "learning_illustration_not_assessment",
+  "version": "routine-images-v1",
+  "reviewStatus": "technical_check_only",
+  "assets": [
+    {
+      "file": "public/learning/routines/wake-up-v1.png",
+      "source": "C:/Users/Omarov/.codex/generated_images/01a1307a-bd63-7063-a669-a085df1da282/exec-e7d5b698-22b3-4dad-b04c-3de59bdb8bb6.png",
+      "prompt": "Use case: scientific-educational. Create a single crisp friendly pastel storybook raster illustration for a Thai Grade 6 English vocabulary flashcard demonstrating WAKE UP, distinct from GET UP. A fully clothed school-age child in modest mint pajamas is STILL LYING in bed, head resting on a pillow, blanket covering torso and legs. Eyes are now open, gentle alert expression, one hand rubbing an eye. Body remains horizontal on mattress, NO sitting, NO standing, NO feet on floor. Morning light, small simple bed, pillow and blanket only; no alarm clock text, no writing, no letters, no labels, no speech bubbles, no symbols or emoji. Clean warm educational illustration, accurate anatomy, restrained pastel pink/mint/sky palette and clear action silhouette, full bed and child visible, generous padding, isolated on truly transparent background. Not a poster, not UI, not an icon. One scene only."
+    },
+    {
+      "file": "public/learning/routines/get-up-v1.png",
+      "source": "C:/Users/Omarov/.codex/generated_images/01a1307a-bd63-7063-a669-a085df1da282/exec-8d0115b0-8c12-41fd-8b67-0e19c21cc61a.png",
+      "prompt": "Use case: scientific-educational. Create one crisp friendly pastel storybook raster illustration for a Thai Grade 6 English flashcard demonstrating GET UP meaning leaving bed, distinct from WAKE UP. A school-age child with short wavy brown hair wearing modest long-sleeve mint pajamas is PUSHING UP FROM THE EDGE OF A SMALL BED TO STAND, both bare feet visibly planted on the floor beside the bed, knees and hips straightening, one hand pushing on the mattress for support. Child is already awake, alert open eyes; NOT lying down, NOT rubbing eyes, NOT stretching in bed, NOT walking away. Bed at left with pink pillow and pink blanket pushed aside, full child and full bed visible, anatomically clear legs and feet. Clean modern educational storybook drawing, soft mint/rose/sky palette, sharp readable silhouette, gentle shading, generous padding. Entire scene isolated on truly transparent background. No scenery, no text, no numbers, no clock, no speech bubbles, no arrows, no icons or emoji. One scene only, not UI and not a poster."
+    }
+  ]
+}

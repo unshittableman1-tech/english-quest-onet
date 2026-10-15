@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 280" role="img" aria-labelledby="title desc">
+  <title id="title">No U-turn sign</title><desc id="desc">A bold U-turn arrow crossed by a red diagonal bar inside a prohibition circle.</desc>
+  <circle cx="160" cy="140" r="112" fill="#fff" stroke="#e33d45" stroke-width="18"/>
+  <path d="M219 214v-70c0-45-23-71-61-71-33 0-57 20-64 53" fill="none" stroke="#263b59" stroke-width="20" stroke-linecap="round"/>
+  <path d="m61 106 35 35 36-35" fill="none" stroke="#263b59" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M82 62 238 218" fill="none" stroke="#e33d45" stroke-width="20" stroke-linecap="round"/>
+</svg>

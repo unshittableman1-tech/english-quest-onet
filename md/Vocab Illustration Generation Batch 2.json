@@ -1,0 +1,142 @@
+{
+  "tool": "built_in_image_gen",
+  "generatedAt": "2026-10-13",
+  "scope": "learning_only_action_verbs_and_daily_routine",
+  "version": "vocab-illustrations-v1",
+  "status": "technical_check_only",
+  "ownerReview": "pending",
+  "assets": [
+    {
+      "slug": "wake-up",
+      "file": "/learning/routines/wake-up-v1.png",
+      "source": "see md/Routine Image Generation.json",
+      "prompt": "See md/Routine Image Generation.json"
+    },
+    {
+      "slug": "get-up",
+      "file": "/learning/routines/get-up-v1.png",
+      "source": "see md/Routine Image Generation.json",
+      "prompt": "See md/Routine Image Generation.json"
+    },
+    {
+      "slug": "eat",
+      "file": "/learning/verbs/eat-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"eat\". Single clear standalone scene: A fully clothed school-age child seated at a small dining table, bringing a spoonful of rice from a bowl toward the open mouth; clear eating action, no drink held. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "drink",
+      "file": "/learning/verbs/drink-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"drink\". Single clear standalone scene: A fully clothed school-age child holding a clear glass of water at the lips and tilting it slightly to drink; no food or spoon. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "read",
+      "file": "/learning/verbs/read-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"read\". Single clear standalone scene: A fully clothed school-age child sitting on a chair holding an open book with both hands, eyes looking down at the pages; no pencil, no writing. Blank non-legible page markings only. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "write",
+      "file": "/learning/verbs/write-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"write\". Single clear standalone scene: A fully clothed school-age child seated at a small desk, clearly holding a pencil with its tip touching a sheet of paper, writing with focused eyes; no book held, no legible letters on paper. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "walk",
+      "file": "/learning/verbs/walk-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"walk\". Single clear standalone scene: A fully clothed school-age child walking calmly in profile with one foot planted flat on ground, other stepping forward, relaxed upright torso and arms, modest school clothes and backpack; no running, no speed lines. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "run",
+      "file": "/learning/verbs/run-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"run\". Single clear standalone scene: A fully clothed school-age child actively running in profile, elbows bent, torso leaning forward, one knee lifted and rear foot pushing off, clear athletic stride, modest sports clothes; no walking posture. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "play",
+      "file": "/learning/verbs/play-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"play\". Single clear standalone scene: A fully clothed school-age child playing football, one leg kicking a clearly visible football toward another fully clothed child, happy active sports scene, just two figures and ball. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "listen",
+      "file": "/learning/verbs/listen-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"listen\". Single clear standalone scene: A fully clothed school-age child with CLOSED mouth, looking attentively toward a teacher who is explaining with a small hand gesture. Child cups one hand lightly behind ear to show listening; teacher mouth slightly open. No speech bubbles or writing. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "speak",
+      "file": "/learning/verbs/speak-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"speak\". Single clear standalone scene: A fully clothed school-age child with mouth OPEN mid-speech, facing another quiet child with closed mouth, one expressive hand gesture near chest; clear speaking rather than listening, no hand cupped at ear, no speech bubbles. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "open",
+      "file": "/learning/verbs/open-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"open\". Single clear standalone scene: A fully clothed school-age child beside a door frame, pulling a door OPEN toward the viewer using its handle. Door swung wide about 70 degrees, large visible open doorway and clear hand on handle, full body visible. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "close",
+      "file": "/learning/verbs/close-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"close\". Single clear standalone scene: A fully clothed school-age child beside a door frame, pushing a door nearly CLOSED with one palm and hand near handle, narrow visible gap between door and frame, clear forward push posture, full body visible. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "help",
+      "file": "/learning/verbs/help-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"help\". Single clear standalone scene: Two fully clothed school-age children beside a small pile of dropped books. One child helping the other collect the books, crouching and handing a retrieved book to the other child; clear cooperative helping action, no injury. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "brush-my-teeth",
+      "file": "/learning/routines/brush-my-teeth-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"brush my teeth\". Single clear standalone scene: A fully clothed school-age child standing at a simple bathroom sink, toothbrush clearly in mouth, brushing front teeth, tiny toothpaste foam, modest ordinary pajamas; no shower, no nudity. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "take-a-shower",
+      "file": "/learning/routines/take-a-shower-v1.png",
+      "source": "",
+      "prompt": "Use case: scientific-educational. Asset for Thai Grade 6 English vocabulary learning, teaching \"take a shower\". Single clear standalone scene: A running indoor shower behind an opaque full-height pastel shower curtain. Visible shower head above curtain sprays clear water downward behind it; a fully covered silhouette is concealed entirely by the curtain. No exposed person, no skin, no nude body, no bath, no text. Depict the shower activity using running water and closed curtain only, family-friendly educational picture. Style: crisp modern children's educational storybook raster illustration, friendly natural proportions, readable hands and objects, restrained pastel mint/rose/sky colors, gentle shading. All action-essential objects and full figures fit inside canvas with generous transparent padding; no cropping. Truly transparent background outside scene. No text, letters, numbers, logos, watermarks, emoji, arrows, badges or UI. No decorative clutter. One scene only. Prioritize unambiguous action over prettiness."
+    },
+    {
+      "slug": "get-dressed",
+      "file": "/learning/routines/get-dressed-v1.png",
+      "source": "",
+      "prompt": "Create a single transparent-background educational vocabulary illustration for Thai Grade 6 English learners. A fully dressed Thai primary-school boy in a complete neat school uniform buttoning the top button of his shirt in front of a wardrobe; all clothing already on; wholesome morning routine. Bright polished pastel children's storybook style, clean cutout silhouette, full subject visible, strong readable action at small card size, consistent with a premium educational game. No words, letters, captions, logos, watermarks, UI, border, frame, or background scenery. Age-appropriate and wholesome."
+    },
+    {
+      "slug": "have-breakfast",
+      "file": "/learning/routines/have-breakfast-v1.png",
+      "source": "",
+      "prompt": "Create a single transparent-background educational vocabulary illustration for Thai Grade 6 English learners. A Thai primary-school child seated at a breakfast table eating toast, fruit, and milk in the morning; clearly having breakfast. Bright polished pastel children's storybook style, clean cutout silhouette, full subject visible, strong readable action at small card size, consistent with a premium educational game. No words, letters, captions, logos, watermarks, UI, border, frame, or background scenery. Age-appropriate and wholesome."
+    },
+    {
+      "slug": "go-to-school",
+      "file": "/learning/routines/go-to-school-v1.png",
+      "source": "",
+      "prompt": "Create a single transparent-background educational vocabulary illustration for Thai Grade 6 English learners. A Thai primary-school child in a complete school uniform and backpack walking toward a school gate in the morning; clearly going to school. Bright polished pastel children's storybook style, clean cutout silhouette, full subject visible, strong readable action at small card size, consistent with a premium educational game. No words, letters, captions, logos, watermarks, UI, border, frame, or background scenery. Age-appropriate and wholesome."
+    },
+    {
+      "slug": "have-lunch",
+      "file": "/learning/routines/have-lunch-v1.png",
+      "source": "",
+      "prompt": "Create a single transparent-background educational vocabulary illustration for Thai Grade 6 English learners. A Thai primary-school child seated at a school lunch table eating rice and vegetables from a lunch tray; clearly having lunch. Bright polished pastel children's storybook style, clean cutout silhouette, full subject visible, strong readable action at small card size, consistent with a premium educational game. No words, letters, captions, logos, watermarks, UI, border, frame, or background scenery. Age-appropriate and wholesome."
+    },
+    {
+      "slug": "do-my-homework",
+      "file": "/learning/routines/do-my-homework-v1.png",
+      "source": "",
+      "prompt": "Create a single transparent-background educational vocabulary illustration for Thai Grade 6 English learners. A Thai primary-school child seated at a desk after school, writing answers in an open workbook with pencil and school books nearby; clearly doing homework. Bright polished pastel children's storybook style, clean cutout silhouette, full subject visible, strong readable action at small card size, consistent with a premium educational game. No words, letters, captions, logos, watermarks, UI, border, frame, or background scenery. Age-appropriate and wholesome."
+    },
+    {
+      "slug": "go-to-bed",
+      "file": "/learning/routines/go-to-bed-v1.png",
+      "source": "",
+      "prompt": "Create a single transparent-background educational vocabulary illustration for Thai Grade 6 English learners. A Thai primary-school child wearing full pajamas climbing into bed at night, pulling the blanket up, with a moon visible through the window; clearly going to bed. Bright polished pastel children's storybook style, clean cutout silhouette, full subject visible, strong readable action at small card size, consistent with a premium educational game. No words, letters, captions, logos, watermarks, UI, border, frame, or background scenery. Age-appropriate and wholesome."
+    }
+  ]
+}

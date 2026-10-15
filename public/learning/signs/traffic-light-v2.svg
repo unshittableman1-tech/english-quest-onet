@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 280" role="img" aria-labelledby="title desc">
+  <title id="title">Traffic light</title><desc id="desc">A black traffic signal with separate red, yellow, and green lights.</desc>
+  <rect x="91" y="18" width="138" height="244" rx="32" fill="#263b59"/>
+  <path d="M91 67H57l34 26m138-26h34l-34 26M91 139H57l34 26m138-26h34l-34 26" fill="#263b59"/>
+  <circle cx="160" cy="72" r="31" fill="#ef4550" stroke="#fff" stroke-width="6"/>
+  <circle cx="160" cy="140" r="31" fill="#ffd447" stroke="#fff" stroke-width="6"/>
+  <circle cx="160" cy="208" r="31" fill="#36bf78" stroke="#fff" stroke-width="6"/>
+</svg>

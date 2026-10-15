@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 280" role="img" aria-labelledby="title desc">
+  <title id="title">No parking sign</title><desc id="desc">A blue letter P crossed by a red diagonal bar inside a red prohibition circle.</desc>
+  <circle cx="160" cy="140" r="112" fill="#fff" stroke="#e33d45" stroke-width="18"/>
+  <path d="M126 213V67h53c42 0 67 23 67 60s-25 60-67 60h-20v26zm33-57h19c22 0 34-10 34-29s-12-29-34-29h-19z" fill="#1769aa"/>
+  <path d="M82 62 238 218" fill="none" stroke="#e33d45" stroke-width="20" stroke-linecap="round"/>
+</svg>

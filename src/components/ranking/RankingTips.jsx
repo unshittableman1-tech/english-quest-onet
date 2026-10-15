@@ -1,0 +1,40 @@
+import UIIcon, { UIIconText } from '../UIIcon';
+import React from 'react';
+
+export default function RankingTips({ onOpenModal }) {
+  return (
+    <div className="bg-amber-50 rounded-2xl p-4 mx-2 mb-20 shadow-sm border border-amber-200">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-black text-amber-800 flex items-center gap-1.5">
+          <span className="text-xl"><UIIcon value={"✨"} /></span> วิธีเพิ่มอันดับ
+        </h3>
+        <button 
+          onClick={() => onOpenModal()}
+          className="text-xs font-bold text-amber-700 bg-white px-2 py-1 rounded-full hover:bg-amber-100 transition-colors border border-amber-200"
+        >
+          ดูแรงก์ทั้งหมด ⓘ
+        </button>
+      </div>
+      
+      <div className="grid grid-cols-3 gap-2">
+        <div className="bg-white rounded-xl p-2 text-center shadow-sm flex flex-col items-center justify-center border border-slate-100 transition-transform hover:scale-105 cursor-default">
+          <div className="text-2xl mb-1"><UIIcon value={"📜"} /></div>
+          <div className="text-emerald-600 font-black text-sm">+150</div>
+          <div className="text-[10px] text-slate-500 font-bold leading-tight mt-0.5">ผ่านด่าน<br/>เควส</div>
+        </div>
+        
+        <div className="bg-white rounded-xl p-2 text-center shadow-sm flex flex-col items-center justify-center border border-slate-100 transition-transform hover:scale-105 cursor-default">
+          <div className="text-2xl mb-1"><UIIcon value={"🛠️"} /></div>
+          <div className="text-sky-600 font-black text-sm">+10</div>
+          <div className="text-[10px] text-slate-500 font-bold leading-tight mt-0.5">แก้ข้อผิด<br/>(ต่อ 1 ข้อ)</div>
+        </div>
+        
+        <div className="bg-white rounded-xl p-2 text-center shadow-sm flex flex-col items-center justify-center border border-slate-100 transition-transform hover:scale-105 cursor-default">
+          <div className="text-2xl mb-1"><UIIcon value={"🏅"} /></div>
+          <div className="text-amber-600 font-black text-sm">+50</div>
+          <div className="text-[10px] text-slate-500 font-bold leading-tight mt-0.5">ปลดล็อก<br/>Badge</div>
+        </div>
+      </div>
+    </div>
+  );
+}

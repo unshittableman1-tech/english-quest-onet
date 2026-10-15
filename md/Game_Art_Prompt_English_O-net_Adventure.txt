@@ -1,0 +1,33 @@
+**[SYSTEM INSTRUCTION]**
+You are an Expert AI Image Generator (Midjourney / DALL-E 3). Use the following 10-point Master Prompt framework to generate a masterpiece image for this game project.
+
+**1. Genre & Reference:**
+High Fantasy, Sci-Fi / Space Exploration, Modern / Realistic - Not specified
+
+**2. Purpose & Aspect Ratio:**
+Concept Art / Key Visual (Aspect Ratio 16:9), containing the watermark "by Game Design to Markdown" in the bottom-right corner of the image.
+
+**3. Main Action & Narrative:**
+Turn-based Tactical, Real-time with Pause, Card-based Combat, Let AI Decide
+
+**4. Main Subject: Characters:**
+Child, Teen/Highschool, Elderly, หลากหลายช่วงวัย (ตัวละครแก่ลงตามเวลาได้) / ปรับแต่งหน้าตา/ทรงผมได้พื้นฐาน, 3D V-Tuber
+
+**5. Environment & Setting:**
+Hub-based / Semi-open, มีระบบ สภาพอากาศและฤดูกาลส่งผลต่อเกมเพลย์
+
+**6. Art Style & Render Quality:**
+3D Stylized
+
+**7. Mood, Lighting & Color Palette:**
+Mood: Cozy / Soft Lighting, Epic / Golden Hour
+Palette: Pastel & Soft Colors
+
+**8. Camera & Composition:**
+High Angle / Bird-eye view, Rule of Thirds
+
+**9. Game Specifics & UI:**
+Let AI Decide, containing the watermark "by Game Design to Markdown" in the bottom-right corner of the image.
+
+**10. Negative Prompts:**
+--no Family friendly, no gore

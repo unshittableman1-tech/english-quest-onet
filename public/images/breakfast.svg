@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150">
+    <rect width="200" height="150" fill="#faebd7"/>
+    <circle cx="100" cy="60" r="25" fill="#ffb6c1"/> <!-- face -->
+    <rect x="70" y="90" width="60" height="60" fill="#87ceeb"/> <!-- body -->
+    <ellipse cx="100" cy="130" rx="50" ry="15" fill="#d3d3d3"/> <!-- table -->
+    <circle cx="90" cy="125" r="10" fill="#fff"/> <!-- plate -->
+    <rect x="110" y="115" width="10" height="15" fill="#f4a460"/> <!-- glass -->
+    <text x="140" y="40" font-size="20">🥪 🥛</text>
+  </svg>

@@ -1,0 +1,80 @@
+{
+  "generator": "built-in image_gen",
+  "generatedAt": "2026-10-13",
+  "background": "transparent",
+  "version": "v1",
+  "visualCheckBy": "Codex",
+  "contentApproval": "approved_for_practice",
+  "approval": {
+    "approvedBy": "workspace_owner",
+    "approvedAt": "2026-10-13",
+    "approvalSource": "explicit_user_chat_after_clothes_illustrated_preview",
+    "itemVersion": "practice-illustrated-v2",
+    "approvedModes": ["practice_assessment"]
+  },
+  "assets": [
+    {
+      "id": "c01",
+      "subject": "raincoat",
+      "path": "/assessment/clothes/c01-v1.png",
+      "prompt": "Use case: scientific-educational. Create one standalone raster illustration for a Thai Grade 6 English vocabulary quiz: ONE unmistakable hooded waterproof raincoat, fully visible front view, yellow waterproof fabric, long sleeves, front fastening, empty garment with no wearer. Clean realistic educational catalog illustration, crisp recognizable silhouette, gentle shading, object centered with generous padding, square composition. Transparent background. No words, letters, labels, numbers, logos, watermark, emoji, people, other clothing, or decorative objects. This is a production question stimulus, not a poster or a UI.",
+      "generationFile": "exec-7effa0d2-aa3f-49a7-8053-a186aede5fec.png"
+    },
+    {
+      "id": "c02",
+      "subject": "socks",
+      "path": "/assessment/clothes/c02-v1.png",
+      "prompt": "Use case: scientific-educational. Standalone raster illustration for a Thai Grade 6 English clothing vocabulary quiz. Subject: ONE matching pair of cotton crew socks, both complete socks laid flat, ribbed cuffs and clearly visible heel and toe, blue and white fabric. No feet. Clean realistic educational catalog illustration with crisp recognizable form, gentle shading, centered square composition, generous transparent padding. Fully visible, isolated on transparent background. No text, letters, labels, numbers, logos, watermark, emoji, people, hands, other objects or decorative elements. It must show only socks, not a poster or UI.",
+      "generationFile": "exec-413a7560-3ae1-4244-bd9d-a904120feea6.png"
+    },
+    {
+      "id": "c03",
+      "subject": "shoes",
+      "path": "/assessment/clothes/c03-v1.png",
+      "prompt": "Use case: scientific-educational. Standalone raster illustration for a Thai Grade 6 English clothing vocabulary quiz. Subject: ONE matching pair of unbranded low-top sports shoes, blue uppers and white soles, three-quarter catalog view showing the complete pair and laces. No feet. Clean realistic educational catalog illustration with crisp recognizable form, gentle shading, centered square composition, generous transparent padding. Fully visible, isolated on transparent background. No text, letters, labels, numbers, logos, watermark, emoji, people, hands, other objects or decorative elements. It must show only shoes, not a poster or UI.",
+      "generationFile": "exec-c16c5924-3f20-4d80-a542-95f22a8735cc.png"
+    },
+    {
+      "id": "c04",
+      "subject": "cap",
+      "path": "/assessment/clothes/c04-v1.png",
+      "prompt": "Use case: scientific-educational. Standalone raster illustration for a Thai Grade 6 English clothing vocabulary quiz. Subject: ONE unbranded baseball cap with a clearly curved bill and rounded fabric crown, blue fabric, clean three-quarter catalog view. Clean realistic educational catalog illustration with crisp recognizable form, gentle shading, centered square composition, generous transparent padding. Fully visible, isolated on transparent background. No text, letters, labels, numbers, logos, watermark, emoji, people, hands, other objects or decorative elements. It must show only cap, not a poster or UI.",
+      "generationFile": "exec-f77101fa-6eb0-48ca-a929-7043c5d346c2.png"
+    },
+    {
+      "id": "c06",
+      "subject": "sunglasses",
+      "path": "/assessment/clothes/c06-v1.png",
+      "prompt": "Use case: scientific-educational. Standalone raster illustration for a Thai Grade 6 English clothing vocabulary quiz. Subject: ONE pair of sunglasses, two dark tinted lenses connected by a bridge, simple black frames and clearly visible arms, front three-quarter catalog view. Clean realistic educational catalog illustration with crisp recognizable form, gentle shading, centered square composition, generous transparent padding. Fully visible, isolated on transparent background. No text, letters, labels, numbers, logos, watermark, emoji, people, other objects or decorative elements. It must show only sunglasses, not a poster or UI.",
+      "generationFile": "exec-8343d1b3-d68d-430e-b243-8d009f99cbfa.png"
+    },
+    {
+      "id": "c07",
+      "subject": "gloves",
+      "path": "/assessment/clothes/c07-v1.png",
+      "prompt": "Use case: scientific-educational. Standalone raster illustration for a Thai Grade 6 English clothing vocabulary quiz. Subject: ONE matching pair of red knitted full-finger winter gloves, each glove has exactly four fingers and one thumb, complete cuffs, laid flat side by side. No hands inside. Clean realistic educational catalog illustration with crisp recognizable form, gentle shading, centered square composition, generous transparent padding. Fully visible, isolated on transparent background. No text, letters, labels, numbers, logos, watermark, emoji, people, other objects or decorative elements. It must show only gloves, not a poster or UI.",
+      "generationFile": "exec-0b35e46c-dc52-4bdd-93a5-6cb38ff31a75.png"
+    },
+    {
+      "id": "c08",
+      "subject": "swimsuit",
+      "path": "/assessment/clothes/c08-v1.png",
+      "prompt": "Use case: scientific-educational. Standalone raster illustration for a Thai Grade 6 English clothing vocabulary quiz. Subject: ONE empty modest one-piece athletic swimming suit laid flat, simple red fabric with dark side panels, shoulder straps and standard full coverage, clearly a sporting garment. No body or mannequin, no wearer. Clean realistic educational catalog illustration with crisp recognizable form, gentle shading, centered square composition, generous transparent padding. Fully visible, isolated on transparent background. No text, letters, labels, numbers, logos, watermark, emoji, people, other objects or decorative elements. It must show only swimsuit, not a poster or UI.",
+      "generationFile": "exec-17d3434f-59e3-48d2-9526-8e17fafb103c.png"
+    },
+    {
+      "id": "c09",
+      "subject": "school uniform",
+      "path": "/assessment/clothes/c09-v1.png",
+      "prompt": "Use case: scientific-educational. Standalone raster illustration for a Thai Grade 6 English clothing vocabulary quiz. Subject: ONE matching Thai primary-school uniform set laid flat: a plain white short-sleeved collared button-up school shirt and navy blue school shorts placed below it. No badges, embroidered names, crests, logos, lettering or numbers. No child, mannequin, shoes, socks, or other accessories. Clean realistic educational catalog illustration with crisp recognizable form, gentle shading, centered square composition, generous transparent padding. Fully visible, isolated on transparent background. No text, letters, labels, numbers, logos, watermark, emoji, people, other objects or decorative elements. It must show only school uniform, not a poster or UI.",
+      "generationFile": "exec-60448be5-c068-4283-a60f-c7c52750d859.png"
+    },
+    {
+      "id": "c10",
+      "subject": "belt",
+      "path": "/assessment/clothes/c10-v1.png",
+      "prompt": "Use case: scientific-educational. Standalone raster illustration for a Thai Grade 6 English clothing vocabulary quiz. Subject: ONE plain dark brown leather waist belt with a simple silver rectangular buckle, shown fully in a loose open curve so the strap, buckle and adjustment holes are clear. No trousers or other accessories. Clean realistic educational catalog illustration with crisp recognizable form, gentle shading, centered square composition, generous transparent padding. Fully visible, isolated on transparent background. No text, letters, labels, numbers, logos, watermark, emoji, people, other objects or decorative elements. It must show only belt, not a poster or UI.",
+      "generationFile": "exec-fdcec414-29cc-48d5-980d-c9c92eafa3f9.png"
+    }
+  ]
+}

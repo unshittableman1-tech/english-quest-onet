@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 150">
+    <rect width="200" height="150" fill="#e0f7fa"/>
+    <path d="M0 100 Q100 80 200 100 L200 150 L0 150 Z" fill="#81c784"/> <!-- grass -->
+    <!-- Garbage bin -->
+    <rect x="140" y="80" width="30" height="40" fill="#546e7a"/>
+    <rect x="135" y="75" width="40" height="5" fill="#37474f"/>
+    <!-- Kids -->
+    <circle cx="50" cy="70" r="12" fill="#ffb74d"/><rect x="40" y="85" width="20" height="30" fill="#ef5350"/>
+    <circle cx="100" cy="65" r="12" fill="#ffb74d"/><rect x="90" y="80" width="20" height="30" fill="#42a5f5"/>
+    <text x="100" y="100" font-size="15">♻️</text>
+  </svg>

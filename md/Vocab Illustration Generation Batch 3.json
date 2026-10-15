@@ -1,0 +1,161 @@
+{
+  "title": "Vocab Illustration Generation Batch 3",
+  "date": "2026-10-14",
+  "generator": "OpenAI built-in imagegen",
+  "scope": "learning_only",
+  "version": "vocab-legacy-batch3-v1",
+  "status": "technical_check_only",
+  "ownerReview": "pending",
+  "categories": {
+    "transport": 12,
+    "places": 8
+  },
+  "notes": [
+    "Generated assets are copied unchanged into public/learning.",
+    "Technical visual review checks recognizability, framing, transparency, and absence of embedded captions or logos.",
+    "This status does not approve assessment media or official Blueprint alignment."
+  ],
+  "assets": [
+    {
+      "category": "transport",
+      "slug": "plane",
+      "file": "public/learning/transport/plane-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-4bb2ece7-414e-4c87-af73-9a4b3877d48c.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a modern passenger airplane viewed from the side with landing gear up. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "transport",
+      "slug": "car",
+      "file": "public/learning/transport/car-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-b0199d6c-336f-4f47-8994-3a6d919e388a.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a compact family car viewed at a clear three-quarter angle. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "transport",
+      "slug": "bus",
+      "file": "public/learning/transport/bus-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-dee7fd25-438d-4f46-a65a-af3060f2efe5.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a city bus viewed from the side with doors and windows visible. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "transport",
+      "slug": "van",
+      "file": "public/learning/transport/van-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-f1cef75d-b8f0-4d3c-bc85-e8d9699bcb3e.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a passenger van viewed at a clear three-quarter angle. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "transport",
+      "slug": "bicycle",
+      "file": "public/learning/transport/bicycle-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-ed268c74-712b-4815-a2a0-564bb990ce0a.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a complete bicycle viewed from the side. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "transport",
+      "slug": "ship",
+      "file": "public/learning/transport/ship-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-e52de85d-9f12-4948-bd76-b601718bf5b0.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a large passenger ship on a small stylized patch of blue water. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "transport",
+      "slug": "train",
+      "file": "public/learning/transport/train-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-845f974a-dbc5-449f-ab40-91128819091d.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a modern passenger train viewed from a clear three-quarter angle. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "transport",
+      "slug": "taxi",
+      "file": "public/learning/transport/taxi-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-39bc1687-689b-4909-9d6e-717cc976a2a0.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a clearly recognizable city taxi with a small roof taxi sign, no written words. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "transport",
+      "slug": "boat",
+      "file": "public/learning/transport/boat-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-b21589fc-4c16-4f2f-85a6-f8b0a0ca39bf.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a small sailboat with one mast on a small stylized patch of blue water. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "transport",
+      "slug": "motorcycle",
+      "file": "public/learning/transport/motorcycle-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-32615c89-62f4-4b17-a693-e65e706967d5.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a complete everyday motorcycle viewed from the side, no rider. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "transport",
+      "slug": "ambulance",
+      "file": "public/learning/transport/ambulance-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-bff4b701-78b0-431c-8c11-4674c6103aaa.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: an ambulance vehicle with a medical cross symbol and emergency light, no written words. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "transport",
+      "slug": "pick-up-truck",
+      "file": "public/learning/transport/pick-up-truck-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-3eb83bbc-9e98-4cfd-8991-3f1b5ab5cb87.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a practical four-door pickup truck viewed at a clear three-quarter angle. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "place",
+      "slug": "hospital",
+      "file": "public/learning/places/hospital-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-0343aade-2556-4396-af04-0e64d9e883b7.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a welcoming hospital building with a medical cross sign, no written words. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "place",
+      "slug": "school",
+      "file": "public/learning/places/school-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-a54f4bc3-06a7-4265-be56-49f9a8f3b800.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a welcoming primary school building with a flagpole and playground hint, no written words. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "place",
+      "slug": "bank",
+      "file": "public/learning/places/bank-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-1bfb0b4c-58e7-4177-9968-07cead46d14f.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a bank building with columns and a simple coin emblem, no written words. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "place",
+      "slug": "airport",
+      "file": "public/learning/places/airport-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-6bd5e81e-caf9-4559-8464-c14b426f8533.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: an airport terminal building with a control tower and one airplane nearby, no written words. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "place",
+      "slug": "market",
+      "file": "public/learning/places/market-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-a86951ca-a8dd-4a69-a2ce-6f04436a1dec.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a colorful open-air fresh market stall with fruit and vegetable baskets, no written words. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "place",
+      "slug": "restaurant",
+      "file": "public/learning/places/restaurant-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-8382915e-ccbe-46f9-bbe3-a8c53e42a3c0.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a welcoming restaurant exterior with dining table and covered serving dish, no written words. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "place",
+      "slug": "cinema",
+      "file": "public/learning/places/cinema-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-44da98d5-7c81-48f0-8495-e79439d1ee47.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a cinema exterior with marquee lights, film reel and ticket symbols, no written words. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    },
+    {
+      "category": "place",
+      "slug": "post-office",
+      "file": "public/learning/places/post-office-v1.png",
+      "generatedSource": "C:\\Users\\Omarov\\.codex\\generated_images\\01a1307a-bd63-7063-a669-a085df1da282\\exec-b7c9588b-7b1d-4a22-b34c-f4244c964399.png",
+      "prompt": "Use case: scientific-educational. Asset type: transparent vocabulary flashcard illustration for Thai Grade 6 learners. Subject: a post office exterior with a red mailbox and envelope symbol, no written words. Style: polished pastel children's storybook illustration matching a premium educational game, clean friendly proportions, crisp edges, realistic enough to identify instantly. Composition: one centered complete subject, generous transparent margin, readable at small card size. Constraints: transparent background, no captions, no letters, no logos, no watermark, no border, no UI, no extra unrelated objects."
+    }
+  ]
+}
+
