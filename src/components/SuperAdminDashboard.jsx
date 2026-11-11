@@ -56,6 +56,7 @@ export default function SuperAdminDashboard() {
       province: '',
       area: '',
       planId: defaultPlan?.id || '',
+      customSeats: '',
       subscriptionStatus: 'active',
       startsAt: new Date().toISOString().slice(0, 10),
       endsAt: new Date(Date.now() + 365 * 86400000).toISOString().slice(0, 10),
@@ -110,6 +111,7 @@ export default function SuperAdminDashboard() {
       province: app.province || '',
       area: app.district || '',
       planId: targetPlan?.id || '',
+      customSeats: app.expectedStudents ? String(app.expectedStudents) : '',
       subscriptionStatus: app.packageInterest === 'trial' ? 'trialing' : 'active',
       startsAt: new Date().toISOString().slice(0, 10),
       endsAt: new Date(Date.now() + durationDays * 86400000).toISOString().slice(0, 10),
@@ -157,6 +159,7 @@ export default function SuperAdminDashboard() {
         schoolProvince: form.province?.trim() || null,
         schoolArea: form.area?.trim() || null,
         planId: form.planId,
+        maxStudentsOverride: form.customSeats ? parseInt(form.customSeats, 10) : null,
         subscriptionStatus: form.subscriptionStatus,
         startsAt: new Date(form.startsAt).toISOString(),
         endsAt: new Date(form.endsAt).toISOString(),
@@ -539,6 +542,52 @@ function Wizard({ step, setStep, form, setForm, activePlans, close, goNext, crea
                 </div>
               )}
             </label>
+
+            {/* Custom Seats Override Field */}
+            <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-4 sm:col-span-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <label htmlFor="custom-seats-input" className="text-xs font-bold text-slate-200">
+                    โควตานักเรียนกำหนดเอง (Custom Seats Override)
+                  </label>
+                  <span className="block text-[11px] text-slate-400 mt-0.5">
+                    ระบุจำนวนที่นั่งพิเศษนอกเหนือจากแพ็กเกจ (เช่น 75, 120 คน) หากไม่ระบุจะใช้ตามแผน
+                  </span>
+                </div>
+                <div>
+                  <span className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-bold ${
+                    form.customSeats
+                      ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                      : 'bg-slate-800 text-slate-400'
+                  }`}>
+                    {form.customSeats ? `โควตาพิเศษ ${form.customSeats} ที่นั่ง` : `ตามแพ็กเกจ (${selectedPlan?.max_students || 60} ที่นั่ง)`}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center gap-2">
+                <input
+                  id="custom-seats-input"
+                  type="number"
+                  min="1"
+                  max="10000"
+                  value={form.customSeats}
+                  onChange={e => setForm({ ...form, customSeats: e.target.value.replace(/[^0-9]/g, '') })}
+                  className={`${input} mt-0 font-mono`}
+                  placeholder={`เว้นว่างไว้หากใช้ตามแพ็กเกจ (${selectedPlan?.max_students || 60} ที่นั่ง)`}
+                />
+                {form.customSeats && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, customSeats: '' })}
+                    className="min-h-11 px-3.5 rounded-xl border border-white/10 bg-slate-800 text-xs font-bold text-slate-300 hover:text-white shrink-0"
+                  >
+                    ใช้ค่าตามแผน
+                  </button>
+                )}
+              </div>
+            </div>
+
             <label className="text-xs font-bold">
               สถานะสมาชิก *
               <select value={form.subscriptionStatus} onChange={e => setForm({ ...form, subscriptionStatus: e.target.value })} className={input}>
@@ -597,8 +646,12 @@ function Wizard({ step, setStep, form, setForm, activePlans, close, goNext, crea
           </div>
           <div className="rounded-2xl bg-slate-950 p-4 text-sm">
             <b>{form.name} ({form.code})</b>
-            <div className="text-slate-400">
-              {activePlans.find(p => p.id === form.planId)?.name} · {fmtDate(form.startsAt)} – {fmtDate(form.endsAt)}
+            <div className="text-slate-400 mt-1">
+              {activePlans.find(p => p.id === form.planId)?.name} ·{' '}
+              <span className="text-amber-300 font-bold">
+                {form.customSeats ? `${form.customSeats} ที่นั่ง (โควตาพิเศษ)` : `${activePlans.find(p => p.id === form.planId)?.max_students} ที่นั่ง`}
+              </span>
+              {' · '}{fmtDate(form.startsAt)} – {fmtDate(form.endsAt)}
             </div>
             {form.applicationId && (
               <div className="mt-2 text-xs text-amber-300">
