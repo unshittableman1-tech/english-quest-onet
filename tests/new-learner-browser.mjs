@@ -53,17 +53,18 @@ try {
 
   await page.getByRole('heading', { name: /Pre-test/ }).waitFor();
   const catalog = await page.evaluate(async () => {
-    const { QUESTS, preTestQuestions } = await import('/src/data/questions.js');
+    const { QUESTS } = await import('/src/data/questions.js');
+    const { pretestV2Questions } = await import('/src/data/pretestV2.js');
     const { isPracticeQuestionReady } = await import('/src/utils/questionMedia.js');
-    return { pretest: preTestQuestions, quests: QUESTS.map(q => ({ id: q.id, name: q.name, chapter: q.chapter, questions: q.questions, roundSize: Math.min(10, q.questions.filter(isPracticeQuestionReady).length) })) };
+    return { pretest: pretestV2Questions, quests: QUESTS.map(q => ({ id: q.id, name: q.name, chapter: q.chapter, questions: q.questions, roundSize: Math.min(10, q.questions.filter(isPracticeQuestionReady).length) })) };
   });
   assert.equal(catalog.pretest.length, 20);
   for (let index = 0; index < 20; index++) {
     const stem = normalize(await page.locator('p.text-slate-800.font-bold.text-lg').innerText());
-    const item = catalog.pretest.find(q => normalize(q.question) === stem);
+    const item = catalog.pretest.find(q => normalize(q.prompt) === stem);
     assert.ok(item, stem);
     if (item.passage) assert.equal(normalize(await page.locator('.question-stimulus-passage').innerText()), normalize(item.passage));
-    await page.locator('.option-btn').filter({ hasText: new RegExp(`^[A-D]\\.\\s*${escape(item.options[item.answer])}$`) }).click();
+    await page.locator('.option-btn').nth(item.answer).click();
     await page.getByRole('button', { name: index === 19 ? /ดูผลการทดสอบ/ : /ข้อต่อไป/ }).click();
   }
   await page.getByRole('heading', { name: 'ผลการทดสอบก่อนเรียน' }).waitFor();
@@ -73,7 +74,7 @@ try {
   let saved = await page.evaluate(() => JSON.parse(localStorage.getItem('eq_onet_current')));
   assert.deepEqual(saved.questProgress, {});
   assert.equal(saved.preTest.total, 20);
-  assert.equal(saved.preTest.version, 'pretest-v1');
+  assert.equal(saved.preTest.version, 'pretest-v2');
   assert.equal(saved.badgeStats.pretestScore, 100);
   console.log('PASS: fresh roster login and full 20-item Pre-test saved with actual total and 100%.');
 

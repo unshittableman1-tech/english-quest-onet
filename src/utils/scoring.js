@@ -1,4 +1,7 @@
 import { getPreTestResult } from './preTestResult';
+import { CHAPTER3_REQUIRED_MISSIONS, normalizeChapter3Eligibility } from './chapter3Eligibility';
+import { applyQuestReviewGate } from './questReviewGate';
+import { CHAPTER3_LOCAL_MISSIONS } from '../data/chapter3LocalMissions';
 
 // --- Constants ---
 export const XP_RULES = {
@@ -46,9 +49,9 @@ export function xpToNextLevel(xp) {
 // --- Progression & Unlocks ---
 import { QUESTS } from '../data/questions';
 
-export function getUnlockedQuests(questProgress = {}, student = {}) {
+export function getUnlockedQuests(questProgress = {}, student = {}, chapter3Eligibility = null) {
   const progress = questProgress || {};
-  const passed = (id) => progress[id]?.passed === true || percent(progress[id]?.pct) >= 70;
+  const passed = (id) => progress[id]?.verifiedLearningRun ? progress[id].passed === true : progress[id]?.passed === true || percent(progress[id]?.pct) >= 70;
   const chapterQuests = (chapter) => QUESTS.filter(q => q.chapter === chapter);
   const completed = (chapter) => chapterQuests(chapter).every(q => passed(q.id));
   const hasMistakes = (chapter) => Object.values(student?.mistakeBank || {}).some(m =>
@@ -68,16 +71,26 @@ export function getUnlockedQuests(questProgress = {}, student = {}) {
   }
 
   const unlocked = Object.fromEntries(QUESTS.map(q => [q.id, opened[q.chapter] || false]));
+  for (const mission of CHAPTER3_LOCAL_MISSIONS) unlocked[mission.id] = opened[3] || false;
   for (const [bossId, chapter] of [['chapter2_boss', 2], ['strategy_boss', 3], ['finalboss', 4], ['chapter5_boss', 5]]) {
     const bossStarted = progress[bossId] != null;
     unlocked[bossId] = opened[chapter] && (bossStarted || chapterQuests(chapter).filter(q => q.id !== bossId).every(q => passed(q.id)));
+    if (bossId === 'strategy_boss' && typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+      if (student?.isDemo === true && student?.demoBossAccess === true) {
+        unlocked[bossId] = opened[chapter] && CHAPTER3_REQUIRED_MISSIONS.every(id => passed(id));
+      } else {
+        const serverStatus = normalizeChapter3Eligibility(chapter3Eligibility);
+        const checkingServer = chapter3Eligibility !== null && chapter3Eligibility !== undefined;
+        unlocked[bossId] = opened[chapter] && (checkingServer ? serverStatus?.bossAllowed === true : CHAPTER3_REQUIRED_MISSIONS.every(id => progress[id]?.verifiedLearningPassed === true));
+      }
+    }
   }
   for (let chapter = 1; chapter <= 3; chapter++) {
     unlocked[`ch${chapter}_review_gate`] = opened[chapter] && completed(chapter);
   }
   unlocked.chapter4_unlocked = opened[5]; // Legacy key used by the Arena entry.
   unlocked.chapter5_unlocked = opened[5];
-  return unlocked;
+  return applyQuestReviewGate(unlocked, student);
 }
 
 // ── Weak/Strong Areas ─────────────────────────────────────────
@@ -126,42 +139,27 @@ export function getStrongAreas(questProgress) {
 export function calculateRankScore(student, rawFastGuessCount) {
   if (typeof student === 'number') return Math.round(nonNegative(student));
   if (!student) return 0;
+  return Math.round(nonNegative(student.xp));
+}
 
-  const quests = Object.values(student.questProgress || {});
-  const stats = student.rankingStats || {};
-  const badgeStats = student.badgeStats || {};
-  const reviewCredits = Object.values(student.mistakeBank || {}).reduce((sum, m) =>
-    sum + nonNegative(m.correctInReview) + (m.mastered ? 2 : 0), 0);
-  const rawFastGuess = nonNegative(rawFastGuessCount ?? stats.fastGuessCount);
-  const adjustedFastGuess = rawFastGuessCount === undefined
-    ? Math.max(0, rawFastGuess - reviewCredits * 5)
-    : nonNegative(stats.fastGuessCount);
-  const legitimateAnswers = Math.max(0, nonNegative(stats.totalAnswered) - rawFastGuess);
-  const cappedXP = Math.min(nonNegative(student.xp), legitimateAnswers * 50 + 2000);
-  const stars = quests.reduce((sum, q) => sum + Math.min(15,
-    (Array.isArray(q.stars) ? q.stars : []).reduce((count, star) => count + Math.min(3, nonNegative(star)), 0)), 0);
-  const missions = quests.reduce((sum, q) => sum + Math.min(5, nonNegative(q.roundsPlayed ?? q.attempts)), 0);
-  const completedQuests = quests.filter(q => q.passed || percent(q.pct) >= 70).length;
-  const badges = new Set(Array.isArray(student.badges) ? student.badges : []).size;
-  const baseline = getStudentPreTestPercent(student);
-  const growth = baseline === null ? 0 : Math.max(0, percent(badgeStats.posttestScore) - baseline);
-
-  return Math.max(0, Math.round(cappedXP + stars * 20 + badges * 50 + missions * 80 +
-    completedQuests * 150 + Math.max(nonNegative(badgeStats.mistakesFixed), reviewCredits) * 10 +
-    growth * 15 + percent(student.finalBoss?.pct) * 5 - adjustedFastGuess * 30));
+export function getTotalStars(questProgress = {}) {
+  return Object.values(questProgress || {}).reduce((total, progress) => {
+    const stars = Array.isArray(progress?.stars) ? progress.stars : [];
+    return total + stars.reduce((sum, value) => sum + Math.min(3, nonNegative(value)), 0);
+  }, 0);
 }
 
 export const RANKING_TIERS = [
-  { min: 0, name: 'Novice Trainee', icon: '🌱', color: 'text-emerald-600' },
-  { min: 500, name: 'Bronze Adventurer', icon: '🪵', color: 'text-amber-600' },
-  { min: 1500, name: 'Silver Explorer', icon: '🥈', color: 'text-slate-500' },
-  { min: 4000, name: 'Gold Scholar', icon: '🥇', color: 'text-yellow-600' },
-  { min: 8000, name: 'Platinum Guardian', icon: '🛡️', color: 'text-teal-600' },
-  { min: 15000, name: 'Diamond Master', icon: '💎', color: 'text-sky-600' },
-  { min: 30000, name: 'Grandmaster', icon: '🐉', color: 'text-violet-600' },
-  { min: 50000, name: 'O-NET Legend', icon: '👑', color: 'text-rose-600' },
-  { min: 75000, name: 'Mythic Conqueror', icon: '🏆', color: 'text-fuchsia-600' },
-  { min: 100000, name: 'O-NET God', icon: '🌟', color: 'text-amber-500' },
+  { min: 0, name: 'Novice Trainee', icon: '🌱', artwork: '/assets/ranking/tiers/novice-trainee-v1.svg', color: 'text-emerald-600' },
+  { min: 500, name: 'Bronze Adventurer', icon: '🪵', artwork: '/assets/ranking/tiers/bronze-adventurer-v1.svg', color: 'text-amber-600' },
+  { min: 1500, name: 'Silver Explorer', icon: '🥈', artwork: '/assets/ranking/tiers/silver-explorer-v1.svg', color: 'text-slate-500' },
+  { min: 4000, name: 'Gold Scholar', icon: '🥇', artwork: '/assets/ranking/tiers/gold-scholar-v1.svg', color: 'text-yellow-600' },
+  { min: 8000, name: 'Platinum Guardian', icon: '🛡️', artwork: '/assets/ranking/tiers/platinum-guardian-v1.svg', color: 'text-teal-600' },
+  { min: 15000, name: 'Diamond Master', icon: '💎', artwork: '/assets/ranking/tiers/diamond-master-v1.svg', color: 'text-sky-600' },
+  { min: 30000, name: 'Grandmaster', icon: '🐉', artwork: '/assets/ranking/tiers/grandmaster-v1.svg', color: 'text-violet-600' },
+  { min: 50000, name: 'O-NET Legend', icon: '👑', artwork: '/assets/ranking/tiers/o-net-legend-v1.svg', color: 'text-rose-600' },
+  { min: 75000, name: 'Mythic Conqueror', icon: '🏆', artwork: '/assets/ranking/tiers/mythic-conqueror-v1.svg', color: 'text-fuchsia-600' },
+  { min: 100000, name: 'O-NET God', icon: '🌟', artwork: '/assets/ranking/tiers/o-net-god-v1.svg', color: 'text-amber-500' },
 ];
 
 export function getRankingTier(score) {
@@ -190,13 +188,13 @@ export function getLevelTitle(level) {
 
 
 export const STREAK_REWARDS = [
-  { xp: 10,  icon: '⭐',  color: '#fbbf24', label: 'Day 1 Bonus',        isMilestone: false },
-  { xp: 15,  icon: '🔥',  color: '#f97316', label: 'Day 2 Bonus',        isMilestone: false },
-  { xp: 20,  icon: '💪',  color: '#ef4444', label: 'Day 3 Bonus',        isMilestone: true  },
-  { xp: 25,  icon: '🎯',  color: '#8b5cf6', label: 'Day 4 Bonus',        isMilestone: false },
-  { xp: 35,  icon: '🚀',  color: '#3b82f6', label: 'Day 5 Bonus',        isMilestone: true  },
-  { xp: 45,  icon: '💎',  color: '#06b6d4', label: 'Day 6 Bonus',        isMilestone: false },
-  { xp: 80,  icon: '👑',  color: '#10b981', label: 'Weekly Champion!',    isMilestone: true  },
+  { xp: 25,  icon: '⭐',  color: '#fbbf24', label: 'Day 1 Bonus',        isMilestone: false },
+  { xp: 30,  icon: '🔥',  color: '#f97316', label: 'Day 2 Bonus',        isMilestone: false },
+  { xp: 40,  icon: '💪',  color: '#ef4444', label: 'Day 3 Bonus',        isMilestone: true  },
+  { xp: 50,  icon: '🎯',  color: '#8b5cf6', label: 'Day 4 Bonus',        isMilestone: false },
+  { xp: 60,  icon: '🚀',  color: '#3b82f6', label: 'Day 5 Bonus',        isMilestone: true  },
+  { xp: 75,  icon: '💎',  color: '#06b6d4', label: 'Day 6 Bonus',        isMilestone: false },
+  { xp: 100,  icon: '👑',  color: '#10b981', label: 'Weekly Champion!',    isMilestone: true  },
 ];
 
 export function getStreakReward(streakDays) {

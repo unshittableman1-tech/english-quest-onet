@@ -10,7 +10,7 @@ import VocabTooltip from '../VocabTooltip';
 //   onComplete: (xpEarned) => void
 //   onBack: () => void
 
-export default function FlashcardGame({ mission, techniqueCard, onComplete, onBack }) {
+export default function FlashcardGame({ mission, techniqueCard, onComplete, onBack, onEvidence, showXP = true, completionLabel = 'รับ XP แล้วไปต่อ!' }) {
   const [showTechnique, setShowTechnique] = useState(!!techniqueCard);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -37,6 +37,7 @@ export default function FlashcardGame({ mission, techniqueCard, onComplete, onBa
 
   function handleResponse(knew) {
     if (flipped && !canAnswer && knew) return; // Prevent fast-click spamming
+    onEvidence?.({ card: currentCard, mode: 'study', correct: null, assisted: true, selfReported: knew, observationId: `${phase}:${currentIdx}` });
 
     const newResults = [...results, { card: currentCard, knew }];
     setResults(newResults);
@@ -131,7 +132,7 @@ export default function FlashcardGame({ mission, techniqueCard, onComplete, onBa
           <div className="text-6xl mb-4"><UIIconText value={pct >= 80 ? '🌟' : pct >= 60 ? '👍' : '💪'} /></div>
           <h2 className="text-2xl font-black text-amber-800 mb-2">จบแล้ว!</h2>
           <p className="text-slate-500 mb-6">{mission.title}</p>
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className={`grid ${showXP ? 'grid-cols-3' : 'grid-cols-2'} gap-4 mb-8`}>
             <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
               <div className="text-2xl font-black text-emerald-600">{knew}</div>
               <div className="text-slate-500 text-xs">จำได้</div>
@@ -140,16 +141,16 @@ export default function FlashcardGame({ mission, techniqueCard, onComplete, onBa
               <div className="text-2xl font-black text-amber-600">{pct}%</div>
               <div className="text-slate-500 text-xs">คะแนน</div>
             </div>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
+            {showXP && <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
               <div className="text-2xl font-black text-yellow-600">+{xpEarned}</div>
               <div className="text-slate-500 text-xs">XP</div>
-            </div>
+            </div>}
           </div>
           <button
             onClick={() => onComplete(xpEarned)}
             className="btn-success w-full py-3"
           >
-            รับ XP แล้วไปต่อ! <UIIcon value={"🎉"} />
+            {completionLabel} <UIIcon value={"🎉"} />
           </button>
         </div>
       </div>
@@ -285,9 +286,9 @@ export default function FlashcardGame({ mission, techniqueCard, onComplete, onBa
       </div>
 
       {/* XP Preview */}
-      <div className="mt-4 text-center text-slate-500 text-xs">
+      {showXP && <div className="mt-4 text-center text-slate-500 text-xs">
         <UIIcon value={"🎯"} /> รางวัล: สูงสุด +{mission.xpReward} XP
-      </div>
+      </div>}
     </div>
   );
 }

@@ -1,15 +1,29 @@
 import UIIcon, { UIIconText } from './UIIcon';
-import { useState, useEffect, useMemo } from 'react';
-import { Menu, RefreshCw, Download, ArrowRight } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { Menu, RefreshCw, Download, ArrowRight, X } from 'lucide-react';
 import TeacherOverview, { exportRiskStudents } from './teacher/TeacherOverview';
 import TeacherSidebarNav from './teacher/TeacherSidebarNav';
-import { getRiskStudents, TEACHER_CHAPTERS } from '../utils/teacherAnalytics';
+import SchoolAdminDashboard from './SchoolAdminDashboard';
+import { canManageSchoolStudents } from '../utils/roleAccess';
+import TeacherPracticeReview from './teacher/TeacherPracticeReview';
+import TeacherVocabularyReport from './teacher/TeacherVocabularyReport';
+import Student360Profile from './teacher/Student360Profile';
+import OfficialExamTeacherPanel from './teacher/OfficialExamTeacherPanel';
+import YearSimulationsTeacherPanel from './teacher/YearSimulationsTeacherPanel';
+import { downloadStudentImportTemplate } from '../utils/studentImportFile';
+import { filterStudent360Roster } from '../utils/student360Model';
+import TierArtwork from './ranking/TierArtwork';
+import { getRiskStudents, hasRiskEvidence, TEACHER_CHAPTERS } from '../utils/teacherAnalytics';
+import { QUESTS } from '../data/questions';
 import { useApp } from '../App';
 import {
-  getAllStudents, parseCSVData, resetAllData, deleteStudent,
-  updateStudentAdmin, deleteStudentsByClass, saveStudent, getStudentsOnlineStatus,
-  updateStudentTranslatePermission
+  parseCSVData
 } from '../utils/storage';
+import {
+  getStaffStudents, createStaffStudent, renameStaffStudent,
+  setStaffTranslatePermission, deleteStaffStudent,
+  deleteStaffStudentsByClass, deleteAllStaffStudents
+} from '../utils/staffStudents';
 import {
   getClassPreTestAverage, getClassCurrentAverage,
   getLevelTitle, calcLevel, calculateRankScore, getRankingTier, getStudentCurrentPercent, getStudentPreTestPercent
@@ -74,14 +88,34 @@ function DonutChart({ data, size = 120, thickness = 22, label, sublabel }) {
   );
 }
 
-const QUEST_LABELS = {
-  vocabulary: 'Vocab', signs: 'Signs', directions: 'Dir.',
-  market: 'Market', conversation: 'Conv.', reading: 'Reading', grammar: 'Grammar',
+const QUEST_THAI_LABELS = {
+  vocabulary: 'คำศัพท์', signs: 'ป้ายและสัญลักษณ์', directions: 'ทิศทาง', market: 'การซื้อขาย',
+  conversation: 'บทสนทนา', reading: 'การอ่าน', grammar: 'ไวยากรณ์', shapes_colors: 'รูปร่างและสี',
+  school_subjects: 'วิชาในโรงเรียน', weather_seasons: 'อากาศและฤดูกาล', emotions_feelings: 'อารมณ์และความรู้สึก',
+};
+const QUEST_LABELS = Object.fromEntries(QUESTS.map(quest => [quest.id, quest.name]));
+const formatQuestLabel = questId => {
+  const english = QUEST_LABELS[questId] || questId.replaceAll('_', ' ');
+  const thai = QUEST_THAI_LABELS[questId];
+  return thai ? `${english} — ${thai}` : english;
 };
 
-export default function TeacherDashboard() {
+const generateExamPin = () => {
+  const values = new Uint32Array(1);
+  globalThis.crypto.getRandomValues(values);
+  return String(100000 + (values[0] % 900000));
+};
+
+const isWeakExamPin = pin => {
+  if (!/^\d{6}$/.test(pin)) return true;
+  if (/^(\d)\1{5}$/.test(pin)) return true;
+  return ['123456', '654321', '111111', '000000', '999999'].includes(pin);
+};
+
+export default function TeacherDashboard({ initialTab = 'overview' }) {
   const { navigate, handleLogout, showToast, student: currentTeacher } = useApp();
   const isSuperAdmin = currentTeacher?.authVerified === true && currentTeacher?.role === 'super_admin';
+  const canManageRoster = isSuperAdmin || currentTeacher?.membership_role === 'school_admin';
 
   // Resolved school: Super admin uses activeSchool context, regular teacher is strictly locked to their own school
   const [activeSchool, setActiveSchool] = useState(() => getActiveSchoolContext());
@@ -89,18 +123,24 @@ export default function TeacherDashboard() {
     if (isSuperAdmin) {
       return activeSchool || getSchoolByCode('BNS01') || { name: 'โรงเรียนบ้านนาสาร', code: 'BNS01', id: 'sch_bns_01' };
     }
-    const tCode = currentTeacher?.school_code || 'BNS01';
-    return getSchoolByCode(tCode) || {
-      name: currentTeacher?.school_name || 'โรงเรียนบ้านนาสาร',
-      code: tCode,
-      id: currentTeacher?.school_id || 'sch_bns_01',
+    return {
+      name: currentTeacher?.school_name || 'โรงเรียนของคุณ',
+      code: currentTeacher?.school_code || '',
+      id: currentTeacher?.school_id || '',
       area: currentTeacher?.school_area || ''
     };
   }, [isSuperAdmin, activeSchool, currentTeacher]);
 
   const [students, setStudents] = useState([]);
+  const rosterContext = JSON.stringify([displaySchool.id, currentTeacher?.user_id, currentTeacher?.school_membership_id, currentTeacher?.role, currentTeacher?.membership_role]);
+  const [loadedRosterContext, setLoadedRosterContext] = useState(null);
+  const rosterRequest = useRef(0);
+  const rosterScope = useRef(rosterContext);
+  rosterScope.current = rosterContext;
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
+  const [loadError, setLoadError] = useState(false);
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetTargetClass, setResetTargetClass] = useState('all');
@@ -123,6 +163,11 @@ export default function TeacherDashboard() {
   const [onlineCheckedAt, setOnlineCheckedAt] = useState(null);
   const [showOnlineList, setShowOnlineList] = useState(false);
   const [selectedStudentForDrilldown, setSelectedStudentForDrilldown] = useState(null);
+  const [drilldownTab, setDrilldownTab] = useState('overview');
+  const [studentQuery, setStudentQuery] = useState('');
+  const [profileSkill, setProfileSkill] = useState('');
+  const [profileEvidence, setProfileEvidence] = useState('all');
+  const [selectedWeakQuest, setSelectedWeakQuest] = useState(null);
   const [showClassComparison, setShowClassComparison] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
 
@@ -143,18 +188,76 @@ export default function TeacherDashboard() {
   const [examResultsLoaded, setExamResultsLoaded] = useState(false);
   const [examCloudSyncOk, setExamCloudSyncOk] = useState(null); // null=ไม่รู้, true=ok, false=fail
 
+  const refresh = useCallback(async ({ silent = false, reportError = false } = {}) => {
+    const requestId = ++rosterRequest.current;
+    const scope = rosterContext;
+    if (!silent) setLoading(true);
+    try {
+      const latestStudents = await getStaffStudents(displaySchool.id);
+      if (rosterScope.current !== scope || requestId !== rosterRequest.current) return [];
+      setStudents(latestStudents);
+      setLoadedRosterContext(scope);
+      setLastUpdatedAt(new Date());
+      setLoadError(false);
+      setCurrentPage(1);
+      return latestStudents;
+    } catch (error) {
+      if (rosterScope.current !== scope || requestId !== rosterRequest.current) return [];
+      if (['42501', 'PGRST301', 'PGRST302'].includes(error.code)) { setStudents([]); setLoadedRosterContext(null); }
+      setLoadError(true);
+      if (reportError) showToast('ไม่สามารถยืนยันสิทธิ์เพื่อโหลดข้อมูลนักเรียนได้');
+      throw error;
+    } finally {
+      if (!silent && rosterScope.current === scope && requestId === rosterRequest.current) setLoading(false);
+    }
+  }, [displaySchool.id, showToast, rosterContext]);
+
+  useEffect(() => { setSelectedStudentForDrilldown(null); }, [displaySchool.id, currentTeacher?.user_id]);
+
   useEffect(() => {
-    getAllStudents().then(setStudents).finally(() => setLoading(false));
+    let active = true;
+    const refreshIfActive = async (options) => {
+      try {
+        if (active) await refresh(options);
+      } catch {
+        // The dashboard keeps the last verified snapshot when refresh fails.
+      }
+    };
+
+    refreshIfActive({ reportError: true });
     // Load current exam session status
     const cached = getExamSession();
     if (cached) setExamSession(cached);
     handleLoadExamResults();
-  }, []);
+
+    const intervalId = window.setInterval(() => {
+      if (!document.hidden) refreshIfActive({ silent: true });
+    }, 30000);
+    const handleVisibility = () => {
+      if (!document.hidden) refreshIfActive({ silent: true });
+    };
+    window.addEventListener('focus', handleVisibility);
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      active = false;
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleVisibility);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [displaySchool.id, refresh]);
+
+  useEffect(() => {
+    if (!selectedStudentForDrilldown?.id) return;
+    const latestStudent = students.find(student => student.id === selectedStudentForDrilldown.id);
+    if (latestStudent && latestStudent !== selectedStudentForDrilldown) {
+      setSelectedStudentForDrilldown(latestStudent);
+    }
+  }, [students, selectedStudentForDrilldown]);
 
   const handleOpenExam = async () => {
     const pin = examPinInput.trim();
     if (!pin) { showToast('⚠️ กรุณาใส่รหัส PIN ก่อน'); return; }
-    if (pin.length < 4) { showToast('⚠️ รหัส PIN ต้องมีอย่างน้อย 4 หลัก'); return; }
+    if (isWeakExamPin(pin)) { showToast('⚠️ กรุณาใช้ PIN 6 หลักที่คาดเดายาก หรือกดสุ่ม PIN'); return; }
     setExamLoading(true);
     setExamCloudSyncOk(null);
     try {
@@ -177,8 +280,8 @@ export default function TeacherDashboard() {
 
   const handleUpdatePin = async () => {
     const pin = editPinInput.trim();
-    if (!pin || pin.length < 4) {
-      showToast('⚠️ รหัส PIN ต้องมีอย่างน้อย 4 หลัก');
+    if (isWeakExamPin(pin)) {
+      showToast('⚠️ กรุณาใช้ PIN 6 หลักที่คาดเดายาก หรือกดสุ่ม PIN');
       return;
     }
     setExamLoading(true);
@@ -530,25 +633,18 @@ export default function TeacherDashboard() {
     printWindow.document.close();
   };
 
-  const refresh = async () => {
-    setLoading(true);
-    try {
-      setStudents(await getAllStudents({ forceRefresh: true }));
-      setCurrentPage(1);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const schoolStudents = useMemo(() => {
+    if (loadedRosterContext !== rosterContext) return [];
     const raw = students.filter(s => s.role !== 'teacher' && !s.isDemo);
     const targetCode = (displaySchool.code || 'BNS01').toUpperCase();
+    const targetId = displaySchool.id || '';
     return raw.filter(s => {
-      const sCode = (s.school_code || s.school_id || '').toUpperCase();
+      if (s.school_id) return s.school_id === targetId;
+      const sCode = (s.school_code || '').toUpperCase();
       if (sCode) return sCode === targetCode;
       return targetCode === 'BNS01';
     });
-  }, [students, displaySchool]);
+  }, [students, displaySchool, loadedRosterContext, rosterContext]);
 
   const schoolExamResults = useMemo(() => {
     const schoolStudentIds = new Set(schoolStudents.map(s => s.id));
@@ -576,12 +672,13 @@ export default function TeacherDashboard() {
   const currentAvg = getClassCurrentAverage(filteredStudents);
 
   const executeReset = async () => {
+    if (!canManageRoster) return showToast('⛔ บัญชีครูไม่มีสิทธิ์ลบรายชื่อนักเรียน');
     if (resetTargetClass === 'all') {
-      await resetAllData();
+      await deleteAllStaffStudents(displaySchool.id);
       setStudents([]);
       if (showToast) showToast('🗑️ ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว');
     } else {
-      await deleteStudentsByClass(resetTargetClass);
+      await deleteStaffStudentsByClass(displaySchool.id, resetTargetClass);
       setStudents(prev => prev.filter(s => s.class !== resetTargetClass));
       if (showToast) showToast(`🗑️ ล้างข้อมูลชั้น ${resetTargetClass} เรียบร้อยแล้ว`);
     }
@@ -590,11 +687,13 @@ export default function TeacherDashboard() {
   };
 
   const handleReset = () => {
+    if (!canManageRoster) return showToast('⛔ บัญชีครูไม่มีสิทธิ์ลบรายชื่อนักเรียน');
     setShowResetModal(true);
   };
 
   const handleAddStudentSubmit = async (e) => {
     e.preventDefault();
+    if (!canManageRoster) return showToast('⛔ บัญชีครูไม่มีสิทธิ์เพิ่มนักเรียน');
     if (!addForm.name || !addForm.class || !addForm.number) {
       if (showToast) showToast('⚠️ กรุณากรอกข้อมูลให้ครบทุกช่อง');
       return;
@@ -607,7 +706,7 @@ export default function TeacherDashboard() {
 
     try {
       if (showToast) showToast('กำลังเพิ่มข้อมูล...');
-      await saveStudent({
+      await createStaffStudent(displaySchool.id, {
         name: addForm.name.trim(),
         class: className,
         number: addForm.number.toString(),
@@ -650,10 +749,11 @@ export default function TeacherDashboard() {
   };
 
   const handleConfirmImport = async () => {
+    if (!canManageRoster) return showToast('⛔ บัญชีครูไม่มีสิทธิ์นำเข้านักเรียน');
     try {
       if (showToast) showToast(`กำลังบันทึกข้อมูล ${previewData.length} รายการ...`);
       for (const student of previewData) {
-        await saveStudent({
+        await createStaffStudent(displaySchool.id, {
           ...student,
           school_code: displaySchool.code || student.school_code || 'BNS01',
           school_id: displaySchool.id || student.school_id || 'sch_bns_01',
@@ -673,6 +773,7 @@ export default function TeacherDashboard() {
 
   const handleImportFromSheetSubmit = async (e) => {
     e.preventDefault();
+    if (!canManageRoster) return showToast('⛔ บัญชีครูไม่มีสิทธิ์นำเข้านักเรียน');
     if (!sheetUrl) return;
 
     try {
@@ -713,6 +814,7 @@ export default function TeacherDashboard() {
   };
 
   const handleImportCSV = (e) => {
+    if (!canManageRoster) return showToast('⛔ บัญชีครูไม่มีสิทธิ์นำเข้านักเรียน');
     const file = e.target.files[0];
     if (!file) return;
 
@@ -732,8 +834,9 @@ export default function TeacherDashboard() {
   };
 
   const handleDeleteStudent = async (studentId, studentName) => {
+    if (!canManageRoster) return showToast('⛔ บัญชีครูไม่มีสิทธิ์ลบนักเรียน');
     if (window.confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะลบข้อมูลของ "${studentName}"?\n(การกระทำนี้ไม่สามารถย้อนกลับได้)`)) {
-      await deleteStudent(studentId);
+      await deleteStaffStudent(displaySchool.id, studentId);
       refresh();
     }
   };
@@ -742,7 +845,7 @@ export default function TeacherDashboard() {
     const newName = window.prompt(`แก้ไขชื่อนักเรียน:\n(ชื่อเดิม: ${student.name})`, student.name);
     if (!newName || newName.trim() === '' || newName === student.name) return;
     
-    await updateStudentAdmin(student.id, { name: newName.trim() });
+    await renameStaffStudent(displaySchool.id, student.id, newName.trim());
     refresh();
   };
 
@@ -751,7 +854,8 @@ export default function TeacherDashboard() {
     (onlineStatus || []).filter(s => s.isOnline).map(s => s.id)
   );
 
-  const studentsWithStats = filteredStudents.map(s => {
+  const profileStudents = filterStudent360Roster(filteredStudents, QUESTS, { query: studentQuery, skill: profileSkill, evidence: profileEvidence });
+  const studentsWithStats = profileStudents.map(s => {
     const p = s.questProgress || {};
     const questEntries = Object.entries(p).filter(([k]) => k !== 'finalboss');
     const avgPct = getStudentCurrentPercent(s) ?? 0;
@@ -792,15 +896,12 @@ export default function TeacherDashboard() {
   const handleCheckOnline = async () => {
     setOnlineLoading(true);
     try {
-      const result = await getStudentsOnlineStatus(10);
-      const schoolStudentIds = new Set(schoolStudents.map(s => s.id));
-      const targetCode = (displaySchool.code || 'BNS01').toUpperCase();
-      const schoolResult = result.filter(s => {
-        if (schoolStudentIds.has(s.id)) return true;
-        const sCode = (s.school_code || s.school_id || '').toUpperCase();
-        if (sCode) return sCode === targetCode;
-        return targetCode === 'BNS01';
-      });
+      const cutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+      const schoolResult = schoolStudents.map(s => ({
+        id: s.id, name: s.name, class: s.class, number: s.number,
+        lastActive: s.lastActive || null,
+        isOnline: Boolean(s.lastActive && s.lastActive >= cutoff),
+      }));
       const filtered = selectedClass === 'all'
         ? schoolResult
         : schoolResult.filter(s => s.class === selectedClass);
@@ -820,16 +921,33 @@ export default function TeacherDashboard() {
 
   const riskStudents = getRiskStudents(filteredStudents);
   const atRiskCount = riskStudents.length;
+  const openStudentReport = (studentId, tab = 'overview') => {
+    const target = filteredStudents.find(student => student.id === studentId);
+    if (target) { setDrilldownTab(tab); setSelectedStudentForDrilldown(target); }
+  };
+  const openWeakQuestStudents = (quest) => {
+    const matchingStudents = filteredStudents.filter(student => {
+      const result = student.questProgress?.[quest.id] || student.arenaStats?.[quest.id];
+      const score = result?.pct ?? result?.percent;
+      return score !== null && score !== undefined && Number.isFinite(Number(score)) && Number(score) < 70;
+    });
+    if (matchingStudents.length === 1) openStudentReport(matchingStudents[0].id, 'errors');
+    else setSelectedWeakQuest({ ...quest, students: matchingStudents });
+  };
 
   const MENU_ITEMS = [
+    ...(canManageSchoolStudents(currentTeacher, displaySchool.id) ? [{ id:'student_management', label:'จัดการนักเรียนและชั้นเรียน', desc:'รายชื่อ นำเข้า PIN และที่นั่ง', icon:'👥' }] : []),
     { id: 'overview', label: 'ภาพรวมห้องเรียน', icon: '📊', desc: 'สถิติรวม & ชาร์ตสรุป' },
     { id: 'table', label: 'รายชื่อนักเรียน', icon: '👥', desc: 'ตาราง & จัดการข้อมูล' },
     { id: 'skills', label: 'วิเคราะห์ทักษะ', icon: '🎯', desc: 'Skill Breakdown 30 วิชา' },
-    { id: 'final_exam', label: 'ศูนย์สอบปลายภาค', icon: '🎓', desc: 'เปิด/ปิดสอบ & รายงานผล', badge: examSession?.isOpen ? 'เปิดสอบ' : null, badgeColor: 'bg-emerald-500 text-white' },
+    { id: 'final_exam', label: 'สอบปลายภาค', icon: '🎓', desc: 'เปิด/ปิดสอบ & รายงานผล', badge: examSession?.isOpen ? 'เปิดสอบ' : null, badgeColor: 'bg-emerald-500 text-white' },
     { id: 'warning', label: 'Early Warning', icon: '⚠️', desc: 'แจ้งเตือนกลุ่มเสี่ยง', badge: atRiskCount > 0 ? `${atRiskCount}` : null, badgeColor: 'bg-rose-500 text-white' },
     { id: 'ranking', label: 'สรุปอันดับ', icon: '🏆', desc: 'Leaderboard & Tiers' },
-    { id: 'arena', label: 'สนามสอบ O-NET', icon: '🏟️', desc: 'Mock Exams & Arena' },
+    { id: 'year_simulations', label: 'จำลองข้อสอบ 64–68', icon: '📝', desc: 'สถิติและคะแนนสอบจำลอง 5 ปี (2564–2568)' },
+    { id: 'arena', label: 'O-NET Arena', icon: '🏟️', desc: 'ผลการฝึกซ้อม Mock Exams & Arena' },
     { id: 'strategy', label: 'วิเคราะห์กลยุทธ์', icon: '🧠', desc: 'กลยุทธ์การทำข้อสอบ' },
+    { id: 'practice_review', label: 'ตรวจชุดฝึก AI', icon: '🛡️', desc: 'อนุมัติก่อนส่งให้นักเรียน' },
+    { id: 'vocabulary_report', label: 'ติดตามคำศัพท์', icon: '📖', desc: 'ตอบเอง / ใช้ตัวช่วย / ควรทบทวน' },
   ];
 
   const currentTabObj = MENU_ITEMS.find(m => m.id === activeTab) || MENU_ITEMS[0];
@@ -884,6 +1002,22 @@ export default function TeacherDashboard() {
               </button>
             </>
           ) : null}
+
+          {/* Link to School Admin Hub */}
+          {(currentTeacher?.membership_role === 'school_admin' || isSuperAdmin) && (
+            <button
+              onClick={() => setActiveTab('student_management')}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 transition-all text-left shadow-sm cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <span><UIIcon value={"🏫"} /></span>
+                <span>School Admin Hub</span>
+              </div>
+              <span className="text-[10px] bg-sky-500/20 px-1.5 py-0.5 rounded text-sky-200">
+                จัดการสิทธิ์
+              </span>
+            </button>
+          )}
 
           {/* Nav items */}
           <TeacherSidebarNav items={MENU_ITEMS} activeTab={activeTab} onChange={setActiveTab} />
@@ -987,6 +1121,22 @@ export default function TeacherDashboard() {
                 )
               ) : null}
 
+              {/* Mobile Link to School Admin Hub */}
+              {(currentTeacher?.membership_role === 'school_admin' || isSuperAdmin) && (
+                <button
+                  onClick={() => { setSidebarOpen(false); setActiveTab('student_management'); }}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-sky-300 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 transition-all text-left shadow-sm cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <span><UIIcon value={"🏫"} /></span>
+                    <span>School Admin Hub</span>
+                  </div>
+                  <span className="text-[10px] bg-sky-500/20 px-1.5 py-0.5 rounded text-sky-200">
+                    จัดการสิทธิ์
+                  </span>
+                </button>
+              )}
+
               <TeacherSidebarNav items={MENU_ITEMS} activeTab={activeTab} onChange={id => { setActiveTab(id); setSidebarOpen(false); }} />
             </div>
 
@@ -1040,7 +1190,12 @@ export default function TeacherDashboard() {
                 <p className="mt-1 break-words text-xs text-slate-400">{displaySchool.name} <span className="ml-1 font-mono text-slate-500">· {displaySchool.code}</span></p>
               </div>
             </div>
-            <button onClick={refresh} disabled={loading} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 disabled:opacity-50" title="รีเฟรชข้อมูล" aria-label="รีเฟรชข้อมูล"><RefreshCw size={17} className={loading ? 'animate-spin' : ''} /></button>
+            <div className="flex shrink-0 items-center gap-2">
+              <span className={`hidden text-[11px] sm:inline ${loadError ? 'text-rose-400' : 'text-slate-500'}`} role="status">
+                {loadError ? 'อัปเดตล่าสุดไม่สำเร็จ' : lastUpdatedAt ? `อัปเดต ${lastUpdatedAt.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}` : 'กำลังอัปเดต'}
+              </span>
+              <button onClick={() => refresh({ reportError: true }).catch(() => {})} disabled={loading} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 disabled:opacity-50" title="รีเฟรชข้อมูลล่าสุด" aria-label="รีเฟรชข้อมูลล่าสุด"><RefreshCw size={17} className={loading ? 'animate-spin' : ''} /></button>
+            </div>
           </div>
           <div className="mt-4 flex min-w-0 flex-wrap items-center justify-between gap-3">
             <div className="flex max-w-full items-center gap-1 overflow-x-auto rounded-lg bg-slate-950 p-1" role="group" aria-label="เลือกห้องเรียน">
@@ -1057,6 +1212,9 @@ export default function TeacherDashboard() {
 
         {/* Tab Body */}
         <main className="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto space-y-6">
+          {activeTab === 'student_management' && canManageSchoolStudents(currentTeacher, displaySchool.id) && <SchoolAdminDashboard key={displaySchool.id} embedded schoolContext={displaySchool} onChanged={() => refresh({silent:true}).catch(()=>{})} />}
+          {activeTab === 'practice_review' && <TeacherPracticeReview schoolId={displaySchool.id} showToast={showToast} />}
+          {activeTab === 'vocabulary_report' && <TeacherVocabularyReport key={displaySchool.id} schoolId={displaySchool.id} students={filteredStudents} />}
           {/* Tab: Overview */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
@@ -1069,7 +1227,8 @@ export default function TeacherDashboard() {
           Chart={DonutChart}
           onWarning={() => setActiveTab('warning')}
           onExam={() => setActiveTab('final_exam')}
-          onStudent={() => setActiveTab('table')}
+          onStudent={(studentId) => studentId ? openStudentReport(studentId) : setActiveTab('table')}
+          onWeakQuest={openWeakQuestStudents}
         />}
 
         {/* ── Chapter Progress Section ─────────────────────────────────────── */}
@@ -1261,7 +1420,7 @@ export default function TeacherDashboard() {
               const skills = Object.entries(skillMap)
                 .map(([q, { total, count }]) => ({
                   id: q,
-                  label: QUEST_LABELS[q] || q,
+                  label: formatQuestLabel(q),
                   avg: Math.round(total / count),
                   count,
                 }))
@@ -1285,9 +1444,9 @@ export default function TeacherDashboard() {
                   </h3>
                   <div className="space-y-2.5">
                     {skills.map((sk, i) => (
-                      <div key={sk.id} className="flex items-center gap-3">
+                      <button key={sk.id} type="button" onClick={() => openWeakQuestStudents({ id: sk.id, name: sk.label })} className="flex min-h-11 w-full items-center gap-3 rounded-lg px-2 text-left hover:bg-slate-800/70" aria-label={`ดูผู้เรียนใน ${sk.label}`}>
                         <div className="w-5 text-xs text-slate-500 shrink-0 text-right">{i + 1}</div>
-                        <div className="w-28 text-xs text-slate-300 font-medium shrink-0 truncate" title={sk.label}>{sk.label}</div>
+                        <div className="w-52 text-xs text-slate-200 font-medium shrink-0 truncate" title={sk.label}>{sk.label}</div>
                         <div className="flex-1 h-2 rounded-full bg-slate-800 border border-white/5 overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-700"
@@ -1305,7 +1464,8 @@ export default function TeacherDashboard() {
                           {sk.avg}%
                         </div>
                         <div className="w-12 text-xs text-slate-400 font-mono shrink-0">{sk.count}คน</div>
-                      </div>
+                        <ArrowRight size={14} className="shrink-0 text-sky-400" />
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -1318,27 +1478,35 @@ export default function TeacherDashboard() {
         {activeTab === 'warning' && (() => {
           const today = Date.now();
           const atRiskStudents = riskStudents;
+          const highRiskCount = atRiskStudents.filter(student => student.severity === 'high').length;
+          const monitorCount = atRiskStudents.length - highRiskCount;
+          const insufficientDataCount = filteredStudents.filter(student => !hasRiskEvidence(student)).length;
+          const normalCount = Math.max(0, filteredStudents.length - atRiskStudents.length - insufficientDataCount);
           const inactiveOnly = [];
 
           return (
             <div className="space-y-4">
               {/* Summary Banner */}
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm text-slate-400">เรียงตามระดับความเสี่ยงและเหตุผลที่พบ</p>
+                <div><p className="text-sm text-slate-300">ประเมินด้วยกฎจากคะแนน กิจกรรม ข้อผิดซ้ำ และการเข้าใช้งาน</p><p className="mt-1 text-xs text-slate-500">อัปเดตล่าสุด {new Date(today).toLocaleString('th-TH')} · ไม่ใช่ผลวิเคราะห์จาก AI</p></div>
                 <button disabled={!atRiskStudents.length} onClick={() => exportRiskStudents(atRiskStudents)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-600 px-3 text-sm font-semibold text-slate-200 disabled:opacity-40"><Download size={16} />ส่งออกรายชื่อ</button>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
                 <div className="glass-card-dark p-4 text-center border border-rose-500/30 shadow-xl shadow-rose-950/20 hover:border-rose-500/50 transition-all">
-                  <div className="text-3xl font-black text-rose-400">{atRiskStudents.length}</div>
-                  <div className="text-xs text-slate-400 mt-1 font-medium">นักเรียนเสี่ยง</div>
+                  <div className="text-3xl font-black text-rose-400">{highRiskCount}</div>
+                  <div className="text-xs text-slate-400 mt-1 font-medium">เสี่ยงสูง</div>
                 </div>
                 <div className="glass-card-dark p-4 text-center border border-amber-500/30 shadow-xl shadow-amber-950/20 hover:border-amber-500/50 transition-all">
-                  <div className="text-3xl font-black text-amber-400">{filteredStudents.filter(s => { const d = s.badgeStats?.lastLoginDate; if (!d) return false; return Math.floor((today - new Date(d).getTime()) / 86400000) >= 3; }).length}</div>
-                  <div className="text-xs text-slate-400 mt-1 font-medium">ไม่ active ≥ 3 วัน</div>
+                  <div className="text-3xl font-black text-amber-400">{monitorCount}</div>
+                  <div className="text-xs text-slate-400 mt-1 font-medium">ควรติดตาม</div>
                 </div>
                 <div className="glass-card-dark p-4 text-center border border-emerald-500/30 shadow-xl shadow-emerald-950/20 hover:border-emerald-500/50 transition-all">
-                  <div className="text-3xl font-black text-emerald-400">{filteredStudents.length - atRiskStudents.length}</div>
-                  <div className="text-xs text-slate-400 mt-1 font-medium">ยังไม่พบสัญญาณเสี่ยง</div>
+                  <div className="text-3xl font-black text-emerald-400">{normalCount}</div>
+                  <div className="text-xs text-slate-400 mt-1 font-medium">ปกติ</div>
+                </div>
+                <div className="glass-card-dark p-4 text-center border border-slate-600 shadow-xl transition-all">
+                  <div className="text-3xl font-black text-slate-300">{insufficientDataCount}</div>
+                  <div className="text-xs text-slate-400 mt-1 font-medium">ข้อมูลไม่เพียงพอ</div>
                 </div>
               </div>
 
@@ -1350,7 +1518,8 @@ export default function TeacherDashboard() {
                 {atRiskStudents.length === 0 ? (
                   <div className="text-center py-8 text-emerald-400">
                     <div className="text-4xl mb-2"><UIIcon value={"✅"} /></div>
-                    <div className="font-bold">ยังไม่พบสัญญาณเสี่ยงจากข้อมูลที่มี</div>
+                    <div className="font-bold">ยังไม่พบสัญญาณเสี่ยงในผู้เรียนที่มีข้อมูลเพียงพอ</div>
+                    {insufficientDataCount > 0 && <div className="mt-2 text-xs text-slate-400">มี {insufficientDataCount} คนที่ยังประเมินไม่ได้</div>}
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -1369,7 +1538,7 @@ export default function TeacherDashboard() {
                         <div className="text-right shrink-0">
                           <div className="text-slate-400 text-xs">คะแนนเฉลี่ย</div>
                           <div className={`font-black text-base ${s.avgScore >= 70 ? 'text-emerald-400' : s.avgScore >= 50 ? 'text-amber-400' : 'text-rose-400'}`}>{s.avgScore === null ? '—' : `${s.avgScore}%`}</div>
-                          <button onClick={() => setSelectedStudentForDrilldown(s)} className="mt-2 inline-flex min-h-9 items-center gap-1 text-xs font-semibold text-sky-400">ดูผลรายคน <ArrowRight size={13} /></button>
+                          <button onClick={() => openStudentReport(s.id, 'errors')} className="mt-2 inline-flex min-h-9 items-center gap-1 text-xs font-semibold text-sky-400">ดูข้อมูลรายบุคคล <ArrowRight size={13} /></button>
                         </div>
                       </div>
                     ))}
@@ -1400,24 +1569,31 @@ export default function TeacherDashboard() {
         {/* Tab: Table */}
         {activeTab === 'table' && (
           <div className="space-y-4">
+            <div className="flex flex-wrap gap-3 rounded-xl border border-slate-700 bg-slate-900 p-4 text-sm text-slate-100">
+              <label>ค้นหาชื่อ / เลขที่<input className="block max-w-full rounded border border-slate-600 bg-slate-800 p-2" value={studentQuery} onChange={event => { setStudentQuery(event.target.value); setCurrentPage(1); }} /></label>
+              <label>ทักษะ<select aria-label="กรองทักษะ" className="block rounded border border-slate-600 bg-slate-800 p-2" value={profileSkill} onChange={event => { setProfileSkill(event.target.value); setCurrentPage(1); }}><option value="">ทุกทักษะที่มี mapping</option><option value="vocabulary">คำศัพท์</option><option value="reading">การอ่าน</option><option value="grammar">ไวยากรณ์</option></select></label>
+              <label>หลักฐาน<select aria-label="กรองหลักฐานการฝึก" className="block rounded border border-slate-600 bg-slate-800 p-2" value={profileEvidence} onChange={event => { setProfileEvidence(event.target.value); setCurrentPage(1); }}><option value="all">ทั้งหมด</option><option value="available">มีคำตอบรายข้อที่จับคู่ได้</option><option value="insufficient">หลักฐานยังไม่พอ</option><option value="errors">พบคำตอบแรกผิด · ไม่ใช่วินิจฉัย</option></select></label>
+              <p className="w-full text-slate-300">ตัวกรองนี้อ่านหลักฐาน Quest ในรายชื่อที่ระบบส่งคืน ไม่ใช้ XP ตัดสินทักษะ · การกรองสถานะงานยังรอข้อมูลสรุปฝั่งเซิร์ฟเวอร์</p>
+            </div>
             {/* Action Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl shadow-xl">
               <div className="flex flex-wrap items-center gap-2">
+                {canManageRoster && <>
+                  <button onClick={() => setShowAddModal(true)} className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-emerald-900/30 transition-all active:scale-95"><UIIcon value={"➕"} /> เพิ่มนักเรียน</button>
+                  <label className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-blue-900/30 cursor-pointer transition-all active:scale-95"><UIIcon value={"📤"} /> Import CSV<input type="file" accept=".csv" className="hidden" onChange={handleImportCSV} /></label>
+
+                  <button onClick={() => setShowSheetModal(true)} className="px-3.5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-sky-900/30 transition-all active:scale-95"><UIIcon value={"🔗"} /> Google Sheets</button>
+                </>}
                 <button
-                  onClick={() => setShowAddModal(true)}
-                  className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-emerald-900/30 transition-all active:scale-95"
+                  type="button"
+                  onClick={() => {
+                    downloadStudentImportTemplate();
+                    showToast('📥 ดาวน์โหลดแบบฟอร์มเรียบร้อยแล้ว');
+                  }}
+                  className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-emerald-950/30 transition-all active:scale-95 cursor-pointer"
+                  title="ดาวน์โหลดแบบฟอร์ม Excel / CSV ตัวอย่าง"
                 >
-                  <UIIcon value={"➕"} /> เพิ่มนักเรียน
-                </button>
-                <label className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-blue-900/30 cursor-pointer transition-all active:scale-95">
-                  <UIIcon value={"📤"} /> Import CSV
-                  <input type="file" accept=".csv" className="hidden" onChange={handleImportCSV} />
-                </label>
-                <button
-                  onClick={() => setShowSheetModal(true)}
-                  className="px-3.5 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-sky-900/30 transition-all active:scale-95"
-                >
-                  <UIIcon value={"🔗"} /> Google Sheets
+                  <UIIcon value={"📥"} /> แบบฟอร์ม Excel
                 </button>
                 <button
                   onClick={() => setShowExportModal(true)}
@@ -1433,18 +1609,18 @@ export default function TeacherDashboard() {
                 >
                   <UIIcon value={"🔄"} /> รีเฟรช
                 </button>
-                <button
+                {canManageRoster && <button
                   onClick={handleReset}
                   className="px-3 py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs font-bold rounded-xl border border-rose-500/30 flex items-center gap-1 transition-all"
                 >
                   <UIIcon value={"🗑️"} /> Reset Data
-                </button>
+                </button>}
               </div>
             </div>
 
             <div className="glass-card-dark overflow-hidden shadow-2xl">
-            {filteredStudents.length === 0 ? (
-              <div className="p-8 text-center text-slate-400">ไม่มีข้อมูลนักเรียนในห้องนี้</div>
+            {profileStudents.length === 0 ? (
+              <div className="p-8 text-center text-slate-400">ไม่มีนักเรียนที่ตรงตัวกรอง หรือยังไม่มีข้อมูลในห้องนี้</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -1484,7 +1660,7 @@ export default function TeacherDashboard() {
                       const p = s.questProgress || {};
                       const weakList = Object.entries(p)
                         .filter(([, v]) => v.attempts > 0 && v.pct < 60)
-                        .map(([k]) => QUEST_LABELS[k] || k)
+                        .map(([k]) => formatQuestLabel(k))
                         .join(', ');
                         
                       const perm = s.translatePermission || 'full';
@@ -1497,7 +1673,7 @@ export default function TeacherDashboard() {
 
                       const handleTogglePermission = async () => {
                         const nextPerm = perm === 'full' ? 'vocab_only' : perm === 'vocab_only' ? 'off' : 'full';
-                        await updateStudentTranslatePermission(s.id, nextPerm);
+                        await setStaffTranslatePermission(displaySchool.id, s.id, nextPerm);
                         setStudents(prev => prev.map(item => item.id === s.id ? { ...item, translatePermission: nextPerm } : item));
                         const labelStr = nextPerm === 'full' ? 'แปลทั้งหมด 🟢' : nextPerm === 'vocab_only' ? 'เฉพาะศัพท์ 🟡' : 'ปิดแปล 🔴';
                         if (showToast) showToast(`✏️ สิทธิ์คำแปลของ ${s.name}: ${labelStr}`);
@@ -1509,8 +1685,9 @@ export default function TeacherDashboard() {
                           <td className="px-3 py-2.5 text-white font-semibold">
                             <button
                               className="hover:text-blue-400 transition-colors text-left flex items-center gap-1"
-                              onClick={() => setSelectedStudentForDrilldown(s)}
-                              title="คลิกเพื่อดูรายละเอียด"
+                              onClick={() => openStudentReport(s.id)}
+                              aria-label={`ดูข้อมูลรายบุคคล ${s.name}`}
+                              title="ดูข้อมูลรายบุคคล / View Student Profile"
                             >
                               <span>{s.name}</span>
                               <span className="text-slate-500 hover:text-slate-300 text-xs"><UIIcon value={"🔍"} /></span>
@@ -1565,7 +1742,7 @@ export default function TeacherDashboard() {
                           </td>
                           <td className="px-3 py-2.5 text-right">
                             <button className="text-sky-400 hover:text-sky-300 mx-1 text-base transition-colors" onClick={() => handleEditStudent(s)} title="แก้ไขชื่อ"><UIIcon value={"✏️"} /></button>
-                            <button className="text-rose-400 hover:text-rose-300 mx-1 text-base transition-colors" onClick={() => handleDeleteStudent(s.id, s.name)} title="ลบข้อมูล"><UIIcon value={"🗑️"} /></button>
+                            {canManageRoster && <button className="text-rose-400 hover:text-rose-300 mx-1 text-base transition-colors" onClick={() => handleDeleteStudent(s.id, s.name)} title="ลบข้อมูล"><UIIcon value={"🗑️"} /></button>}
                           </td>
                         </tr>
                       );
@@ -1631,7 +1808,7 @@ export default function TeacherDashboard() {
                 const twoStepStudents = filteredStudents.filter(s => s.badgeStats?.twoStepTotal > 0);
                 
                 if (twoStepStudents.length === 0) {
-                   return <div className="text-slate-400 italic text-center py-8">ยังไม่มีข้อมูลการเล่นด่านกลยุทธ์ (Two-Step)</div>;
+                   return <div className="py-8 text-center"><p className="font-semibold text-slate-300">ยังไม่มีข้อมูลการทำกิจกรรม Two-Step ใน Chapter 3</p><p className="mt-2 text-sm text-slate-500">ระบบยังไม่สรุปความสามารถด้านกลยุทธ์จนกว่าจะมีผลกิจกรรมที่เกี่ยวข้อง</p></div>;
                 }
                 
                 let totalQs = 0;
@@ -1755,7 +1932,7 @@ export default function TeacherDashboard() {
                             <span className="font-bold text-slate-500 w-5 font-mono">{i + 1}.</span>
                             {onlineStudents.some(os => os.id === s.id) && <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" title="ออนไลน์" />}
                             <span className="text-white font-semibold">{s.name}</span>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full bg-white/10 ${tier.color}`}><UIIcon value={tier.icon} /> {tier.name}</span>
+                            <span className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-white/10 ${tier.color}`}><TierArtwork tier={tier} className="tier-artwork-teacher" /> {tier.name}</span>
                           </div>
                           <span className="font-bold text-amber-400 font-mono">{s.rankScore.toLocaleString()}</span>
                         </div>
@@ -1804,6 +1981,15 @@ export default function TeacherDashboard() {
           </div>
         )}
 
+        {activeTab === 'year_simulations' && (
+          <YearSimulationsTeacherPanel
+            theme={theme}
+            students={filteredStudents}
+            selectedClass={selectedClass}
+            onSelectStudent={(id) => openStudentReport(id, 'overview')}
+            onRefresh={() => refresh({ silent: true }).catch(() => {})}
+          />
+        )}
         {/* Tab: Arena */}
         {activeTab === 'arena' && (() => {
           // Summary stats across all students
@@ -1821,7 +2007,29 @@ export default function TeacherDashboard() {
                 if (data) arenaStats = JSON.parse(data);
               } catch(e) {}
             }
-            const m = arenaStats?.[mockKey];
+            let m = arenaStats?.[mockKey];
+            if (!m && arenaStats?.attempts) {
+              const modeMap = {
+                bestMiniMock: 'mini_mock_arena',
+                bestSpeedMock: 'speed_mock_challenge',
+                bestSkillMixedMock: 'skill_mixed_mock',
+                bestWeaknessMock: 'weakness_mock',
+                bestFullMock: 'full_mock_test',
+                bestFinalSimulation: 'final_exam_simulation',
+                bestOnetYear2564: 'onet_year_2564',
+                bestOnetYear2565: 'onet_year_2565',
+                bestOnetYear2566: 'onet_year_2566',
+                bestOnetYear2567: 'onet_year_2567',
+                bestOnetYear2568: 'onet_year_2568',
+              };
+              const targetMode = modeMap[mockKey];
+              if (targetMode) {
+                const matching = arenaStats.attempts.filter(a => a.mode === targetMode);
+                if (matching.length > 0) {
+                  m = matching.reduce((best, cur) => cur.percent > (best?.percent || 0) ? cur : best, null);
+                }
+              }
+            }
             if (!m) return <span className="text-slate-600">-</span>;
             return <span className={`font-mono font-bold ${m.percent >= 80 ? 'text-emerald-400' : m.percent >= 50 ? 'text-amber-400' : 'text-rose-400'}`}>{Math.round(m.percent)}%</span>;
           };
@@ -1847,7 +2055,7 @@ export default function TeacherDashboard() {
               {/* Arena Table */}
               <div className="glass-card-dark p-6 border border-sky-500/25 shadow-xl">
                 <h3 className="text-lg font-bold text-sky-300 mb-4 flex items-center gap-2">
-                  <span><UIIcon value={"🏟️"} /></span> O-NET Arena — Best Scores (Supabase <UIIcon value={"✅"} />)
+                  <span><UIIcon value={"🏟️"} /></span> O-NET Arena — ผลการฝึกซ้อม
                 </h3>
                 <div className="overflow-x-auto rounded-xl border border-white/10">
                   <table className="w-full text-left text-sm whitespace-nowrap">
@@ -1860,6 +2068,11 @@ export default function TeacherDashboard() {
                         <th className="p-3">Weakness</th>
                         <th className="p-3">Full Mock</th>
                         <th className="p-3">Final Sim</th>
+                        <th className="p-3 text-rose-300">O-NET '64</th>
+                        <th className="p-3 text-emerald-300">O-NET '65</th>
+                        <th className="p-3 text-sky-300">O-NET '66</th>
+                        <th className="p-3 text-amber-300">O-NET '67</th>
+                        <th className="p-3 text-violet-300">O-NET '68</th>
                         <th className="p-3 text-center">Badges</th>
                         <th className="p-3 text-right">Rank Score</th>
                       </tr>
@@ -1878,13 +2091,18 @@ export default function TeacherDashboard() {
                               <td className="p-3">{renderScore(s, 'bestWeaknessMock')}</td>
                               <td className="p-3">{renderScore(s, 'bestFullMock')}</td>
                               <td className="p-3">{renderScore(s, 'bestFinalSimulation')}</td>
+                              <td className="p-3">{renderScore(s, 'bestOnetYear2564')}</td>
+                              <td className="p-3">{renderScore(s, 'bestOnetYear2565')}</td>
+                              <td className="p-3">{renderScore(s, 'bestOnetYear2566')}</td>
+                              <td className="p-3">{renderScore(s, 'bestOnetYear2567')}</td>
+                              <td className="p-3">{renderScore(s, 'bestOnetYear2568')}</td>
                               <td className="p-3 text-center text-amber-300 font-bold">{(aStats.arenaBadges || []).length} <UIIcon value={"🏅"} /></td>
                               <td className="p-3 text-right text-sky-400 font-bold font-mono">{aStats.arenaRankScore ? Math.round(aStats.arenaRankScore) : '-'}</td>
                             </tr>
                           );
                         })}
                       {filteredStudents.length === 0 && (
-                        <tr><td colSpan="9" className="p-5 text-center text-slate-500 italic">ไม่มีข้อมูลนักเรียน</td></tr>
+                        <tr><td colSpan="14" className="p-5 text-center text-slate-500 italic">ไม่มีข้อมูลนักเรียน</td></tr>
                       )}
                     </tbody>
                   </table>
@@ -1954,15 +2172,15 @@ export default function TeacherDashboard() {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
                       <div>
                         <h4 className="text-amber-400 font-black text-sm flex items-center gap-2">
-                          <span><UIIcon value={"🔑"} /></span> กำหนดรหัส PIN สำหรับเข้าสอบ (ครูตั้งเองได้อิสระ)
+                          <span><UIIcon value={"🔑"} /></span> กำหนด PIN สำหรับรอบสอบ
                         </h4>
                         <p className="text-xs text-slate-400 mt-0.5">
-                          คุณครูสามารถพิมพ์เลขรหัส 4-8 หลักเองได้ตามต้องการ (นักเรียนต้องกรอกรหัสนี้ก่อนเข้าสอบ)
+                          ใช้ตัวเลข 6 หลักที่คาดเดายาก รหัสนี้แยกจาก PIN เข้าบัญชีนักเรียน
                         </p>
                       </div>
                       {examPinInput && (
                         <span className="text-xs font-mono font-bold text-amber-300 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30">
-                          {examPinInput.length}/8 หลัก
+                          {examPinInput.length}/6 หลัก
                         </span>
                       )}
                     </div>
@@ -1973,7 +2191,7 @@ export default function TeacherDashboard() {
                           type="text"
                           inputMode="numeric"
                           pattern="[0-9]*"
-                          maxLength={8}
+                          maxLength={6}
                           autoComplete="off"
                           autoCorrect="off"
                           autoCapitalize="off"
@@ -1985,7 +2203,7 @@ export default function TeacherDashboard() {
                             const val = e.target.value.replace(/[^0-9]/g, '');
                             setExamPinInput(val);
                           }}
-                          placeholder="พิมพ์รหัส PIN 4-8 หลักที่ต้องการ"
+                          placeholder="PIN รอบสอบ 6 หลัก"
                           className="w-full bg-slate-950 border-2 border-amber-400/60 rounded-xl px-5 py-3.5 text-yellow-300 placeholder:text-slate-500 placeholder:text-sm placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/20 font-mono text-2xl font-black tracking-[0.25em] text-center transition-all shadow-inner"
                         />
                         {examPinInput && (
@@ -2002,33 +2220,23 @@ export default function TeacherDashboard() {
 
                       <button
                         onClick={handleOpenExam}
-                        disabled={examLoading || !examPinInput.trim() || examPinInput.trim().length < 4}
+                        disabled={examLoading || isWeakExamPin(examPinInput.trim())}
                         className="px-8 py-3.5 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 active:scale-95 text-slate-950 font-black rounded-xl transition-all disabled:opacity-40 disabled:scale-100 disabled:cursor-not-allowed shadow-lg shadow-yellow-500/20 text-base flex items-center justify-center gap-2 whitespace-nowrap"
                       >
                         <UIIconText value={examLoading ? '⏳ กำลังเปิด...' : '🟢 เปิดสอบด้วย PIN นี้'} />
                       </button>
                     </div>
 
-                    {/* Quick Preset Buttons */}
                     <div className="flex items-center gap-2 flex-wrap pt-1 text-xs">
-                      <span className="text-slate-400 font-bold"><UIIcon value={"💡"} /> ตัวช่วยตั้งรหัสไว:</span>
+                      <span className="text-slate-400 font-bold"><UIIcon value={"💡"} /> แนะนำ:</span>
                       <button
                         type="button"
-                        onClick={() => setExamPinInput(Math.floor(1000 + Math.random() * 9000).toString())}
+                        onClick={() => setExamPinInput(generateExamPin())}
                         className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold rounded-lg border border-slate-700 transition-all flex items-center gap-1 active:scale-95"
                       >
-                        <UIIcon value={"🎲"} /> สุ่มรหัส 4 หลัก
+                        <UIIcon value={"🎲"} /> สุ่ม PIN ปลอดภัย 6 หลัก
                       </button>
-                      {['1234', '9999', '2026', '8888', '5555'].map(preset => (
-                        <button
-                          key={preset}
-                          type="button"
-                          onClick={() => setExamPinInput(preset)}
-                          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 font-mono text-slate-300 hover:text-white font-bold rounded-lg border border-slate-700 transition-all active:scale-95"
-                        >
-                          {preset}
-                        </button>
-                      ))}
+                      <span className="text-slate-500">ระบบยังไม่มีวันหมดอายุหรือจำกัดจำนวนครั้งที่ลอง PIN</span>
                     </div>
                   </div>
                 ) : (
@@ -2095,18 +2303,18 @@ export default function TeacherDashboard() {
                           <input
                             type="text"
                             inputMode="numeric"
-                            maxLength={8}
+                            maxLength={6}
                             autoComplete="off"
                             value={editPinInput}
                             onChange={e => setEditPinInput(e.target.value.replace(/[^0-9]/g, ''))}
-                            placeholder="รหัสใหม่ 4-8 หลัก"
+                            placeholder="PIN ใหม่ 6 หลัก"
                             className="w-full bg-slate-900 border border-amber-400/50 rounded-xl px-4 py-2 text-yellow-300 font-mono text-lg font-black tracking-widest text-center focus:outline-none focus:border-yellow-400"
                           />
                         </div>
                         <div className="flex items-center gap-2 w-full sm:w-auto">
                           <button
                             onClick={handleUpdatePin}
-                            disabled={examLoading || !editPinInput.trim() || editPinInput.trim().length < 4}
+                            disabled={examLoading || isWeakExamPin(editPinInput.trim())}
                             className="flex-1 sm:flex-none px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition-all disabled:opacity-40"
                           >
                             บันทึก PIN ใหม่
@@ -2256,7 +2464,7 @@ export default function TeacherDashboard() {
       )}
 
       {/* Add Student Modal */}
-      {showAddModal && (
+      {canManageRoster && showAddModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setShowAddModal(false)} />
           <div className="relative glass-card-dark border border-amber-500/30 w-full max-w-md p-6 sm:p-8 shadow-2xl animate-scale-in text-white">
@@ -2312,7 +2520,7 @@ export default function TeacherDashboard() {
       )}
 
       {/* Google Sheets Modal */}
-      {showSheetModal && (
+      {canManageRoster && showSheetModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setShowSheetModal(false)} />
           <div className="relative glass-card-dark border border-sky-500/30 w-full max-w-md p-6 sm:p-8 shadow-2xl animate-scale-in text-white">
@@ -2405,7 +2613,7 @@ export default function TeacherDashboard() {
       )}
 
       {/* Reset Confirmation Modal */}
-      {showResetModal && (
+      {canManageRoster && showResetModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={() => setShowResetModal(false)} />
           <div className="relative glass-card-dark border-2 border-rose-500/50 w-full max-w-md p-6 sm:p-8 text-center shadow-2xl animate-scale-in text-white rounded-3xl">
@@ -2615,9 +2823,27 @@ export default function TeacherDashboard() {
       )}
 
       {/* Student Drill-down Modal */}
+      {selectedWeakQuest && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 p-4" role="dialog" aria-modal="true" aria-labelledby="weak-quest-students-title" onClick={() => setSelectedWeakQuest(null)}>
+          <div className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-xl border border-slate-700 bg-slate-900 p-5" onClick={event => event.stopPropagation()}>
+            <div className="flex items-start justify-between gap-3"><div><h3 id="weak-quest-students-title" className="font-bold text-white">ควรทบทวน · {selectedWeakQuest.name}</h3><p className="mt-1 text-xs text-slate-400">นักเรียนที่ทำแล้วและยังไม่ผ่าน 70%</p></div><button onClick={() => setSelectedWeakQuest(null)} className="text-slate-400" aria-label="ปิด"><X size={18} /></button></div>
+            <div className="mt-4 space-y-2">{selectedWeakQuest.students.map(student => {
+              const result = student.questProgress?.[selectedWeakQuest.id] || student.arenaStats?.[selectedWeakQuest.id];
+              const score = result?.pct ?? result?.percent ?? 0;
+              return <button key={student.id} onClick={() => { setSelectedWeakQuest(null); openStudentReport(student.id, 'errors'); }} className="flex w-full items-center justify-between rounded-lg bg-slate-950/70 px-3 py-3 text-left hover:bg-slate-800"><span><strong className="block text-sm text-white">{student.name}</strong><small className="text-xs text-slate-400">{student.class} · เลขที่ {student.number || '-'}</small></span><span className="font-bold text-amber-400">{score}% <ArrowRight className="ml-1 inline" size={14} /></span></button>;
+            })}</div>
+          </div>
+        </div>
+      )}
+
       {selectedStudentForDrilldown && (
-        <StudentDrilldownModal
-          student={selectedStudentForDrilldown}
+        <Student360Profile
+          key={`${displaySchool.id}:${selectedStudentForDrilldown.id}`}
+          schoolId={displaySchool.id}
+          studentId={selectedStudentForDrilldown.id}
+          actor={currentTeacher}
+          initialTab={drilldownTab}
+          renderLegacyDetails={record => <StudentDrilldownModal student={record} embedded />}
           onClose={() => setSelectedStudentForDrilldown(null)}
         />
       )}
@@ -2627,7 +2853,7 @@ export default function TeacherDashboard() {
 }
 
 // ── Student Drill-down Modal ──────────────────────────────────────────────────
-function StudentDrilldownModal({ student, onClose }) {
+function StudentDrilldownModal({ student, onClose, embedded = false }) {
   if (!student) return null;
 
   const CHAPTER_DEFS = TEACHER_CHAPTERS;
@@ -2649,12 +2875,12 @@ function StudentDrilldownModal({ student, onClose }) {
   const totalStars = Object.values(student.questProgress || {}).reduce((a, v) => a + (v.stars ? v.stars.reduce((x,y)=>x+y,0) : 0), 0);
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />
-      <div className="relative glass-card-dark border border-sky-500/30 w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl rounded-3xl overflow-hidden" style={{ animation: 'scaleIn 0.2s ease' }}>
+    <div className={embedded ? '' : 'fixed inset-0 z-[200] flex items-center justify-center p-4'}>
+      {!embedded && <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={onClose} />}
+      <div className={embedded ? '' : 'relative glass-card-dark border border-sky-500/30 w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl rounded-3xl overflow-hidden'}>
 
         {/* Header */}
-        <div className="p-5 border-b border-white/10 shrink-0">
+        {!embedded && <div className="p-5 border-b border-white/10 shrink-0">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-black text-white"><UIIcon value={"🔍"} /> {student.name}</h2>
@@ -2700,6 +2926,7 @@ function StudentDrilldownModal({ student, onClose }) {
           </div>
         </div>
 
+        }
         {/* Scrollable body */}
         <div className="overflow-y-auto p-5 space-y-5">
           {CHAPTER_DEFS.map(ch => {

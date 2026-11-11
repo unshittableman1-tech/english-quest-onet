@@ -1,6 +1,29 @@
-import { CH1_MISSIONS } from './missions/ch1_missions';
-import { CH2_MISSIONS } from './missions/ch2_missions';
-import { CH5_MISSIONS } from './missions/ch5_missions';
+import { CH1_LEARNING_DECKS } from './missions/ch1_missions.js';
+import { CH2_MISSIONS } from './missions/ch2_missions.js';
+import { CH5_MISSIONS } from './missions/ch5_missions.js';
+import { QUEST_VERB_GROUPS } from './questVerbGroups.js';
+
+const questVerbThai = {
+  answer: 'ตอบ', ask: 'ถาม', choose: 'เลือก', read: 'อ่าน', write: 'เขียน', study: 'เรียน', learn: 'เรียนรู้', practice: 'ฝึกฝน', match: 'จับคู่', describe: 'บรรยาย',
+  speak: 'พูด', listen: 'ฟัง', reply: 'ตอบกลับ', invite: 'เชิญ', help: 'ช่วย', feel: 'รู้สึก', like: 'ชอบ', want: 'ต้องการ', need: 'จำเป็นต้องใช้', prefer: 'ชอบมากกว่า',
+  eat: 'กิน', drink: 'ดื่ม', take: 'หยิบ / นำ', give: 'ให้', wear: 'สวมใส่', wash: 'ล้าง', clean: 'ทำความสะอาด', cook: 'ทำอาหาร', sleep: 'นอนหลับ', 'wake up': 'ตื่นนอน',
+  go: 'ไป', turn: 'เลี้ยว', cross: 'ข้าม', visit: 'เยี่ยม', travel: 'เดินทาง', buy: 'ซื้อ', sell: 'ขาย', pay: 'จ่าย', order: 'สั่ง', work: 'ทำงาน',
+  recycle: 'รีไซเคิล', plant: 'ปลูก', save: 'ประหยัด / ช่วยรักษา', throw: 'โยน / ทิ้ง', protect: 'ปกป้อง', celebrate: 'เฉลิมฉลอง', decorate: 'ตกแต่ง',
+};
+
+const questVerbExamples = {
+  answer: ['I answer the question.', 'ฉันตอบคำถาม'], ask: ['I ask my teacher.', 'ฉันถามคุณครู'], choose: ['I choose the blue card.', 'ฉันเลือกการ์ดสีน้ำเงิน'], read: ['I read a story.', 'ฉันอ่านเรื่องราว'], write: ['I write a sentence.', 'ฉันเขียนประโยค'], study: ['I study English.', 'ฉันเรียนภาษาอังกฤษ'], learn: ['I learn new words.', 'ฉันเรียนรู้คำศัพท์ใหม่'], practice: ['I practice every day.', 'ฉันฝึกฝนทุกวัน'], match: ['I match the pictures.', 'ฉันจับคู่รูปภาพ'], describe: ['I describe the picture.', 'ฉันบรรยายรูปภาพ'],
+  speak: ['I speak with my friend.', 'ฉันพูดกับเพื่อน'], listen: ['I listen carefully.', 'ฉันฟังอย่างตั้งใจ'], reply: ['I reply to the message.', 'ฉันตอบกลับข้อความ'], invite: ['I invite my friend.', 'ฉันเชิญเพื่อน'], help: ['I help my classmate.', 'ฉันช่วยเพื่อนร่วมชั้น'], feel: ['I feel happy.', 'ฉันรู้สึกมีความสุข'], like: ['I like this book.', 'ฉันชอบหนังสือเล่มนี้'], want: ['I want a new pencil.', 'ฉันต้องการดินสอใหม่'], need: ['I need an umbrella.', 'ฉันจำเป็นต้องใช้ร่ม'], prefer: ['I prefer fruit.', 'ฉันชอบผลไม้มากกว่า'],
+  eat: ['I eat breakfast.', 'ฉันกินอาหารเช้า'], drink: ['I drink water.', 'ฉันดื่มน้ำ'], take: ['I take a book.', 'ฉันหยิบหนังสือ'], give: ['I give her a gift.', 'ฉันให้ของขวัญแก่เธอ'], wear: ['I wear my uniform.', 'ฉันสวมชุดนักเรียน'], wash: ['I wash my hands.', 'ฉันล้างมือ'], clean: ['I clean my desk.', 'ฉันทำความสะอาดโต๊ะ'], cook: ['I cook vegetables.', 'ฉันทำอาหารจากผัก'], sleep: ['I sleep at night.', 'ฉันนอนหลับตอนกลางคืน'], 'wake up': ['I wake up at six.', 'ฉันตื่นนอนตอนหกโมง'],
+  go: ['I go to school.', 'ฉันไปโรงเรียน'], turn: ['Turn right here.', 'เลี้ยวขวาตรงนี้'], cross: ['I cross the road safely.', 'ฉันข้ามถนนอย่างปลอดภัย'], visit: ['I visit my grandmother.', 'ฉันไปเยี่ยมคุณยาย'], travel: ['We travel by train.', 'พวกเราเดินทางโดยรถไฟ'], buy: ['I buy some fruit.', 'ฉันซื้อผลไม้'], sell: ['They sell vegetables.', 'พวกเขาขายผัก'], pay: ['I pay at the counter.', 'ฉันจ่ายเงินที่เคาน์เตอร์'], order: ['I order some food.', 'ฉันสั่งอาหาร'], work: ['My teacher works at school.', 'คุณครูของฉันทำงานที่โรงเรียน'],
+  recycle: ['We recycle bottles.', 'พวกเรารีไซเคิลขวด'], plant: ['We plant a tree.', 'พวกเราปลูกต้นไม้'], save: ['We save water.', 'พวกเราประหยัดน้ำ'], throw: ['I throw paper in the bin.', 'ฉันทิ้งกระดาษลงถัง'], protect: ['We protect nature.', 'พวกเราปกป้องธรรมชาติ'], celebrate: ['We celebrate together.', 'พวกเราเฉลิมฉลองร่วมกัน'], decorate: ['We decorate the classroom.', 'พวกเราตกแต่งห้องเรียน'],
+};
+
+const questVerbDeck = group => {
+  const rows = group.words.map(word => [word, questVerbThai[word], ...questVerbExamples[word]]);
+  const illustrations = group.words.map(word => ({ image: `/learning/verbs/${word.replace(/\s+/g, '-')}-v1.png`, imageAlt: `ภาพแสดงกริยา ${word}` }));
+  return learningDeck(`quest_verbs_${group.id}_v1`, rows, illustrations);
+};
 
 const verbRows = [
   ['eat', 'กิน', 'I eat rice.', 'ฉันกินข้าว'],
@@ -131,6 +154,37 @@ const cultureIllustrations = [
   ['mothers-new-year', 'ของขวัญและดาวประดับสำหรับวันปีใหม่'],
   ['mothers-new-year', 'ภาพการอวยพรปีใหม่ด้วยของขวัญและดาวประดับ'],
 ].map(([slug, imageAlt]) => ({ image: `/learning/culture_festivals/${slug}-v1.png`, imageAlt }));
+
+const examCommandRows = [
+  ['according to', 'จากเรื่องที่อ่าน / ตามที่ระบุ', 'According to the passage, what did Tom find?', 'จากเรื่องที่อ่าน ทอมพบอะไร'],
+  ['mainly about', 'ใจความสำคัญหลัก', 'What is the story mainly about?', 'เรื่องนี้มีใจความสำคัญหลักเกี่ยวกับอะไร'],
+  ['best title', 'ชื่อเรื่องที่เหมาะสมที่สุด', 'What is the best title for this passage?', 'ชื่อเรื่องใดเหมาะสมที่สุดสำหรับบทอ่านนี้'],
+  ['purpose', 'จุดประสงค์ของผู้เขียน', 'What is the purpose of this sign?', 'จุดประสงค์ของป้ายนี้คืออะไร'],
+  ['NOT correct', 'ข้อใดไม่ถูกต้อง', 'Which sentence is NOT correct?', 'ประโยคใดไม่ถูกต้องตามเนื้อเรื่อง'],
+  ['EXCEPT', 'ยกเว้น / ทุกข้อยกเว้นข้อนี้', 'All students passed EXCEPT Tom.', 'นักเรียนทุกคนสอบผ่านยกเว้นทอม'],
+  ['infer', 'สรุปความจากเบาะแส', 'What can we infer from the dialogue?', 'เราสามารถสรุปความได้อย่างไรจากบทสนทนา'],
+  ['probably', 'น่าจะ / มีแนวโน้มว่าจะ', 'Where will they probably go next?', 'พวกเขาจะน่าจะไปที่ไหนต่อ'],
+  ['refers to', 'หมายถึง / สรรพนามแทนคำว่า', 'The word "it" in line 3 refers to...', 'คำว่า "it" ในบรรทัดที่ 3 หมายถึงคำใด'],
+  ['true / false', 'จริง / เท็จ', 'Which statement is true?', 'ข้อความใดต่อไปนี้เป็นจริง'],
+  ['before / after', 'ก่อนหน้า / หลังจากนั้น', 'What happened before the rain stopped?', 'เกิดอะไรขึ้นก่อนที่ฝนจะหยุดตก'],
+  ['however / although', 'อย่างไรก็ตาม / แม้ว่า', 'It was raining; however, they went out.', 'ฝนกำลังตก อย่างไรก็ตาม พวกเขาก็ออกไปข้างนอก'],
+];
+
+const decisivePairRows = [
+  ['borrow', 'ขอยืม (รับเข้ามาหาตัว)', 'May I borrow your ruler?', 'ฉันขอยืมไม้บรรทัดของคุณได้ไหม'],
+  ['lend', 'ให้ยืม (ส่งออกไปให้ผู้อื่น)', 'Can you lend me your pencil?', 'คุณให้ฉันยืมดินสอหน่อยได้ไหม'],
+  ['postpone', 'เลื่อนเวลา (ยังมีจัดในอนาคต)', 'The match is postponed to Friday.', 'การแข่งขันถูกเลื่อนไปเป็นวันศุกร์'],
+  ['cancel', 'ยกเลิก (ไม่มีการจัดอีกแล้ว)', 'The flight was cancelled due to storm.', 'เที่ยวบินถูกยกเลิกเนื่องจากพายุ'],
+  ['autumn', 'ฤดูใบไม้ร่วง (British English)', 'Leaves turn orange in autumn.', 'ใบไม้เปลี่ยนเป็นสีส้มในฤดูใบไม้ร่วง'],
+  ['fall', 'ฤดูใบไม้ร่วง (American English)', 'School starts in the fall.', 'โรงเรียนเปิดเทอมในฤดูใบไม้ร่วง'],
+  ['hand in', 'ส่งงาน / ส่งการบ้านให้ครู', 'Please hand in your homework.', 'กรุณาส่งการบ้านของคุณ'],
+  ['hand out', 'แจกจ่าย (ใบงาน/ข้อสอบ)', 'The teacher hands out worksheets.', 'คุณครูแจกจ่ายใบงานให้นักเรียน'],
+  ['slow down', 'ชะลอความเร็ว', 'Slow down near the crosswalk.', 'ชะลอความเร็วใกล้ทางม้าลาย'],
+  ['watch out', 'ระวังอันตรายตรงหน้า', 'Watch out! The floor is slippery.', 'ระวัง พื้นลื่น'],
+  ['May I...?', 'ขออนุญาตทำเอง', 'May I come in, please?', 'ฉันขออนุญาตเข้ามาได้ไหมครับ'],
+  ['Could you...?', 'ขอร้องให้อีกฝ่ายช่วยทำ', 'Could you open the door, please?', 'คุณช่วยเปิดประตูให้หน่อยได้ไหมครับ'],
+];
+
 const NEW_DECKS = {
   verbs: learningDeck('verbs_learning_v1', verbRows, verbIllustrations),
   daily_routine: learningDeck('daily_routine_learning_v1', routineRows, routineIllustrations),
@@ -139,6 +193,17 @@ const NEW_DECKS = {
     sourceScope: 'owner_requested_festival_and_culture_vocabulary',
     cardMetadata: { standard: 'ต 2.1', learningOnly: true },
   }),
+  exam_commands: learningDeck('exam_commands_v1', examCommandRows, [], {
+    curriculumStandard: 'ต 1.1 / ต 1.2',
+    sourceScope: 'onet_exam_command_decoder',
+    cardMetadata: { standard: 'ต 1.1', learningOnly: true },
+  }),
+  decisive_pairs: learningDeck('decisive_pairs_v1', decisivePairRows, [], {
+    curriculumStandard: 'ต 1.1 / ต 2.2',
+    sourceScope: 'onet_decisive_keyword_pairs',
+    cardMetadata: { standard: 'ต 1.1', learningOnly: true },
+  }),
+  ...Object.fromEntries(QUEST_VERB_GROUPS.map(group => [`quest_verbs_${group.id}`, questVerbDeck(group)])),
 };
 const LEGACY_ILLUSTRATIONS = {
   subjects: [
@@ -204,25 +269,25 @@ const LEGACY_ILLUSTRATIONS = {
     ['t4', 'future-simple', 'เส้นเวลาที่เน้นเหตุการณ์ทางขวาของปัจจุบัน แทน Future Simple', 'svg'],
   ],
   numbers: [
-    ['nf1', 'ordinal-podium', 'แท่นรางวัลแสดงลำดับที่หนึ่ง ที่สอง และที่สาม', 'svg'],
-    ['nf2', 'ordinal-podium', 'แท่นรางวัลแสดงลำดับที่หนึ่ง ที่สอง และที่สาม', 'svg'],
-    ['nf3', 'ordinal-podium', 'แท่นรางวัลแสดงลำดับที่หนึ่ง ที่สอง และที่สาม', 'svg'],
-    ['nf4', 'ordinal-podium', 'แท่นรางวัลสำหรับเรียนรู้ตัวเลขลำดับ', 'svg'],
-    ['nf5', 'ordinal-podium', 'แท่นรางวัลสำหรับเรียนรู้ตัวเลขลำดับ', 'svg'],
-    ['nf6', 'ordinal-podium', 'แท่นรางวัลสำหรับเรียนรู้ตัวเลขลำดับ', 'svg'],
-    ['nf7', 'ordinal-podium', 'แท่นรางวัลสำหรับเรียนรู้ตัวเลขลำดับ', 'svg'],
-    ['nf8', 'ordinal-podium', 'แท่นรางวัลสำหรับเรียนรู้ตัวเลขลำดับ', 'svg'],
-    ['nf9', 'ordinal-podium', 'แท่นรางวัลสำหรับเรียนรู้ตัวเลขลำดับ', 'svg'],
-    ['nf10', 'ordinal-podium', 'แท่นรางวัลสำหรับเรียนรู้ตัวเลขลำดับ', 'svg'],
+    ['nf1', 'ordinal-1st', 'ผู้เข้าแข่งขันลำดับที่หนึ่งถูกเน้นบนเส้นทาง', 'svg'],
+    ['nf2', 'ordinal-2nd', 'ผู้เข้าแข่งขันลำดับที่สองถูกเน้นบนเส้นทาง', 'svg'],
+    ['nf3', 'ordinal-3rd', 'ผู้เข้าแข่งขันลำดับที่สามถูกเน้นบนเส้นทาง', 'svg'],
+    ['nf4', 'ordinal-4th', 'ผู้เข้าแข่งขันลำดับที่สี่ถูกเน้นบนเส้นทาง', 'svg'],
+    ['nf5', 'ordinal-5th', 'ผู้เข้าแข่งขันลำดับที่ห้าถูกเน้นบนเส้นทาง', 'svg'],
+    ['nf6', 'ordinal-6th', 'ผู้เข้าแข่งขันลำดับที่หกถูกเน้นบนเส้นทาง', 'svg'],
+    ['nf7', 'ordinal-7th', 'ผู้เข้าแข่งขันลำดับที่เจ็ดถูกเน้นบนเส้นทาง', 'svg'],
+    ['nf8', 'ordinal-8th', 'ผู้เข้าแข่งขันลำดับที่แปดถูกเน้นบนเส้นทาง', 'svg'],
+    ['nf9', 'ordinal-9th', 'ผู้เข้าแข่งขันลำดับที่เก้าถูกเน้นบนเส้นทาง', 'svg'],
+    ['nf10', 'ordinal-10th', 'ผู้เข้าแข่งขันลำดับที่สิบถูกเน้นบนเส้นทาง', 'svg'],
   ],
   pronouns: [
-    ['p1', 'i', 'บุคคลชี้เข้าหาตนเอง แทนสรรพนาม I', 'svg'],
-    ['p2', 'you', 'ลูกศรชี้ไปยังบุคคล แทนสรรพนาม You', 'svg'],
-    ['p3', 'he', 'บุคคลผู้ชายหนึ่งคน แทนสรรพนาม He', 'svg'],
-    ['p4', 'she', 'บุคคลผู้หญิงหนึ่งคน แทนสรรพนาม She', 'svg'],
-    ['p5', 'it', 'แมวหนึ่งตัว แทนสรรพนาม It', 'svg'],
-    ['p6', 'we', 'กลุ่มบุคคลที่รวมผู้พูด แทนสรรพนาม We', 'svg'],
-    ['p7', 'they', 'กลุ่มบุคคลหลายคน แทนสรรพนาม They', 'svg'],
+    ['p1', 'i', 'เด็กผู้ชายชี้เข้าหาตนเอง แทนสรรพนาม I'],
+    ['p2', 'you', 'เด็กผู้ชายชี้มายังผู้ชม แทนสรรพนาม You'],
+    ['p3', 'he', 'เด็กผู้ชายหนึ่งคนโบกมือ แทนสรรพนาม He'],
+    ['p4', 'she', 'เด็กผู้หญิงหนึ่งคนโบกมือ แทนสรรพนาม She'],
+    ['p5', 'it', 'แมวหนึ่งตัว แทนสรรพนาม It'],
+    ['p6', 'we', 'กลุ่มเด็กที่รวมผู้พูด แทนสรรพนาม We'],
+    ['p7', 'they', 'กลุ่มเด็กที่ผู้พูดกำลังชี้ถึง แทนสรรพนาม They'],
   ],
   quantifiers: [
     ['nqm1', 'many', 'หนังสือหลายเล่ม แทน many สำหรับนามนับได้', 'svg'],
@@ -353,7 +418,9 @@ const LEGACY_ILLUSTRATION_LOOKUP = Object.fromEntries(
         ? `/learning/signs/${slug}-v3.png`
         : category === 'directions'
           ? `/learning/directions/${slug}-v2.png`
-        : `/learning/${category === 'place' ? 'places' : category}/${slug}-v1.${extension}`,
+          : category === 'pronouns'
+            ? `/learning/pronouns/${slug}-v2.png`
+            : `/learning/${category === 'place' ? 'places' : category}/${slug}-v1.${extension}`,
       imageAlt,
       illustrationVersion: 'vocab-legacy-batch3-v1',
       illustrationReview: 'technical_check_only',
@@ -361,15 +428,111 @@ const LEGACY_ILLUSTRATION_LOOKUP = Object.fromEntries(
     },
   ])),
 );
+
+const supplementalCard = (category, id, word, thai, example, exampleThai, visual) => ({
+  id: `${category}_supp_${id}`,
+  front: word,
+  frontType: 'text',
+  frontLabel: word,
+  back: word,
+  backThai: thai,
+  example,
+  exampleThai,
+  image: `/learning/vocab-supplemental/${category}-${id}-v1.svg`,
+  imageAlt: visual,
+  illustrationVersion: 'vocab-supplemental-v1',
+  illustrationReview: 'technical_check_only',
+  illustrationSource: 'authored curriculum extension',
+});
+
+const SUPPLEMENTAL_CARDS = {
+  place: [
+    supplementalCard('place', 'coffee-shop', 'coffee shop', 'ร้านกาแฟ', 'We meet at the coffee shop.', 'พวกเราพบกันที่ร้านกาแฟ', 'ร้านกาแฟ มีถ้วยกาแฟและโต๊ะ'),
+    supplementalCard('place', 'library', 'library', 'ห้องสมุด', 'I borrow books from the library.', 'ฉันยืมหนังสือจากห้องสมุด', 'ห้องสมุด มีชั้นหนังสือและหนังสือเปิดอยู่'),
+  ],
+  jobs: [
+    supplementalCard('jobs', 'nurse', 'nurse', 'พยาบาล', 'A nurse helps sick people.', 'พยาบาลช่วยดูแลผู้ป่วย', 'พยาบาลถือกล่องปฐมพยาบาล'),
+    supplementalCard('jobs', 'farmer', 'farmer', 'เกษตรกร', 'A farmer grows vegetables.', 'เกษตรกรปลูกผัก', 'เกษตรกรยืนข้างแปลงผัก'),
+  ],
+  food: [
+    supplementalCard('food', 'rice', 'rice', 'ข้าว', 'We eat rice with curry.', 'พวกเรากินข้าวกับแกง', 'ชามข้าวสวยพร้อมช้อน'),
+    supplementalCard('food', 'noodles', 'noodles', 'ก๋วยเตี๋ยว', 'She eats noodles for lunch.', 'เธอกินก๋วยเตี๋ยวเป็นอาหารกลางวัน', 'ชามก๋วยเตี๋ยวพร้อมตะเกียบ'),
+  ],
+  clothes: [
+    supplementalCard('clothes', 'skirt', 'skirt', 'กระโปรง', 'The blue skirt is beautiful.', 'กระโปรงสีฟ้าสวย', 'กระโปรงสีฟ้าทรงเรียบ'),
+    supplementalCard('clothes', 'shorts', 'shorts', 'กางเกงขาสั้น', 'I wear shorts on a hot day.', 'ฉันสวมกางเกงขาสั้นในวันที่อากาศร้อน', 'กางเกงขาสั้นสีเขียว'),
+  ],
+  weather: [supplementalCard('weather', 'cloudy', 'cloudy', 'มีเมฆมาก', 'It is cloudy today.', 'วันนี้มีเมฆมาก', 'ท้องฟ้ามีก้อนเมฆหลายก้อนบังดวงอาทิตย์')],
+  emotions: [
+    supplementalCard('emotions', 'surprised', 'surprised', 'ประหลาดใจ', 'He is surprised by the gift.', 'เขาประหลาดใจกับของขวัญ', 'เด็กทำหน้าประหลาดใจข้างกล่องของขวัญ'),
+    supplementalCard('emotions', 'worried', 'worried', 'กังวล', 'She is worried about the test.', 'เธอกังวลเกี่ยวกับการสอบ', 'เด็กมีสีหน้ากังวลข้างกระดาษข้อสอบ'),
+  ],
+  countries: [
+    supplementalCard('countries', 'france', 'France / French', 'ฝรั่งเศส / สัญชาติฝรั่งเศส', 'France is a country. French is a nationality.', 'ฝรั่งเศสเป็นประเทศ French คือสัญชาติ', 'แผนที่ฝรั่งเศสและหอไอเฟล'),
+    supplementalCard('countries', 'australia', 'Australia / Australian', 'ออสเตรเลีย / สัญชาติออสเตรเลีย', 'Australia is a country. Australian is a nationality.', 'ออสเตรเลียเป็นประเทศ Australian คือสัญชาติ', 'แผนที่ออสเตรเลียและจิงโจ้'),
+    supplementalCard('countries', 'canada', 'Canada / Canadian', 'แคนาดา / สัญชาติแคนาดา', 'Canada is a country. Canadian is a nationality.', 'แคนาดาเป็นประเทศ Canadian คือสัญชาติ', 'แผนที่แคนาดาและใบเมเปิล'),
+    supplementalCard('countries', 'india', 'India / Indian', 'อินเดีย / สัญชาติอินเดีย', 'India is a country. Indian is a nationality.', 'อินเดียเป็นประเทศ Indian คือสัญชาติ', 'แผนที่อินเดียและทัชมาฮาล'),
+  ],
+  shapes: [
+    supplementalCard('shapes', 'heart', 'heart', 'รูปหัวใจ', 'The card has a red heart.', 'การ์ดมีรูปหัวใจสีแดง', 'รูปหัวใจสีแดง'),
+    supplementalCard('shapes', 'pentagon', 'pentagon', 'รูปห้าเหลี่ยม', 'A pentagon has five sides.', 'รูปห้าเหลี่ยมมีห้าด้าน', 'รูปห้าเหลี่ยมพร้อมจุดยอดห้าจุด'),
+    supplementalCard('shapes', 'hexagon', 'hexagon', 'รูปหกเหลี่ยม', 'A hexagon has six sides.', 'รูปหกเหลี่ยมมีหกด้าน', 'รูปหกเหลี่ยมพร้อมจุดยอดหกจุด'),
+  ],
+  environment: [
+    supplementalCard('environment', 'save-water', 'save water', 'ประหยัดน้ำ', 'Turn off the tap to save water.', 'ปิดก๊อกเพื่อประหยัดน้ำ', 'ก๊อกน้ำที่ปิดสนิทและหยดน้ำ'),
+    supplementalCard('environment', 'reusable-bag', 'reusable bag', 'ถุงใช้ซ้ำ', 'Use a reusable bag when shopping.', 'ใช้ถุงใช้ซ้ำเมื่อซื้อของ', 'ถุงผ้าใส่ผักและขนมปัง'),
+    supplementalCard('environment', 'clean-beach', 'clean the beach', 'ทำความสะอาดชายหาด', 'We clean the beach together.', 'พวกเราช่วยกันทำความสะอาดชายหาด', 'เด็กเก็บขยะใส่ถุงบนชายหาด'),
+    supplementalCard('environment', 'protect-animals', 'protect animals', 'ปกป้องสัตว์', 'We should protect wild animals.', 'พวกเราควรปกป้องสัตว์ป่า', 'มือโอบปกป้องนกและเต่า'),
+  ],
+  subjects: [
+    supplementalCard('subjects', 'music', 'Music', 'วิชาดนตรี', 'We sing songs in Music class.', 'พวกเราร้องเพลงในวิชาดนตรี', 'โน้ตดนตรีและเครื่องดนตรี'),
+    supplementalCard('subjects', 'history', 'History', 'วิชาประวัติศาสตร์', 'We learn about the past in History.', 'พวกเราเรียนเรื่องอดีตในวิชาประวัติศาสตร์', 'หนังสือประวัติศาสตร์และนาฬิกาทราย'),
+    supplementalCard('subjects', 'computer', 'Computer', 'วิชาคอมพิวเตอร์', 'We learn to type in Computer class.', 'พวกเราเรียนพิมพ์ในวิชาคอมพิวเตอร์', 'จอคอมพิวเตอร์และแป้นพิมพ์'),
+    supplementalCard('subjects', 'thai', 'Thai', 'วิชาภาษาไทย', 'We read Thai stories in class.', 'พวกเราอ่านนิทานภาษาไทยในชั้นเรียน', 'หนังสือภาษาไทยและดินสอ'),
+  ],
+  greeting: [
+    supplementalCard('greeting', 'good-morning', 'Good morning!', 'สวัสดีตอนเช้า', 'Good morning, teacher!', 'สวัสดีตอนเช้าคุณครู', 'เด็กโบกมือทักทายใต้ดวงอาทิตย์ยามเช้า'),
+    supplementalCard('greeting', 'excuse-me', 'Excuse me.', 'ขอโทษนะ / ขออนุญาต', 'Excuse me. Can you help me?', 'ขอโทษนะ ช่วยฉันหน่อยได้ไหม', 'เด็กยกมือเรียกอย่างสุภาพ'),
+  ],
+  pronouns: [
+    supplementalCard('pronouns', 'this', 'this', 'นี้ (เอกพจน์ ใกล้)', 'This is my pencil.', 'นี่คือดินสอของฉัน', 'มือชี้ดินสอหนึ่งแท่งที่อยู่ใกล้'),
+    supplementalCard('pronouns', 'that', 'that', 'นั้น (เอกพจน์ ไกล)', 'That is your bag.', 'นั่นคือกระเป๋าของคุณ', 'มือชี้กระเป๋าหนึ่งใบที่อยู่ไกล'),
+    supplementalCard('pronouns', 'these-those', 'these / those', 'เหล่านี้ / เหล่านั้น', 'These are books. Those are bags.', 'เหล่านี้คือหนังสือ เหล่านั้นคือกระเป๋า', 'หนังสือหลายเล่มอยู่ใกล้และกระเป๋าหลายใบอยู่ไกล'),
+  ],
+  quantifiers: [
+    supplementalCard('quantifiers', 'a-lot-of', 'a lot of', 'จำนวนมาก', 'There are a lot of books.', 'มีหนังสือจำนวนมาก', 'หนังสือจำนวนมากเรียงบนชั้น'),
+    supplementalCard('quantifiers', 'enough', 'enough', 'เพียงพอ', 'We have enough water.', 'พวกเรามีน้ำเพียงพอ', 'ขวดน้ำเต็มจำนวนพอดีกับเด็กทุกคน'),
+    supplementalCard('quantifiers', 'several', 'several', 'หลายชิ้น / หลายคน', 'Several students are reading.', 'นักเรียนหลายคนกำลังอ่านหนังสือ', 'นักเรียนหลายคนอ่านหนังสือ'),
+    supplementalCard('quantifiers', 'none', 'none', 'ไม่มีเลย', 'None of the boxes are open.', 'ไม่มีกล่องใบใดเปิดอยู่', 'กล่องหลายใบปิดสนิทพร้อมเลขศูนย์'),
+  ],
+  tenses: [
+    supplementalCard('tenses', 'present-negative', 'do / does not + V1', 'ปัจจุบันรูปปฏิเสธ', 'He does not play on Monday.', 'เขาไม่เล่นในวันจันทร์', 'เส้นเวลาปัจจุบันพร้อมสัญลักษณ์ปฏิเสธ'),
+    supplementalCard('tenses', 'present-question', 'Do / Does + subject + V1?', 'คำถาม Present Simple', 'Does she walk to school?', 'เธอเดินไปโรงเรียนหรือไม่', 'เส้นเวลาปัจจุบันพร้อมเครื่องหมายคำถาม'),
+    supplementalCard('tenses', 'continuous-negative', 'is / am / are not + V-ing', 'กำลังทำรูปปฏิเสธ', 'They are not sleeping now.', 'ตอนนี้พวกเขาไม่ได้กำลังนอน', 'จุดเวลาปัจจุบันพร้อมสัญลักษณ์กำลังทำและปฏิเสธ'),
+    supplementalCard('tenses', 'past-negative', 'did not + V1', 'อดีตรูปปฏิเสธ', 'I did not go yesterday.', 'เมื่อวานฉันไม่ได้ไป', 'เส้นเวลาอดีตพร้อมสัญลักษณ์ปฏิเสธ'),
+    supplementalCard('tenses', 'past-question', 'Did + subject + V1?', 'คำถาม Past Simple', 'Did you study last night?', 'เมื่อคืนคุณอ่านหนังสือหรือไม่', 'เส้นเวลาอดีตพร้อมเครื่องหมายคำถาม'),
+    supplementalCard('tenses', 'future-plan', 'be going to + V1', 'แผนในอนาคต', 'We are going to travel.', 'พวกเราวางแผนว่าจะเดินทาง', 'เส้นเวลาอนาคตพร้อมปฏิทินแผนการเดินทาง'),
+  ],
+};
 export const VOCAB_GROUPS = [
+  { id: 'quest_verbs', name: 'กริยาที่พบใน Quest' },
   { id: 'words', name: 'คำศัพท์ใกล้ตัว' },
   { id: 'communication', name: 'การสื่อสาร' },
   { id: 'culture', name: 'เทศกาลและวัฒนธรรม' },
   { id: 'grammar', name: 'ภาษาและไวยากรณ์' },
+  { id: 'exam_intelligence', name: 'ถอดรหัสข้อสอบ O-NET' },
 ];
 export const VOCAB_CATEGORIES = [
-  { id: 'verbs', name: 'กริยาพื้นฐาน (Action Verbs)', icon: '🏃', tone: 'mint', group: 'words', deckId: 'verbs' },
-  { id: 'daily_routine', name: 'กิจวัตรประจำวัน (Daily Routine)', icon: '📅', tone: 'peach', group: 'words', deckId: 'daily_routine' },
+  { id: 'profile', name: 'ข้อมูลส่วนตัว (My Profile)', icon: '👤', tone: 'sky', group: 'words', questId: 'about_myself', missionId: 'about_profile_flip' },
+  { id: 'family_words', name: 'ครอบครัว (Family Words)', icon: '👪', tone: 'rose', group: 'words', questId: 'family', missionId: 'family_relation_flip' },
+  { id: 'classroom_words', name: 'โรงเรียนและห้องเรียน (Classroom Words)', icon: '📚', tone: 'mint', group: 'words', questId: 'school', missionId: 'school_object_flip' },
+  { id: 'quest_verbs_classroom', name: 'อ่านโจทย์และเรียนในห้อง', icon: '📖', tone: 'sky', group: 'quest_verbs', deckId: 'quest_verbs_classroom' },
+  { id: 'quest_verbs_communication', name: 'สนทนาและความรู้สึก', icon: '💬', tone: 'rose', group: 'quest_verbs', deckId: 'quest_verbs_communication' },
+  { id: 'quest_verbs_daily', name: 'กิจวัตรและสุขภาพ', icon: '🧼', tone: 'peach', group: 'quest_verbs', deckId: 'quest_verbs_daily' },
+  { id: 'quest_verbs_places', name: 'เดินทาง ซื้อของ และบอกทาง', icon: '🧭', tone: 'mint', group: 'quest_verbs', deckId: 'quest_verbs_places' },
+  { id: 'quest_verbs_environment', name: 'สิ่งแวดล้อมและเทศกาล', icon: '🌱', tone: 'lemon', group: 'quest_verbs', deckId: 'quest_verbs_environment' },
+  { id: 'verbs', name: 'กริยาพื้นฐาน (Action Verbs)', icon: '🏃', tone: 'mint', group: 'quest_verbs', deckId: 'verbs' },
+  { id: 'daily_routine', name: 'กิจวัตรประจำวัน (Daily Routine)', icon: '📅', tone: 'peach', group: 'quest_verbs', deckId: 'daily_routine' },
   { id: 'transport', name: 'ยานพาหนะ (Transport)', icon: '🚗', tone: 'sky', group: 'words', questId: 'vocabulary', missionId: 'vocab_flip' },
   { id: 'place', name: 'สถานที่ (Places)', icon: '🏫', tone: 'mint', group: 'words', questId: 'vocabulary', missionId: 'vocab_match' },
   { id: 'illness', name: 'การเจ็บป่วย (Illness)', icon: '🏥', tone: 'rose', group: 'words', questId: 'illness', missionId: 'illness_flip' },
@@ -391,8 +554,10 @@ export const VOCAB_CATEGORIES = [
   { id: 'pronouns', name: 'สรรพนาม (Pronouns)', icon: '👥', tone: 'rose', group: 'grammar', questId: 'pronouns_master', missionId: 'pm_flip' },
   { id: 'quantifiers', name: 'ปริมาณ (Quantifiers)', icon: '🥛', tone: 'sky', group: 'grammar', questId: 'nouns_quantifiers', missionId: 'nq_match' },
   { id: 'tenses', name: 'ไวยากรณ์ Tenses', icon: '⚡', tone: 'lilac', group: 'grammar', questId: 'tenses_arena', missionId: 'ten_flip' },
+  { id: 'exam_commands', name: 'คำสั่งข้อสอบ (Exam Commands)', icon: '🎯', tone: 'sky', group: 'exam_intelligence', deckId: 'exam_commands' },
+  { id: 'decisive_pairs', name: 'คู่คำตัดสินสอบ (Decisive Pairs)', icon: '⚖️', tone: 'lilac', group: 'exam_intelligence', deckId: 'decisive_pairs' },
 ];
-const MISSIONS = { ...CH1_MISSIONS, ...CH2_MISSIONS, ...CH5_MISSIONS };
+const MISSIONS = { ...CH1_LEARNING_DECKS, ...CH2_MISSIONS, ...CH5_MISSIONS };
 export function getDrillMission(category) {
   if (!category) return null;
   if (category.deckId) return NEW_DECKS[category.deckId] || null;
@@ -428,7 +593,7 @@ export function getDrillCards(category) {
     }
     return { id: p.id, front: p.right, frontLabel: p.left, back: p.left, backThai: p.leftThai };
   });
-  return cards.map(c => ({
+  return [...cards, ...(SUPPLEMENTAL_CARDS[category.id] || [])].map(c => ({
     ...c,
     frontType: c.frontType || (/[A-Za-z]/.test(c.front) ? 'text' : 'symbol'),
     ...(LEGACY_ILLUSTRATION_LOOKUP[`${category.id}:${c.id}`] || {}),

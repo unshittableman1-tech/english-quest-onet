@@ -2,7 +2,7 @@ import './helpers/environment.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-const { getRiskStudents, getTeacherOverview, getReviewTasks, ARENA_MODES, TEACHER_CHAPTERS } = await import('../src/utils/teacherAnalytics.js');
+const { getRiskStudents, hasRiskEvidence, getTeacherOverview, getReviewTasks, getLatestLearningActivities, ARENA_MODES, TEACHER_CHAPTERS } = await import('../src/utils/teacherAnalytics.js');
 const { QUESTS } = await import('../src/data/questions.js');
 const now = Date.UTC(2026, 9, 12, 12);
 
@@ -17,6 +17,8 @@ test('teacher chapter definitions cover every catalog quest exactly once and lab
 
 test('missing pre-test and activity dates do not automatically classify new students as at risk', () => {
   assert.deepEqual(getRiskStudents([{ id: 'new', questProgress: {} }], now), []);
+  assert.equal(hasRiskEvidence({ id: 'new', questProgress: {} }), false);
+  assert.equal(hasRiskEvidence({ id: 'measured', questProgress: { vocabulary: { pct: 70 } } }), true);
 });
 
 test('risk classification distinguishes low results, inactivity, guessing and repeated mistakes', () => {
@@ -59,4 +61,16 @@ test('review plans prioritize actual failed quests and unresolved mistakes', () 
   assert.ok(tasks[0].includes('Vocab Village'));
   assert.ok(tasks[1].includes('1 ข้อ'));
   assert.equal(getReviewTasks({})[0], 'เริ่มทบทวน Chapter 1 และทำแบบฝึกพื้นฐาน');
+});
+
+test('latest learning activities use verified quest timestamps and newest-first order', () => {
+  const activities = getLatestLearningActivities([
+    { id: 'a', name: 'A', class: 'ป.6/1', xp: 20, questProgress: { shapes_colors: { pct: 67, lastAssessment: { score: 2, total: 3, completedAt: '2026-10-18T01:00:00Z' } } } },
+    { id: 'b', name: 'B', class: 'ป.6/1', xp: 80, questProgress: { vocabulary: { pct: 80, lastPlayed: '2026-10-18T02:00:00Z' } } },
+  ]);
+  assert.deepEqual(activities.map(activity => activity.studentId), ['b', 'a']);
+  assert.equal(activities[1].questName, 'Shapes & Colors');
+  assert.equal(activities[1].score, 2);
+  assert.equal(activities[1].total, 3);
+  assert.equal(activities[1].xp, 20);
 });

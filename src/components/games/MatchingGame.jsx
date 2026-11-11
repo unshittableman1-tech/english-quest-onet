@@ -21,7 +21,7 @@ export default function MatchingGame({ mission, onComplete, onBack }) {
 
   // Shuffle right column once
   const [shuffledRight] = useState(() =>
-    [...pairs].map(p => ({ id: p.id, text: p.right })).sort(() => Math.random() - 0.5)
+    [...pairs].map(p => ({ id: p.id, text: p.right, image: p.image, imageAlt: p.imageAlt })).sort(() => Math.random() - 0.5)
   );
 
   useEffect(() => {
@@ -184,7 +184,9 @@ export default function MatchingGame({ mission, onComplete, onBack }) {
                       : 'bg-white border-amber-200 text-slate-800 hover:bg-amber-50 hover:border-amber-400'
               }`}
             >
-              {r.text}
+              {r.image ? (
+                <img src={r.image} alt={r.imageAlt || ''} className="h-16 w-20 object-contain" />
+              ) : r.text}
             </button>
           ))}
         </div>

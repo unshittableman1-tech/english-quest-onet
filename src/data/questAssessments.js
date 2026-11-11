@@ -49,7 +49,8 @@ export const shapesAssessment = [
   ...question,
   reviewStatus: 'approved', approvedModes: ['practice_assessment'],
   contentReview: { ...question.contentReview, status: 'approved_for_practice', approvedBy: 'workspace_owner', approvedAt: '2026-10-13', approvalSource: 'explicit_user_chat_after_shapes_preview' },
-  mediaReview: { status: 'verified', version: question.itemVersion, reviewer: 'workspace_owner', approvedAt: '2026-10-13', scope: 'practice_assessment' },
+  mediaReview: { status: 'verified', version: question.itemVersion, reviewer: 'workspace_owner', approvedAt: '2026-10-22', scope: 'practice_assessment' },
+  mediaSource: { kind: 'authored_svg_illustration', style: '2.5d', assetVersion: 'v2', updatedAt: '2026-10-22' },
 }));
 
 export const clothesAssessment = [

@@ -84,8 +84,15 @@ function approvedPool() {
   );
 }
 
-test('unreviewed production bank fails closed instead of inventing blueprint coverage', () => {
-  assert.throws(() => sampleBlueprintExam({ seed: 1 }), /Insufficient eligible items/);
+test('approved production bank supplies a complete blueprint paper', () => {
+  const paper = sampleBlueprintExam({ seed: 1 });
+  const counts = paper.reduce((result, question) => {
+    result[question.standard] = (result[question.standard] || 0) + 1;
+    return result;
+  }, {});
+
+  assert.equal(paper.length, 32);
+  assert.deepEqual(counts, BLUEPRINT_CONFIG.quota);
 });
 
 test('sampleBlueprintExam generates exactly 32 questions from an explicitly reviewed fixture pool', () => {

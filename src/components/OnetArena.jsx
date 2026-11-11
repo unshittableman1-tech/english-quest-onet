@@ -19,6 +19,7 @@ export default function OnetArena({ student, onBack, onStartExam, onStartFinalEx
   // ── Initial load ────────────────────────────────────────────
   useEffect(() => {
     if (student) {
+      if(student.isDemo){setStats({attempts:[],arenaBadges:[],arenaRankScore:0});setExamSession(null);setFinalExamResult(null);setSyncing(false);return;}
       setSyncing(true);
       Promise.all([
         mergeArenaStatsFromCloud(student.id),
@@ -35,7 +36,7 @@ export default function OnetArena({ student, onBack, onStartExam, onStartFinalEx
 
   // ── Auto-polling: ตรวจสถานะสอบทุก 30 วินาที ──────────────
   useEffect(() => {
-    if (!student) return;
+    if (!student||student.isDemo) return;
     const interval = setInterval(async () => {
       try {
         const session = await getExamSessionFromCloud();
@@ -51,7 +52,7 @@ export default function OnetArena({ student, onBack, onStartExam, onStartFinalEx
 
   // ── Manual Refresh ───────────────────────────────────────────
   const handleRefresh = useCallback(async () => {
-    if (refreshing) return;
+    if (refreshing||student?.isDemo) return;
     setRefreshing(true);
     try {
       const session = await getExamSessionFromCloud();
@@ -83,8 +84,20 @@ export default function OnetArena({ student, onBack, onStartExam, onStartFinalEx
     if (missionId === 'weakness_mock') key = 'bestWeaknessMock';
     if (missionId === 'full_mock_test') key = 'bestFullMock';
     if (missionId === 'final_exam_simulation') key = 'bestFinalSimulation';
+    if (missionId === 'onet_year_2564') key = 'bestOnetYear2564';
+    if (missionId === 'onet_year_2565') key = 'bestOnetYear2565';
+    if (missionId === 'onet_year_2566') key = 'bestOnetYear2566';
+    if (missionId === 'onet_year_2567') key = 'bestOnetYear2567';
+    if (missionId === 'onet_year_2568') key = 'bestOnetYear2568';
     
-    return stats[key];
+    let res = stats[key];
+    if (!res && stats?.attempts) {
+      const matching = stats.attempts.filter(a => a.mode === missionId);
+      if (matching.length > 0) {
+        res = matching.reduce((best, cur) => cur.percent > (best?.percent || 0) ? cur : best, null);
+      }
+    }
+    return res;
   };
 
   const handlePinSubmit = () => {
@@ -120,7 +133,7 @@ export default function OnetArena({ student, onBack, onStartExam, onStartFinalEx
           O-NET Arena
         </h1>
         <p className="text-slate-800/80 max-w-sm mx-auto text-sm">
-          สนามประลองข้อสอบจริง ฝึกฝนทำข้อสอบ จับเวลา และวิเคราะห์จุดอ่อนของคุณ
+          สนามประลองข้อสอบเสมือนจริง ฝึกฝนทำข้อสอบ จับเวลา และวิเคราะห์จุดอ่อนของคุณ
         </p>
       </div>
 
@@ -148,7 +161,6 @@ export default function OnetArena({ student, onBack, onStartExam, onStartFinalEx
 
       {/* Missions Grid */}
       <div className="px-6 relative z-10 max-w-lg mx-auto space-y-4">
-
         {/* ── Final Exam Card (Pinned at the Top!) ── */}
         <div className={`glass-card p-5 relative overflow-hidden transition-all duration-300 border-2 ${
           examIsOpen && !alreadySubmitted

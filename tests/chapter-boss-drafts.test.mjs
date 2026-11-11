@@ -45,7 +45,7 @@ test('owner-approved challenges release only the reviewed version for practice',
       assert.equal(isMediaReleaseEligible(released, 'school_final_50'), false);
       assert.equal(isMediaReleaseEligible(released, 'onet_blueprint_32'), false);
     }
-    assert.equal(QUESTS.find(quest => quest.id === `chapter${chapter}_boss`).questions, CHAPTER_BOSS_QUESTIONS[chapter]);
+    assert.notEqual(QUESTS.find(quest => quest.id === `chapter${chapter}_boss`).questions, CHAPTER_BOSS_QUESTIONS[chapter]);
   }
   assert.equal(seen.size, 20);
   assert.ok(getFinalExamPool(70).every(item => !seen.has(item.id)));

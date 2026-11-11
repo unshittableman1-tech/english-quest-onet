@@ -1,53 +1,58 @@
 import UIIcon, { UIIconText } from '../UIIcon';
 import React from 'react';
-import { getRankingTier, calculateRankScore, RANKING_TIERS } from '../../utils/scoring';
+import { getRankingTier, RANKING_TIERS, XP_RULES } from '../../utils/scoring';
+import TierArtwork from './TierArtwork';
+import RankingBadges from './RankingBadges';
 
 const ALL_TIERS = RANKING_TIERS.map(tier => getRankingTier(tier.min)).reverse();
 
 const SCORING_RULES = [
-  { action: 'ผ่าน 1 เควส', points: '+150 pts' },
-  { action: 'เล่นซ้ำ 1 รอบ (Missions)', points: '+80 pts' },
-  { action: 'ปลดล็อก 1 Badge', points: '+50 pts' },
-  { action: 'สะสม 1 ดาว', points: '+20 pts' },
-  { action: 'พัฒนา Post-test (+1%)', points: '+15 pts' },
-  { action: 'แก้ข้อผิด 1 ข้อ', points: '+10 pts' },
-  { action: 'ผ่าน Final Boss (+1%)', points: '+5 pts' },
-  { action: 'กดมั่วเร็วกว่า 3 วิ', points: '-30 pts/ข้อ' },
+  { action: 'ตอบถูก 1 ข้อ', points: `+${XP_RULES.CORRECT_ANSWER} XP` },
+  { action: 'ทำเควสครบ', points: `+${XP_RULES.COMPLETE_QUEST} XP` },
+  { action: 'ผ่านด่าน 70%', points: `+${XP_RULES.PASS_70} XP` },
+  { action: 'ผ่านด่าน 90%', points: `+${XP_RULES.PASS_90} XP` },
+  { action: 'ผ่าน Final Boss', points: `+${XP_RULES.FINALBOSS_PASS} XP` },
 ];
 
 export default function TierInfoModal({ onClose, student, selectedTierName = null }) {
-  const currentRankScore = calculateRankScore(student);
+  const currentRankScore = Math.max(0, Number(student?.xp) || 0);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-slate-50 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border border-amber-200 flex flex-col max-h-[85vh]">
+    <div className="tier-modal-backdrop">
+      <section className="tier-modal" role="dialog" aria-modal="true" aria-labelledby="tier-modal-title">
         
         {/* Header */}
-        <div className="p-4 bg-white/5 border-b border-amber-200 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <UIIcon value={"🏅"} /> ระบบ Rank & Tier
-          </h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-slate-500 hover:text-white hover:bg-white/20 transition-colors">
+        <header className="tier-modal-header">
+          <div>
+            <h2 id="tier-modal-title"><UIIcon value={"🏅"} /> ระบบ Rank & Tier</h2>
+            <p>{student?.name ? `ข้อมูลของ ${student.name}` : 'รายละเอียดระดับทั้งหมด'}</p>
+          </div>
+          <button onClick={onClose} aria-label="ปิดรายละเอียด Rank">
             <UIIcon value={"✕"} />
           </button>
-        </div>
+        </header>
 
         {/* Scrollable Content */}
-        <div className="p-5 overflow-y-auto space-y-6">
+        <div className="tier-modal-body">
+          <RankingBadges student={student} limit={null} />
           
           {/* Active Tier Spotlight (If passed) */}
           {selectedTierName && (() => {
             const tier = ALL_TIERS.find(t => t.name === selectedTierName) || getRankingTier(currentRankScore);
             return (
               <div className="glass-card p-5 border border-amber-300 text-center relative overflow-hidden">
-                <div className="absolute -top-4 -right-4 text-8xl opacity-10 blur-sm"><UIIcon value={tier.icon} /></div>
-                <div className="text-5xl mb-2 drop-shadow-lg relative z-10"><UIIcon value={tier.icon} /></div>
+                <TierArtwork tier={tier} decorative className="tier-artwork-watermark" />
+                <TierArtwork tier={tier} className="tier-artwork-spotlight relative z-10" />
                 <h3 className={`text-2xl font-black ${tier.color} drop-shadow mb-1 relative z-10`}>{tier.name}</h3>
                 <p className="text-sm text-slate-800/80 relative z-10">{tier.description}</p>
                 
                 <div className="mt-4 pt-4 border-t border-amber-200 relative z-10">
+                  <div className="tier-student-stats">
+                    <span><strong>{currentRankScore.toLocaleString()}</strong> XP</span>
+                    <span><strong>{student?.totalStars || 0}</strong> ดาวสะสม</span>
+                  </div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-500">คะแนนของคุณ: <strong className="text-slate-800">{currentRankScore.toLocaleString()}</strong></span>
+                    <span className="text-slate-500">XP ปัจจุบัน: <strong className="text-slate-800">{currentRankScore.toLocaleString()} XP</strong></span>
                     {tier.next ? (
                       <span className="text-slate-500">เป้าหมาย: <strong className="text-amber-300">{tier.next.toLocaleString()}</strong></span>
                     ) : (
@@ -84,13 +89,13 @@ export default function TierInfoModal({ onClose, student, selectedTierName = nul
                 const isLocked = currentRankScore < t.min;
                 
                 return (
-                  <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border ${isCurrent ? 'bg-white/10 border-amber-400/50' : 'bg-white/5 border-white/5'} ${isLocked ? 'opacity-60 grayscale' : ''}`}>
-                    <div className="text-3xl w-10 text-center drop-shadow"><UIIcon value={t.icon} /></div>
+                <div key={i} className={`tier-row ${isCurrent ? 'is-current' : ''} ${isLocked ? 'is-locked' : ''}`}>
+                    <TierArtwork tier={t} className="tier-artwork-row" />
                     <div className="flex-1">
                       <div className={`font-bold ${isLocked ? 'text-slate-500' : t.color}`}>{t.name}</div>
-                      <div className="text-xs text-slate-500">{t.min.toLocaleString()} {t.next ? `- ${(t.next - 1).toLocaleString()}` : '+'} pts</div>
+                      <div className="text-xs text-slate-500">{t.min.toLocaleString()} {t.next ? `- ${(t.next - 1).toLocaleString()}` : '+'} XP</div>
                     </div>
-                    {isCurrent && <div className="text-xs font-bold px-2 py-1 bg-amber-400/20 text-amber-300 rounded-full">ปัจจุบัน</div>}
+                    {isCurrent && <div className="tier-current">ปัจจุบัน</div>}
                   </div>
                 );
               })}
@@ -99,7 +104,7 @@ export default function TierInfoModal({ onClose, student, selectedTierName = nul
 
           {/* Scoring Rules */}
           <div>
-            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 px-1">วิธีได้คะแนน Rank</h3>
+            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 px-1">วิธีสะสม XP</h3>
             <div className="bg-white/5 rounded-xl overflow-hidden border border-amber-200">
               {SCORING_RULES.map((rule, i) => (
                 <div key={i} className={`flex justify-between p-2.5 text-sm ${i % 2 === 0 ? 'bg-white/5' : ''}`}>
@@ -113,16 +118,16 @@ export default function TierInfoModal({ onClose, student, selectedTierName = nul
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-white/5 border-t border-amber-200">
+        <footer className="tier-modal-footer">
           <button 
             onClick={onClose}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-bold hover:shadow-[0_0_15px_rgba(139,92,246,0.5)] transition-all"
+            className="eq-btn"
           >
             เข้าใจแล้ว!
           </button>
-        </div>
+        </footer>
 
-      </div>
+      </section>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import React from 'react';
 import TierBadge from './TierBadge';
 import { getRankingTier } from '../../utils/scoring';
-import { getAvatarUrl } from '../../utils/avatar';
+import StudentAvatar from '../StudentAvatar';
+import RankingBadges from './RankingBadges';
 
 export default function MyRankCard({ student, rankIndex, activeTab, onTierClick, leaderboardLength }) {
   if (!student) return null;
@@ -10,7 +11,7 @@ export default function MyRankCard({ student, rankIndex, activeTab, onTierClick,
   
   // Format score based on activeTab
   let scoreText = '';
-  if (activeTab === 'overall') scoreText = `${(student?.rankScore || 0).toLocaleString()} pts`;
+  if (activeTab === 'overall') scoreText = `${(student?.xp || 0).toLocaleString()} XP`;
   else if (activeTab === 'growth') scoreText = `+${student?.growthScore || 0}%`;
   else if (activeTab === 'accuracy') scoreText = `${student?.accuracy || 0}%`;
   else if (activeTab === 'streak') scoreText = `${student?.streakDays || 0} วัน`;
@@ -50,8 +51,8 @@ export default function MyRankCard({ student, rankIndex, activeTab, onTierClick,
       <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/20 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
       
       <div className="flex items-center gap-3 relative z-10">
-        <div className="w-16 h-16 rounded-full bg-slate-200 border-2 border-amber-300 p-0.5 shadow-md flex-shrink-0">
-          <img src={getAvatarUrl(student.name)} alt="My Avatar" className="w-full h-full object-cover rounded-full" />
+        <div className="ranking-list-avatar ranking-list-avatar-me w-16 h-16 rounded-full bg-slate-200 border-2 border-amber-300 p-0.5 shadow-md flex-shrink-0">
+          <StudentAvatar student={student} className="w-full h-full" label="อวตาร์ของฉัน" />
         </div>
         
         <div className="flex-1 min-w-0">
@@ -70,7 +71,10 @@ export default function MyRankCard({ student, rankIndex, activeTab, onTierClick,
               Lv.{student.level || 1}
             </span>
             {activeTab === 'overall' && (
-              <TierBadge tier={tier} onClick={onTierClick} className="bg-white border-amber-200 shadow scale-90 origin-left" />
+              <>
+                <TierBadge tier={tier} onClick={onTierClick} className="bg-white border-amber-200 shadow scale-90 origin-left" />
+                <span className="ranking-star-stat" aria-label={`ดาวสะสม ${student.totalStars || 0} ดาว`}><span aria-hidden="true">★</span> {student.totalStars || 0} ดาว</span>
+              </>
             )}
           </div>
           
@@ -85,6 +89,7 @@ export default function MyRankCard({ student, rankIndex, activeTab, onTierClick,
           </div>
         </div>
       </div>
+      <RankingBadges student={student} />
     </div>
   );
 }

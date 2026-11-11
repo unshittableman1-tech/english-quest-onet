@@ -1,6 +1,6 @@
 // ============================================================
 // ch3_missions.js — Mission data สำหรับ Chapter 3 (6 Quests)
-// ข้อมูลจาก: โค้งหักศอก (O-NET technique) + Worksheet P6 passages
+// ข้อมูลจาก: O-NET Technique + Worksheet P6 passages
 // ============================================================
 
 import { TECHNIQUE_CARDS } from './ch1_missions';
@@ -34,7 +34,7 @@ export const questionWordsMissions = [
     subtitle: 'อ่านเรื่องราวแล้วตอบคำถาม WH',
     xpReward: 50,
     techniqueCard: 'reading',
-    // จากโค้งหักศอก (O-NET style passage)
+    // จากสูตรลัด O-NET (O-NET style passage)
     storyText: "Mike is a fifteen-year-old student. He goes to Wattana School. He gets up at six o'clock every morning. He goes to school by bicycle. He arrives at school at seven thirty. He has lunch at school with his friends at noon. After school, he goes home and does homework. He goes to bed at nine o'clock.",
     passages: [
       { id: 'qw1', question: 'How old is Mike?', options: ['14', '15', '16', '17'], answer: 1, explanation: '"fifteen-year-old student" = อายุ 15 ปี' },
@@ -58,7 +58,7 @@ export const signDetectiveMissions = [
     subtitle: 'ฝึกอ่านป้ายแบบ O-NET จริง',
     xpReward: 30,
     techniqueCard: 'signs',
-    // จากโค้งหักศอก Part 2: O-NET Style Signs
+    // จากสูตรลัด O-NET Part 2: O-NET Style Signs
     cards: [
       {
         id: 'sdf1',
@@ -170,7 +170,7 @@ export const conversationRescueMissions = [
     subtitle: 'จับคู่ประโยคในบทสนทนา',
     xpReward: 30,
     techniqueCard: 'conversation',
-    // จากโค้งหักศอก Part 1
+    // จากสูตรลัด O-NET Part 1
     pairs: [
       { id: 'crm1', left: 'Nice to meet you.', right: 'Nice to meet you, too.', leftThai: 'ยินดีที่ได้รู้จัก' },
       { id: 'crm2', left: 'Do you need any help?', right: 'No, thank you.', leftThai: 'ต้องการความช่วยเหลือไหม' },
@@ -339,7 +339,7 @@ export const readingDetectiveMissions = [
     subtitle: 'อ่านบทความ O-NET Style แล้วตอบ',
     xpReward: 50,
     techniqueCard: 'reading',
-    // จากโค้งหักศอก: Sarah passage
+    // จากสูตรลัด O-NET: Sarah passage
     storyText: "Sarah is a Grade 9 student. She is fourteen years old. She wakes up at five thirty every morning. She goes to school by bus. Her school is about five kilometers from her house. She has three meals a day: breakfast at home, lunch at school, and dinner with her family. She loves reading books and playing the piano. She practices the piano for one hour every evening.",
     passages: [
       { id: 'rs1', question: 'How old is Sarah?', options: ['13', '14', '15', '16'], answer: 1, explanation: '"She is fourteen years old."' },
@@ -359,7 +359,7 @@ export const strategyBossMissions = [
     questId: 'strategy_boss',
     type: 'rearrange',
     title: '⚡ Sentence Rearrange',
-    subtitle: 'เรียงประโยคจากโค้งหักศอก',
+    subtitle: 'เรียงประโยคตามสูตร O-NET',
     xpReward: 40,
     techniqueCard: 'grammar',
     wordSentences: [
@@ -379,7 +379,7 @@ export const strategyBossMissions = [
     xpReward: 50,
     description: 'เรียงประโยคให้ได้ลำดับที่ถูกต้อง',
     techniqueHint: 'First/Then/Finally → หาคำบอกลำดับก่อนเสมอ',
-    // จากโค้งหักศอก Part 5: Ordering
+    // จากสูตรลัด O-NET Part 5: Ordering
     sentences: [
       {
         id: 'sbo1',

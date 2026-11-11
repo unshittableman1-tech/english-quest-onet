@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { playCorrectSound, playWrongSound } from '../../utils/audio';
 import { useSpeech } from '../../utils/useSpeech';
 
-export default function AudioDetectiveGame({ cards, title, onBack, onComplete }) {
+export default function AudioDetectiveGame({ cards, title, onBack, onComplete, onEvidence }) {
   const { speak, speaking } = useSpeech();
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -50,6 +50,7 @@ export default function AudioDetectiveGame({ cards, title, onBack, onComplete })
     setRevealed(true);
 
     const isCorrect = choice.id === currentCard.id;
+    onEvidence?.({ card: currentCard, mode: 'audio', correct: isCorrect, assisted: false, observationId: String(qIndex) });
 
     if (isCorrect) {
       playCorrectSound();

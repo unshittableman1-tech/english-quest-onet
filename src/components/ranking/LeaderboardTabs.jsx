@@ -13,13 +13,17 @@ const TABS = [
 
 export default function LeaderboardTabs({ activeTab, setActiveTab }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2 px-3 snap-x hide-scrollbar mb-4">
+    <div className="ranking-tabs hide-scrollbar" role="tablist" aria-label="ประเภทอันดับ">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id;
         return (
           <button
             key={tab.id}
+            id={`ranking-tab-${tab.id}`}
             onClick={() => setActiveTab(tab.id)}
+            role="tab"
+            aria-selected={isActive}
+            aria-controls="ranking-results"
             className={`
               flex items-center gap-1.5 px-4 py-2 rounded-full font-bold whitespace-nowrap snap-start transition-all text-sm border
               ${isActive 

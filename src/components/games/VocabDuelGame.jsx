@@ -8,7 +8,7 @@ export default function VocabDuelGame({ cards, title, onBack, onComplete }) {
   const { speak } = useSpeech();
   const [p1Score, setP1Score] = useState(0);
   const [p2Score, setP2Score] = useState(0);
-  const targetScore = 5;
+  const targetScore = 10;
 
   const [qIndex, setQIndex] = useState(0);
   const [currentCard, setCurrentCard] = useState(null);
@@ -66,21 +66,13 @@ export default function VocabDuelGame({ cards, title, onBack, onComplete }) {
       if (player === 'P1') {
         const next = p1Score + 1;
         setP1Score(next);
-        if (next >= targetScore) {
-          triggerWin('ผู้เล่น 1 (สีน้ำเงิน) 🔵');
-          return;
-        }
       } else {
         const next = p2Score + 1;
         setP2Score(next);
-        if (next >= targetScore) {
-          triggerWin('ผู้เล่น 2 (สีแดง) 🔴');
-          return;
-        }
       }
 
       setTimeout(() => {
-        setQIndex(prev => prev + 1);
+        advanceRound(p1Score + (player === 'P1' ? 1 : 0), p2Score + (player === 'P2' ? 1 : 0));
       }, 1200);
     } else {
       playWrongSound();
@@ -92,7 +84,7 @@ export default function VocabDuelGame({ cards, title, onBack, onComplete }) {
           setBothFailed(true);
           setLockedRound(true);
           setTimeout(() => {
-            setQIndex(prev => prev + 1);
+            advanceRound(p1Score, p2Score);
           }, 1600);
         }
       } else {
@@ -103,11 +95,19 @@ export default function VocabDuelGame({ cards, title, onBack, onComplete }) {
           setBothFailed(true);
           setLockedRound(true);
           setTimeout(() => {
-            setQIndex(prev => prev + 1);
+            advanceRound(p1Score, p2Score);
           }, 1600);
         }
       }
     }
+  };
+
+  const advanceRound = (firstScore, secondScore) => {
+    if (qIndex + 1 < targetScore) {
+      setQIndex(prev => prev + 1);
+      return;
+    }
+    triggerWin(firstScore === secondScore ? 'เสมอกัน!' : firstScore > secondScore ? 'ผู้เล่น 1 (สีน้ำเงิน) 🔵' : 'ผู้เล่น 2 (สีแดง) 🔴');
   };
 
   const triggerWin = (winName) => {
@@ -127,7 +127,7 @@ export default function VocabDuelGame({ cards, title, onBack, onComplete }) {
         </button>
         <div className="text-center">
           <span className="text-amber-400 font-black text-sm"><UIIcon value={"⚔️"} /> 1v1 Vocab Duel: {title}</span>
-          <p className="text-[10px] text-slate-400">ใครได้ {targetScore} แต้มก่อนชนะ! (ตอบผิดจะโดนล็อกรอบนี้)</p>
+          <p className="text-[10px] text-slate-400">ข้อ {qIndex + 1}/{targetScore} · เล่นครบ 10 ข้อ ผู้ได้คะแนนมากกว่าชนะ (ตอบผิดจะโดนล็อกรอบนี้)</p>
         </div>
         <button onClick={() => speak(currentCard.frontLabel || currentCard.back)} className="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded-lg">
           <UIIcon value={"🔊"} /> ฟังเสียง
@@ -252,9 +252,9 @@ export default function VocabDuelGame({ cards, title, onBack, onComplete }) {
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="bg-slate-900 border-2 border-amber-400 rounded-3xl p-6 text-center max-w-sm w-full animate-bounce-in shadow-2xl space-y-4">
             <div className="text-6xl"><UIIcon value={"🏆"} /></div>
-            <h2 className="text-2xl font-black text-amber-400">ชนะเลิศ!</h2>
+            <h2 className="text-2xl font-black text-amber-400">จบการดวล 10 ข้อ!</h2>
             <p className="text-lg font-bold text-white">{winner}</p>
-            <p className="text-xs text-slate-400">ประลองความเร็วชนะด้วยคะแนน {targetScore} แต้ม!</p>
+            <p className="text-xs text-slate-400">ผู้เล่น 1: {p1Score} แต้ม · ผู้เล่น 2: {p2Score} แต้ม</p>
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => {

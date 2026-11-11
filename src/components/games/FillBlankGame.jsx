@@ -1,6 +1,9 @@
 import UIIcon, { UIIconText } from '../UIIcon';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import VocabTooltip from '../VocabTooltip';
+import { useSpeech } from '../../utils/useSpeech';
+import { playCorrectSound } from '../../utils/audio';
+import { selectFillBlankOption } from '../../utils/fillBlankSound';
 
 // ── FillBlankGame ─────────────────────────────────────────────
 // Props:
@@ -16,20 +19,32 @@ export default function FillBlankGame({ mission, onComplete, onBack }) {
   const [correct, setCorrect] = useState(0);
   const [wrong, setWrong] = useState(0);
   const [phase, setPhase] = useState('play'); // 'play' | 'done'
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const { speak, stop } = useSpeech();
+  const successTimer = useRef(null);
+  const selectedRef = useRef(false);
+  useEffect(() => () => clearTimeout(successTimer.current), []);
 
   const q = questions[currentIdx];
   const progress = Math.round((currentIdx / Math.max(questions.length, 1)) * 100);
 
   function handleSelect(idx) {
-    if (showResult) return;
-    setSelected(idx);
-    setShowResult(true);
-
-    if (idx === q.answer) setCorrect(c => c + 1);
-    else setWrong(w => w + 1);
+    if (selectedRef.current) return;
+    selectFillBlankOption(q, idx, showResult, soundEnabled, {
+      choose: (choice) => {
+        selectedRef.current = true;
+        setSelected(choice);
+        setShowResult(true);
+        if (choice === q.answer) setCorrect(c => c + 1);
+        else setWrong(w => w + 1);
+      },
+      speak,
+      success: () => { successTimer.current = setTimeout(playCorrectSound, 650); },
+    });
   }
 
   function handleNext() {
+    selectedRef.current = false;
     setSelected(null);
     setShowResult(false);
     const next = currentIdx + 1;
@@ -118,6 +133,7 @@ export default function FillBlankGame({ mission, onComplete, onBack }) {
           <p className="text-slate-500 text-xs">{mission.subtitle}</p>
         </div>
         <div className="text-slate-500 text-sm">{currentIdx + 1}/{questions.length}</div>
+        <button type="button" className="min-h-11 rounded-xl border-2 border-sky-300 bg-white px-3 text-sm font-bold text-sky-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-600" aria-pressed={soundEnabled} onClick={() => { if (soundEnabled) { stop(); clearTimeout(successTimer.current); } setSoundEnabled(!soundEnabled); }}>{soundEnabled ? 'ปิดเสียงเกม' : 'เปิดเสียงเกม'}</button>
       </div>
 
       {/* Progress */}
@@ -171,7 +187,7 @@ export default function FillBlankGame({ mission, onComplete, onBack }) {
           {q.options.map((opt, i) => (
             <button
               key={i}
-              onClick={() => handleSelect(i)}
+              onClickCapture={() => handleSelect(i)}
               className="py-4 px-3 rounded-2xl text-slate-800 font-bold text-sm bg-white border-2 border-amber-200 hover:bg-amber-50 hover:border-amber-400 active:scale-95 transition-all shadow-sm"
             >
               <VocabTooltip text={opt} />

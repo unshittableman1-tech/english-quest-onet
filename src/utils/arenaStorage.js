@@ -3,8 +3,10 @@
 // Saves to localStorage (fast) + syncs to Supabase (cross-device)
 
 import { supabase } from '../config/supabase';
+import { isDemoMode } from '../config/runtimeMode';
 
 const ARENA_STORAGE_KEY_PREFIX = 'eng_quest_arena_';
+const MAX_ARENA_ATTEMPTS = 50;
 
 const EMPTY_STATS = () => ({
   bestMiniMock: null,
@@ -13,6 +15,10 @@ const EMPTY_STATS = () => ({
   bestWeaknessMock: null,
   bestFullMock: null,
   bestFinalSimulation: null,
+  bestOnetYear2565: null,
+  bestOnetYear2566: null,
+  bestOnetYear2567: null,
+  bestOnetYear2568: null,
   finalExamResult: null,     // One-time final exam result (never overwritten)
   arenaBadges: [],
   arenaRankScore: 0,
@@ -35,7 +41,8 @@ function mergeStats(local, cloud) {
 
   const bestKeys = [
     'bestMiniMock', 'bestSpeedMock', 'bestSkillMixedMock',
-    'bestWeaknessMock', 'bestFullMock', 'bestFinalSimulation'
+    'bestWeaknessMock', 'bestFullMock', 'bestFinalSimulation',
+    'bestOnetYear2565', 'bestOnetYear2566', 'bestOnetYear2567', 'bestOnetYear2568'
   ];
 
   for (const key of bestKeys) {
@@ -59,7 +66,7 @@ function mergeStats(local, cloud) {
     ...(cloud.arenaBadges || [])
   ])];
 
-  // Merge attempts history (deduplicate by startedAt, keep last 20)
+  // Merge attempts history (deduplicate by startedAt, keep up to MAX_ARENA_ATTEMPTS)
   const allAttempts = [...(local.attempts || []), ...(cloud.attempts || [])];
   const seen = new Set();
   merged.attempts = allAttempts
@@ -69,7 +76,7 @@ function mergeStats(local, cloud) {
       seen.add(k);
       return true;
     })
-    .slice(0, 20);
+    .slice(0, MAX_ARENA_ATTEMPTS);
 
   // Recalculate rank score after merge
   merged.arenaRankScore = (
@@ -134,8 +141,8 @@ export function saveArenaAttempt(studentId, attempt) {
   const stats = getArenaStats(studentId);
   const mode = attempt.mode; // e.g., 'mini_mock_arena'
   
-  // Add to attempts history (keep last 20)
-  stats.attempts = [attempt, ...stats.attempts].slice(0, 20);
+  // Add to attempts history (keep up to MAX_ARENA_ATTEMPTS)
+  stats.attempts = [attempt, ...stats.attempts].slice(0, MAX_ARENA_ATTEMPTS);
   
   // Update best score for this mode
   let bestKey = '';
@@ -145,6 +152,10 @@ export function saveArenaAttempt(studentId, attempt) {
   if (mode === 'weakness_mock') bestKey = 'bestWeaknessMock';
   if (mode === 'full_mock_test') bestKey = 'bestFullMock';
   if (mode === 'final_exam_simulation') bestKey = 'bestFinalSimulation';
+  if (mode === 'onet_year_2565') bestKey = 'bestOnetYear2565';
+  if (mode === 'onet_year_2566') bestKey = 'bestOnetYear2566';
+  if (mode === 'onet_year_2567') bestKey = 'bestOnetYear2567';
+  if (mode === 'onet_year_2568') bestKey = 'bestOnetYear2568';
 
   if (bestKey) {
     const currentBest = stats[bestKey];
@@ -273,6 +284,7 @@ const SYSTEM_EXAM_SESSION_ID = '__SYSTEM_EXAM_SESSION__';
  * Uses students table system record for guaranteed cross-device sync.
  */
 export async function openExamSession(pin) {
+  if (isDemoMode) return { isOpen: false, pin: '', cloudSynced: false, disabled: true };
   const session = { isOpen: true, pin: String(pin), openedAt: new Date().toISOString() };
   localStorage.setItem(EXAM_SESSION_KEY, JSON.stringify(session));
 
@@ -314,6 +326,7 @@ export async function openExamSession(pin) {
  * Close the exam session (teacher action).
  */
 export async function closeExamSession() {
+  if (isDemoMode) return { isOpen: false, pin: '', cloudSynced: false, disabled: true };
   const prev = getExamSession();
   const session = { isOpen: false, pin: prev?.pin || '', openedAt: prev?.openedAt || null, closedAt: new Date().toISOString() };
   localStorage.setItem(EXAM_SESSION_KEY, JSON.stringify(session));
@@ -366,6 +379,7 @@ export function getExamSession() {
  * Fetch the exam session from Supabase (for students polling).
  */
 export async function getExamSessionFromCloud() {
+  if (isDemoMode) return getExamSession();
   try {
     // 1. First check students table (__SYSTEM_EXAM_SESSION__)
     const { data: sysData, error: sysErr } = await supabase
@@ -416,6 +430,7 @@ export async function getExamSessionFromCloud() {
  * Returns array of { id, name, class, number, finalExamResult }.
  */
 export async function getAllFinalExamResultsFromCloud() {
+  if (isDemoMode) return [];
   try {
     const { data, error } = await supabase
       .from('students')

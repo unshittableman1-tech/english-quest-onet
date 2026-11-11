@@ -7,7 +7,39 @@ import { restoreSourceMedia } from './mediaRepairs';
 import { restoreFamilyMedia } from './familyMediaRepairs';
 import { QUEST_ASSESSMENTS } from './questAssessments';
 import { cultureQuestions } from './cultureQuestions';
-import { CHAPTER_BOSS_QUESTIONS } from './chapterBossDrafts';
+import { buildVocabularyAssessment } from './vocabularyAssessment';
+import { O_NET_QUEST_UPGRADES } from './onetQuestUpgrades';
+import { EXPANDED_ONET_ASSESSMENTS } from './expandedOnetAssessments';
+import { OFFICIAL_ONET_BOSS_QUESTIONS } from './officialOnetBossQuestions';
+import { finalBossQuestions } from './finalBossQuestions';
+import { BOSS_ACTIVITY_FOCUS, BOSS_ACTIVITY_QUESTIONS } from './bossActivityQuestions';
+
+function preserveQuestionIds(legacyQuestions, upgradedQuestions) {
+  return upgradedQuestions.map((question, index) => ({
+    ...question,
+    id: legacyQuestions[index]?.id || question.id,
+  }));
+}
+
+function uniqueQuestions(questions) {
+  const seen = new Set();
+  return questions.filter(question => {
+    const key = JSON.stringify([question.question, question.image || null, question.passage || null]);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function balanceDraftQuestionOptions(questions) {
+  return questions.map((question, index) => {
+    if (!Array.isArray(question.options) || question.options.length !== 4 || !Number.isInteger(question.answer)) return question;
+    const target = index % 4;
+    const shift = (question.answer - target + 4) % 4;
+    if (!shift) return question;
+    return { ...question, options: [...question.options.slice(shift), ...question.options.slice(0, shift)], answer: target };
+  });
+}
 
 // ── helper: สร้าง quiz questions จาก fill_blank missions ของ Ch5 ──
 function ch5QuizQuestions(questId) {
@@ -28,7 +60,7 @@ function ch5QuizQuestions(questId) {
   );
 }
 
-export const vocabularyQuestions = [
+const legacyVocabularyQuestions = [
   { id: 'v01', quest: 'vocabulary', question: "\"Bicycle\" แปลว่าอะไร?", options: ["รถยนต์","รถจักรยาน","รถบัส","รถไฟ"], answer: 1, correctFeedback: "เก่งมาก! \"Bicycle\" แปลว่า รถจักรยาน", wrongFeedback: "Bi = สอง, cycle = วงล้อ ดังนั้น Bicycle = รถจักรยาน", keyword: "bicycle = รถจักรยาน"  },
   { id: 'v02', quest: 'vocabulary', question: "\"Motorcycle\" แปลว่าอะไร?", options: ["รถไฟ","รถเรือ","รถจักรยานยนต์","รถบรรทุก"], answer: 2, correctFeedback: "ถูกต้อง! \"Motorcycle\" คือ รถจักรยานยนต์", wrongFeedback: "Motor = เครื่องยนต์, Cycle = วงล้อ → Motorcycle = รถจักรยานยนต์", keyword: "motorcycle = รถจักรยานยนต์"  },
   { id: 'v03', quest: 'vocabulary', question: "ยานพาหนะชนิดใดที่วิ่งบนรางเหล็ก?", options: ["Bus","Taxi","Train","Van"], answer: 2, correctFeedback: "ใช่เลย! \"Train\" คือ รถไฟ", wrongFeedback: "รถไฟวิ่งบนราง = Train", keyword: "train = รถไฟ"  },
@@ -81,6 +113,8 @@ export const vocabularyQuestions = [
   { id: 'v50', quest: 'vocabulary', question: "\"Van\" คือยานพาหนะชนิดใด?", options: ["รถตู้","รถกระบะ","รถยนต์","รถจักรยาน"], answer: 0, correctFeedback: "ถูกแล้ว! Van = รถตู้", wrongFeedback: "Van = รถตู้", keyword: "van = รถตู้"  }
 ];
 
+export const vocabularyQuestions = buildVocabularyAssessment();
+
 export const signsQuestions = [
   { id: 's01', quest: 'signs', question: "\"No Parking\" หมายความว่าอะไร?", options: ["ห้ามจอดรถ","ที่จอดรถ","ห้ามแซง","ทางเดินรถ"], answer: 0, correctFeedback: "ถูกต้อง! No Parking = ห้ามจอดรถ", wrongFeedback: "No + คำนาม = ห้าม... | Parking = การจอดรถ", keyword: "No Parking = ห้ามจอดรถ"  },
   { id: 's02', quest: 'signs', question: "\"No U-turn\" หมายความว่าอะไร?", options: ["ห้ามเลี้ยวซ้าย","ห้ามกลับรถ","ให้กลับรถ","ห้ามเลี้ยวขวา"], answer: 1, correctFeedback: "ถูก! No U-turn = ห้ามกลับรถ", wrongFeedback: "U-turn คือการกลับรถรูปตัว U", keyword: "No U-turn = ห้ามกลับรถ"  },
@@ -89,7 +123,7 @@ export const signsQuestions = [
   { id: 's05', quest: 'signs', question: "\"Fire Exit\" หมายความว่าอะไร?", options: ["ทางออกฉุกเฉิน","ห้ามก่อไฟ","ถังดับเพลิง","เขตอันตราย"], answer: 0, correctFeedback: "ถูกต้อง! Fire Exit = ทางออกฉุกเฉิน (หนีไฟ)", wrongFeedback: "Fire = ไฟ, Exit = ทางออก", keyword: "Fire Exit = ทางออกฉุกเฉิน"  },
   { id: 's06', quest: 'signs', question: "\"Wet Floor\" หมายความว่าอะไร?", options: ["ห้ามเดิน","พื้นเปียก/ระวังลื่น","ทำความสะอาด","ห้ามวิ่ง"], answer: 1, correctFeedback: "ถูกแล้ว! Wet Floor = พื้นเปียก", wrongFeedback: "Wet = เปียก, Floor = พื้น", keyword: "Wet Floor = พื้นเปียก"  },
   { id: 's07', quest: 'signs', question: "\"No Photography\" หมายความว่าอะไร?", options: ["ห้ามถ่ายรูป","ห้ามใช้กล้อง","ถ่ายรูปได้","ห้ามเข้า"], answer: 0, correctFeedback: "ถูกต้อง! No Photography = ห้ามถ่ายรูป", wrongFeedback: "Photography = การถ่ายภาพ", keyword: "No Photography = ห้ามถ่ายรูป"  },
-  { id: 's08', quest: 'signs', quest: 'signs', question: "\"No Pets Allowed\" หมายความว่าอะไร?", options: ["นำสัตว์เลี้ยงเข้าได้","ห้ามนำสัตว์เลี้ยงเข้า","ห้ามส่งเสียง","เขตสัตว์"], answer: 1, correctFeedback: "ถูกเลย! ห้ามนำสัตว์เลี้ยงเข้า", wrongFeedback: "Pets = สัตว์เลี้ยง, Allowed = อนุญาต", keyword: "No Pets Allowed = ห้ามสัตว์เลี้ยงเข้า"  },
+  { id: 's08', quest: 'signs', question: "\"No Pets Allowed\" หมายความว่าอะไร?", options: ["นำสัตว์เลี้ยงเข้าได้","ห้ามนำสัตว์เลี้ยงเข้า","ห้ามส่งเสียง","เขตสัตว์"], answer: 1, correctFeedback: "ถูกเลย! ห้ามนำสัตว์เลี้ยงเข้า", wrongFeedback: "Pets = สัตว์เลี้ยง, Allowed = อนุญาต", keyword: "No Pets Allowed = ห้ามสัตว์เลี้ยงเข้า"  },
   { id: 's09', quest: 'signs', question: "\"Toilet\" หมายความว่าอะไร?", options: ["ห้องนอน","ห้องน้ำ","ห้องรับแขก","ทางออก"], answer: 1, correctFeedback: "ถูกต้อง! Toilet = ห้องน้ำ", wrongFeedback: "Toilet = ห้องน้ำ", keyword: "Toilet = ห้องน้ำ", image: "/images/male_toilet.jpg" },
   { id: 's10', quest: 'signs', question: "\"Traffic Light\" คืออะไร?", options: ["ไฟฉุกเฉิน","ไฟสัญญาณจราจร","ป้ายหยุด","ไฟเตือน"], answer: 1, correctFeedback: "ถูกแล้ว! Traffic Light = สัญญาณไฟจราจร", wrongFeedback: "Traffic = จราจร, Light = ไฟ", keyword: "Traffic Light = ไฟจราจร"  },
   { id: 's11', quest: 'signs', question: "\"No Smoking\" หมายความว่าอะไร?", options: ["ห้ามสูบบุหรี่","เขตสูบบุหรี่","ห้ามจุดไฟ","ระวังควัน"], answer: 0, correctFeedback: "ถูกต้อง! No Smoking = ห้ามสูบบุหรี่", wrongFeedback: "Smoke = ควัน/สูบ", keyword: "No Smoking = ห้ามสูบบุหรี่"  },
@@ -522,8 +556,7 @@ import {
   signDetectiveQuestions,
   conversationRescueQuestions,
   mapEscapeQuestions,
-  readingDetectiveQuestions,
-  strategyBossQuestions
+  readingDetectiveQuestions
 } from './chapter3_questions';
 
 // ── 12 Chapter 5 Topic Questions ─────────────────────────────
@@ -617,13 +650,13 @@ export const weatherQuestions_2 = [
   { id: 'w_pdf_01', quest: 'weather_seasons', question: "You are in Canada in December. The weather is cold and snowy. What should you wear?", options: ["T-shirt and shorts", "Coat, scarf, and gloves", "Swimsuit", "Sandals"], answer: 1, correctFeedback: "ถูกต้อง! อากาศหนาว (cold and snowy) ต้องใส่เสื้อโค้ท ผ้าพันคอ และถุงมือ", wrongFeedback: "cold and snowy = หนาวและมีหิมะ ต้องใส่ Coat, scarf, gloves", keyword: "cold and snowy = หนาวมีหิมะ" },
   { id: 'w_pdf_02', quest: 'weather_seasons', question: "In autumn in the USA, the leaves on trees usually…", options: ["fall and change color", "grow new flowers", "become green", "stay the same"], answer: 0, correctFeedback: "ถูกต้อง! ฤดูใบไม้ร่วง ใบไม้จะเปลี่ยนสีและร่วงหล่น", wrongFeedback: "autumn = ฤดูใบไม้ร่วง (leaves fall and change color)", keyword: "autumn = ฤดูใบไม้ร่วง" },
   { id: 'w_pdf_03', quest: 'weather_seasons', question: "It is very hot in July in Spain. What activity is the most suitable?", options: ["Skiing in the mountains", "Going to the beach", "Making a snowman", "Planting rice"], answer: 1, correctFeedback: "ถูกต้อง! อากาศร้อน (very hot) เหมาะกับการไปชายหาด", wrongFeedback: "very hot = ร้อนมาก เหมาะกับ Going to the beach", keyword: "very hot = ร้อนมาก" },
-  { id: 'w_pdf_04', quest: 'weather_seasons', question: "In winter, many families in Europe decorate their houses with lights. What festival is this?", options: ["Halloween", "Easter", "Christmas", "Thanksgiving"], answer: 2, correctFeedback: "ถูกต้อง! คริสต์มาสอยู่ในฤดูหนาวและมีการประดับไฟ", wrongFeedback: "winter = ฤดูหนาว เทศกาลในฤดูหนาวคือ Christmas", keyword: "winter = ฤดูหนาว" },
-  { id: 'w_pdf_05', quest: 'weather_seasons', question: "In spring, the weather is usually…", options: ["very hot", "very cold and snowy", "cool and flowers bloom", "dry and dusty"], answer: 2, correctFeedback: "ถูกต้อง! ฤดูใบไม้ผลิ อากาศจะเย็นสบายและดอกไม้บาน", wrongFeedback: "spring = ฤดูใบไม้ผลิ (cool and flowers bloom)", keyword: "spring = ฤดูใบไม้ผลิ" },
+  { id: 'w_pdf_04', quest: 'weather_seasons', question: "In winter, many families in Europe decorate their houses with lights. What festival is this?", options: ["Halloween", "Easter", "Thanksgiving", "Christmas"], answer: 3, correctFeedback: "ถูกต้อง! คริสต์มาสอยู่ในฤดูหนาวและมีการประดับไฟ", wrongFeedback: "winter = ฤดูหนาว เทศกาลในฤดูหนาวคือ Christmas", keyword: "winter = ฤดูหนาว" },
+  { id: 'w_pdf_05', quest: 'weather_seasons', question: "In spring, the weather is usually…", options: ["cool and flowers bloom", "very hot", "very cold and snowy", "dry and dusty"], answer: 0, correctFeedback: "ถูกต้อง! ฤดูใบไม้ผลิ อากาศจะเย็นสบายและดอกไม้บาน", wrongFeedback: "spring = ฤดูใบไม้ผลิ (cool and flowers bloom)", keyword: "spring = ฤดูใบไม้ผลิ" },
   { id: 'w_pdf_06', quest: 'weather_seasons', question: "Which season is after summer in the UK?", options: ["Winter", "Spring", "Autumn", "Summer again"], answer: 2, correctFeedback: "ถูกต้อง! หลังฤดูร้อนคือฤดูใบไม้ร่วง (Autumn)", wrongFeedback: "หลังจาก summer คือ autumn (ใบไม้ร่วง)", keyword: "after summer = หลังฤดูร้อน" },
-  { id: 'w_pdf_07', quest: 'weather_seasons', question: "Tom is planning a picnic in England. He checks the weather forecast: 'It will rain tomorrow.' What should he do?", options: ["Bring sunglasses", "Take an umbrella", "Wear sandals", "Go swimming"], answer: 1, correctFeedback: "ถูกต้อง! ถ้ารู้ว่าฝนจะตก (rain) ก็ต้องพกร่ม (umbrella)", wrongFeedback: "rain = ฝนตก ต้องใช้ umbrella (ร่ม)", keyword: "rain = ฝนตก" },
+  { id: 'w_pdf_07', quest: 'weather_seasons', question: "Tom is planning a picnic in England. He checks the weather forecast: 'It will rain tomorrow.' What should he do?", options: ["Bring sunglasses", "Wear sandals", "Go swimming", "Take an umbrella"], answer: 3, correctFeedback: "ถูกต้อง! ถ้ารู้ว่าฝนจะตก (rain) ก็ต้องพกร่ม (umbrella)", wrongFeedback: "rain = ฝนตก ต้องใช้ umbrella (ร่ม)", keyword: "rain = ฝนตก" },
   { id: 'w_pdf_08', quest: 'weather_seasons', question: "In the USA, many people eat turkey and celebrate with family in November. What season is this?", options: ["Winter", "Autumn", "Spring", "Summer"], answer: 1, correctFeedback: "ถูกต้อง! เดือนพฤศจิกายนในอเมริกาอยู่ในช่วงฤดูใบไม้ร่วง (Autumn)", wrongFeedback: "พฤศจิกายน (November) คือ Autumn", keyword: "November = พฤศจิกายน (Autumn)" },
   { id: 'w_pdf_09', quest: 'weather_seasons', question: "Which of the following sentences is correct?", options: ["In summer, people wear coats and boots.", "In winter, people go skiing.", "In spring, it always snows.", "In autumn, people swim in the sea."], answer: 1, correctFeedback: "ถูกต้อง! ในฤดูหนาว ผู้คนจะไปเล่นสกี", wrongFeedback: "In winter, people go skiing. (ฤดูหนาวไปเล่นสกี)", keyword: "winter = ฤดูหนาว, skiing = เล่นสกี" },
-  { id: 'w_pdf_10', quest: 'weather_seasons', question: "You are in Australia in January. What is the weather usually like?", options: ["Cold and snowy", "Hot and sunny", "Rainy and stormy", "Foggy and freezing"], answer: 1, correctFeedback: "ถูกต้อง! ออสเตรเลียอยู่ซีกโลกใต้ เดือนมกราคมคือฤดูร้อน", wrongFeedback: "ออสเตรเลียในเดือนมกราคมคือฤดูร้อน (Hot and sunny)", keyword: "Australia in January = ออสเตรเลียเดือนมกราคม (ฤดูร้อน)" },
+  { id: 'w_pdf_10', quest: 'weather_seasons', question: "You are in Australia in January. What is the weather usually like?", options: ["Cold and snowy", "Rainy and stormy", "Hot and sunny", "Foggy and freezing"], answer: 2, correctFeedback: "ถูกต้อง! ออสเตรเลียอยู่ซีกโลกใต้ เดือนมกราคมคือฤดูร้อน", wrongFeedback: "ออสเตรเลียในเดือนมกราคมคือฤดูร้อน (Hot and sunny)", keyword: "Australia in January = ออสเตรเลียเดือนมกราคม (ฤดูร้อน)" },
 ];
 
 export const emotionsQuestions_2 = [
@@ -808,7 +841,7 @@ export const familyQuestions = [
     "correctFeedback": "เป็นสัญลักษณ์ของครอบครัว (Family)",
     "wrongFeedback": "Incorrect.",
     "keyword": "symbol",
-    "image": "/images/family.svg"
+    "image": "/assessment/quest-scenes/family-parents-v1.webp"
   },
   {
     "id": "pdf_1.2_ครอบครัว_2",
@@ -1671,7 +1704,7 @@ export const set7Questions = [
     "answer": 1,
     "correctFeedback": "Correct!",
     "wrongFeedback": "Incorrect.",
-    "image": "/images/rain_school.svg"
+    "image": "/assessment/quest-scenes/rain-school-v1.webp"
   },
   {
     "id": "pdf_set7_1",
@@ -1686,7 +1719,7 @@ export const set7Questions = [
     "answer": 0,
     "correctFeedback": "Correct!",
     "wrongFeedback": "Incorrect.",
-    "image": "/images/breakfast.svg"
+    "image": "/assessment/quest-scenes/breakfast-v1.webp"
   },
   {
     "id": "pdf_set7_2",
@@ -1701,7 +1734,7 @@ export const set7Questions = [
     "answer": 0,
     "correctFeedback": "Correct!",
     "wrongFeedback": "Incorrect.",
-    "image": "/images/clean_classroom.svg"
+    "image": "/assessment/quest-scenes/clean-classroom-v1.webp"
   },
   {
     "id": "pdf_set7_3",
@@ -1731,7 +1764,7 @@ export const set7Questions = [
     "answer": 0,
     "correctFeedback": "Correct!",
     "wrongFeedback": "Incorrect.",
-    "image": "/images/teaching.svg"
+    "image": "/assessment/quest-scenes/student-reading-v1.webp"
   },
   {
     "id": "pdf_set7_5",
@@ -1746,7 +1779,7 @@ export const set7Questions = [
     "answer": 2,
     "correctFeedback": "Correct!",
     "wrongFeedback": "Incorrect.",
-    "image": "/images/library.svg"
+    "image": "/assessment/quest-scenes/library-reading-v1.webp"
   },
   {
     "id": "pdf_set7_6",
@@ -1761,7 +1794,7 @@ export const set7Questions = [
     "answer": 1,
     "correctFeedback": "Correct!",
     "wrongFeedback": "Incorrect.",
-    "image": "/images/no_signal.svg"
+    "image": "/assessment/quest-scenes/no-signal-v2.webp"
   },
   {
     "id": "pdf_set7_7",
@@ -1776,7 +1809,7 @@ export const set7Questions = [
     "answer": 1,
     "correctFeedback": "Correct!",
     "wrongFeedback": "Incorrect.",
-    "image": "/images/clean_school.svg"
+    "image": "/assessment/quest-scenes/clean-school-v1.webp"
   },
   {
     "id": "pdf_set7_8",
@@ -1791,7 +1824,7 @@ export const set7Questions = [
     "answer": 0,
     "correctFeedback": "Correct!",
     "wrongFeedback": "Incorrect.",
-    "image": "/images/cross_road.svg"
+    "image": "/assessment/quest-scenes/crossing-road-v1.webp"
   },
   {
     "id": "pdf_set7_9",
@@ -1806,7 +1839,7 @@ export const set7Questions = [
     "answer": 0,
     "correctFeedback": "Correct!",
     "wrongFeedback": "Incorrect.",
-    "image": "/images/noisy_class.svg"
+    "image": "/assessment/quest-scenes/noisy-classroom-v1.webp"
   },
   {
     "id": "pdf_set7_10",
@@ -2047,18 +2080,19 @@ export const set7Questions = [
     "wrongFeedback": "Incorrect."
   },
   {
-    "id": "pdf_set7_26",
+    "id": "pdf_set7_26_v2",
     "quest": "reading",
+    "itemVersion": "reading-paraphrase-v2",
     "question": "Tom: “In my opinion, playing outside is better than playing video games.” Which sentence expresses his view?",
     "options": [
       "A. He thinks video games are better.",
-      "B. He believes outdoor play is healthier.",
+      "B. He prefers playing outside to playing video games.",
       "C. He doesn’t like playing at all.",
       "D. He wants to stop playing."
     ],
     "answer": 1,
-    "correctFeedback": "Correct!",
-    "wrongFeedback": "Incorrect."
+    "correctFeedback": "Tom says playing outside is better than playing video games. The answer restates his preference without adding a reason about health.",
+    "wrongFeedback": "Look for the sentence that restates Tom's preference. The text does not say why he prefers playing outside."
   },
   {
     "id": "pdf_set7_27",
@@ -3428,52 +3462,55 @@ export const set1Part2 = [
 export const QUESTS = [
 
 
-  { id: 'about_myself', chapter: 1, name: 'About Myself', description: 'ข้อมูลส่วนตัว ความชอบ และการแนะนำตนเอง', icon: '🙋‍♂️', color: 'from-sky-500 to-indigo-500', questions: aboutMyselfQuestions },
-  { id: 'family', chapter: 1, name: 'Family & Home', description: 'ครอบครัว เครือญาติ และชีวิตในบ้าน', icon: '👨‍👩‍👧‍👦', color: 'from-amber-500 to-orange-500', questions: familyQuestions },
-  { id: 'school', chapter: 1, name: 'School & Classroom', description: 'โรงเรียน ห้องเรียน และอุปกรณ์การเรียน', icon: '🏫', color: 'from-emerald-500 to-teal-500', questions: [...schoolQuestions, ...set1Part2] },
+  { id: 'about_myself', chapter: 1, name: 'About Myself', description: 'ข้อมูลส่วนตัว ความชอบ และการแนะนำตนเอง', icon: '🙋‍♂️', color: 'from-sky-500 to-indigo-500', questions: preserveQuestionIds(aboutMyselfQuestions, EXPANDED_ONET_ASSESSMENTS.about_myself) },
+  { id: 'family', chapter: 1, name: 'Family & Home', description: 'ครอบครัว เครือญาติ และชีวิตในบ้าน', icon: '👨‍👩‍👧‍👦', color: 'from-amber-500 to-orange-500', questions: preserveQuestionIds(familyQuestions, EXPANDED_ONET_ASSESSMENTS.family) },
+  { id: 'school', chapter: 1, name: 'School & Classroom', description: 'โรงเรียน ห้องเรียน และอุปกรณ์การเรียน', icon: '🏫', color: 'from-emerald-500 to-teal-500', questions: [
+    ...preserveQuestionIds([...schoolQuestions, ...set1Part2], EXPANDED_ONET_ASSESSMENTS.school),
+    set1Part2.find(question => question.id === 'pdf_1.6_เครื่องดื่ม_4'),
+  ].filter(Boolean) },
 
   // ── Chapter 1: The Foundation (Basic Vocab & Grammar) ──
   { id: 'vocabulary', chapter: 1, name: 'Vocab Village', description: 'คำศัพท์รอบตัว ยานพาหนะ สถานที่', icon: '📚', color: 'from-blue-600 to-cyan-500', questions: vocabularyQuestions },
-  { id: 'numbers', chapter: 1, name: 'Number Arena', description: 'ตัวเลข ราคา และการบอกเวลา', icon: '🔢', color: 'from-violet-600 to-purple-500', questions: numbersQuestions },
-  { id: 'weather_seasons', chapter: 1, name: 'Weather & Seasons', description: 'สภาพอากาศและฤดูกาล', icon: '🌤️', color: 'from-yellow-500 to-amber-400', questions: weatherQuestions },
-  { id: 'food', chapter: 1, name: 'Food Festival', description: 'อาหารและการสั่งอาหาร', icon: '🍜', color: 'from-red-600 to-orange-500', questions: foodQuestions },
-  { id: 'illness', chapter: 1, name: 'Health Clinic', description: 'คำศัพท์การเจ็บป่วยและสุขภาพ', icon: '🏥', color: 'from-teal-600 to-cyan-500', questions: illnessQuestions },
+  { id: 'numbers', chapter: 1, name: 'Number Arena', description: 'ตัวเลข ราคา และการบอกเวลา', icon: '🔢', color: 'from-violet-600 to-purple-500', questions: EXPANDED_ONET_ASSESSMENTS.numbers },
+  { id: 'weather_seasons', chapter: 1, name: 'Weather & Seasons', description: 'สภาพอากาศและฤดูกาล', icon: '🌤️', color: 'from-yellow-500 to-amber-400', questions: weatherQuestions_2 },
+  { id: 'food', chapter: 1, name: 'Food Festival', description: 'อาหารและการสั่งอาหาร', icon: '🍜', color: 'from-red-600 to-orange-500', questions: preserveQuestionIds(foodQuestions, O_NET_QUEST_UPGRADES.food) },
+  { id: 'illness', chapter: 1, name: 'Health Clinic', description: 'คำศัพท์การเจ็บป่วยและสุขภาพ', icon: '🏥', color: 'from-teal-600 to-cyan-500', questions: preserveQuestionIds(illnessQuestions, O_NET_QUEST_UPGRADES.illness) },
   { id: 'shapes_colors', chapter: 1, name: 'Shapes & Colors', description: 'รูปทรงและสีสัน', icon: '🎨', color: 'from-purple-600 to-indigo-500', questions: ch5QuizQuestions('shapes_colors') },
-  { id: 'grammar', chapter: 1, name: 'Grammar Boss', description: 'สรุป Tense และ Grammar พื้นฐาน', icon: '⚡', color: 'from-pink-600 to-rose-500', questions: grammarQuestions },
+  { id: 'grammar', chapter: 1, name: 'O-NET Blueprint Boss', description: 'ข้อสอบจำลอง O-NET 32 ข้อตาม Test Blueprint', icon: '⚡', color: 'from-pink-600 to-rose-500', questions: finalBossQuestions, isExam: true },
 
   // ── Chapter 2: Social Interactions ──
-  { id: 'conversation', chapter: 2, name: 'Conversation Café', description: 'บทสนทนาทักทาย ขอบคุณ ขอโทษ', icon: '💬', color: 'from-purple-600 to-violet-500', questions: [...conversationQuestions, ...set3Questions], unlockCondition: ['Chapter1'] },
-  { id: 'conversation_rescue', chapter: 2, name: 'Conversation Rescue', description: 'มารยาทสังคมและการขอความช่วยเหลือ', icon: '🤝', color: 'from-pink-600 to-rose-700', questions: conversationRescueQuestions, unlockCondition: ['Chapter1'] },
-  { id: 'emotions_feelings', chapter: 2, name: 'Emotions & Feelings', description: 'อารมณ์และความรู้สึก', icon: '😊', color: 'from-emerald-500 to-teal-400', questions: emotionsQuestions, unlockCondition: ['Chapter1'] },
-  { id: 'jobs', chapter: 2, name: 'Career World', description: 'อาชีพและการทำงาน', icon: '👷', color: 'from-orange-600 to-amber-500', questions: jobsQuestions, unlockCondition: ['Chapter1'] },
-  { id: 'market', chapter: 2, name: 'Market Quest', description: 'การซื้อขายในตลาด', icon: '🛒', color: 'from-yellow-500 to-amber-400', questions: marketQuestions, unlockCondition: ['Chapter1'] },
-  { id: 'chapter2_boss', chapter: 2, name: 'Social Challenge', description: 'เลือกคำพูดให้เหมาะกับสถานการณ์', icon: '⚔️', color: 'from-rose-600 to-orange-500', questions: CHAPTER_BOSS_QUESTIONS[2], unlockCondition: ['Chapter1'] },
+  { id: 'conversation', chapter: 2, name: 'Conversation Café', description: 'บทสนทนาทักทาย ขอบคุณ ขอโทษ', icon: '💬', color: 'from-purple-600 to-violet-500', questions: balanceDraftQuestionOptions(uniqueQuestions([...conversationQuestions, ...set3Questions])), unlockCondition: ['Chapter1'] },
+  { id: 'conversation_rescue', chapter: 2, name: 'Conversation Rescue', description: 'มารยาทสังคมและการขอความช่วยเหลือ', icon: '🤝', color: 'from-pink-600 to-rose-700', questions: balanceDraftQuestionOptions(conversationRescueQuestions), unlockCondition: ['Chapter1'] },
+  { id: 'emotions_feelings', chapter: 2, name: 'Emotions & Feelings', description: 'อารมณ์และความรู้สึก', icon: '😊', color: 'from-emerald-500 to-teal-400', questions: balanceDraftQuestionOptions(emotionsQuestions_2), unlockCondition: ['Chapter1'] },
+  { id: 'jobs', chapter: 2, name: 'Career World', description: 'อาชีพและการทำงาน', icon: '👷', color: 'from-orange-600 to-amber-500', questions: EXPANDED_ONET_ASSESSMENTS.jobs, unlockCondition: ['Chapter1'] },
+  { id: 'market', chapter: 2, name: 'Market Quest', description: 'การซื้อขายในตลาด', icon: '🛒', color: 'from-yellow-500 to-amber-400', questions: preserveQuestionIds(marketQuestions, O_NET_QUEST_UPGRADES.market), unlockCondition: ['Chapter1'] },
+  { id: 'chapter2_boss', chapter: 2, name: 'Social Challenge', description: 'ข้อสอบ O-NET และโจทย์คละทักษะ', icon: '⚔️', color: 'from-rose-600 to-orange-500', questions: OFFICIAL_ONET_BOSS_QUESTIONS.chapter2_boss, supplementalBossQuestions: BOSS_ACTIVITY_QUESTIONS.chapter2_boss, assessmentCount: 10, requiredAssessmentFocus: BOSS_ACTIVITY_FOCUS, isExam: true, unlockCondition: ['Chapter1'] },
 
   // ── Chapter 3: The Interrogation Room (Question Mastery) ──
   { id: 'question_words', chapter: 3, name: 'Question Word Gate', description: 'ฝึกวิเคราะห์คำถาม Wh-Questions', icon: '🕵️', color: 'from-purple-700 to-indigo-800', questions: questionWordQuestions, unlockCondition: ['Chapter2'] },
-  { id: 'pronouns_master', chapter: 3, name: 'Pronoun World', description: 'วิเคราะห์สรรพนามในคำถาม', icon: '👥', color: 'from-fuchsia-600 to-pink-500', questions: ch5QuizQuestions('pronouns_master'), unlockCondition: ['Chapter2'] },
+  { id: 'pronouns_master', chapter: 3, name: 'Pronoun World', description: 'วิเคราะห์สรรพนามในคำถาม', icon: '👥', color: 'from-fuchsia-600 to-pink-500', questions: EXPANDED_ONET_ASSESSMENTS.pronouns_master, unlockCondition: ['Chapter2'] },
   { id: 'tenses_arena', chapter: 3, name: 'Tense Mastery', description: 'จับผิด Tense ในประโยคคำถาม', icon: '⏳', color: 'from-yellow-600 to-orange-500', questions: ch5QuizQuestions('tenses_arena'), unlockCondition: ['Chapter2'] },
-  { id: 'strategy_boss', chapter: 3, name: 'The Question Sphinx', description: 'บอสแห่งคำถาม (Two-Step Strategy)', icon: '👑', color: 'from-red-700 to-rose-900', questions: strategyBossQuestions, unlockCondition: ['Chapter2'] },
+  { id: 'strategy_boss', chapter: 3, name: 'The Question Sphinx', description: 'ข้อสอบ O-NET และโจทย์คละทักษะ', icon: '👑', color: 'from-red-700 to-rose-900', questions: OFFICIAL_ONET_BOSS_QUESTIONS.strategy_boss, supplementalBossQuestions: BOSS_ACTIVITY_QUESTIONS.strategy_boss, assessmentCount: 10, requiredAssessmentFocus: BOSS_ACTIVITY_FOCUS, isExam: true, unlockCondition: ['Chapter2'] },
 
   // ── Chapter 4: Data Detective (Reading & Interpretation) ──
-  { id: 'signs', chapter: 4, name: 'Signs City', description: 'อ่านป้ายและสัญลักษณ์', icon: '🚦', color: 'from-red-600 to-orange-500', questions: [...signsQuestions, ...set5Questions], unlockCondition: ['Chapter3'] },
+  { id: 'signs', chapter: 4, name: 'Signs City', description: 'อ่านป้ายและสัญลักษณ์', icon: '🚦', color: 'from-red-600 to-orange-500', questions: preserveQuestionIds(signsQuestions, O_NET_QUEST_UPGRADES.signs), unlockCondition: ['Chapter3'] },
   { id: 'sign_detective', chapter: 4, name: 'Sign Detective', description: 'วิเคราะห์ป้ายแบบลึก', icon: '🔍', color: 'from-slate-700 to-gray-900', questions: signDetectiveQuestions, unlockCondition: ['Chapter3'] },
-  { id: 'directions', chapter: 4, name: 'Direction Maze', description: 'คำบอกทิศทางและแผนที่', icon: '🧭', color: 'from-green-600 to-emerald-500', questions: directionsQuestions, unlockCondition: ['Chapter3'] },
-  { id: 'prepositions_hub', chapter: 4, name: 'Preposition Portal', description: 'ตำแหน่งและสถานที่', icon: '📍', color: 'from-emerald-600 to-teal-500', questions: ch5QuizQuestions('prepositions_hub'), unlockCondition: ['Chapter3'] },
+  { id: 'directions', chapter: 4, name: 'Direction Maze', description: 'คำบอกทิศทางและแผนที่', icon: '🧭', color: 'from-green-600 to-emerald-500', questions: preserveQuestionIds(directionsQuestions, O_NET_QUEST_UPGRADES.directions), unlockCondition: ['Chapter3'] },
+  { id: 'prepositions_hub', chapter: 4, name: 'Preposition Portal', description: 'ตำแหน่งและสถานที่', icon: '📍', color: 'from-emerald-600 to-teal-500', questions: EXPANDED_ONET_ASSESSMENTS.prepositions_hub, unlockCondition: ['Chapter3'] },
   { id: 'map_escape', chapter: 4, name: 'Map Escape', description: 'วิเคราะห์แผนผังและทิศทาง', icon: '🗺️', color: 'from-emerald-700 to-teal-900', questions: mapEscapeQuestions, unlockCondition: ['Chapter3'] },
-  { id: 'reading', chapter: 4, name: 'Reading Dungeon', description: 'การอ่านจับใจความ', icon: '📖', color: 'from-indigo-600 to-blue-700', questions: [...readingQuestions, ...set7Questions], unlockCondition: ['Chapter3'] },
+  { id: 'reading', chapter: 4, name: 'Reading Dungeon', description: 'การอ่านจับใจความ', icon: '📖', color: 'from-indigo-600 to-blue-700', questions: uniqueQuestions([...readingQuestions, ...set7Questions]), unlockCondition: ['Chapter3'] },
   { id: 'reading_detective', chapter: 4, name: 'Reading Detective', description: 'หา keyword จาก passage', icon: '🕵️‍♂️', color: 'from-amber-700 to-orange-900', questions: readingDetectiveQuestions, unlockCondition: ['Chapter3'] },
-  { id: 'finalboss', chapter: 4, name: 'The Logic Dragon', description: 'สอบวัดผลก่อนเข้า Arena', icon: '🐉', color: 'from-amber-500 to-yellow-400', questions: strategyBossQuestions, unlockCondition: ['Chapter3'] }, // Using strategyBossQuestions temporarily
+  { id: 'finalboss', chapter: 4, name: 'The Logic Dragon', description: 'ข้อสอบ O-NET และโจทย์คละทักษะ', icon: '🐉', color: 'from-amber-500 to-yellow-400', questions: OFFICIAL_ONET_BOSS_QUESTIONS.finalboss, supplementalBossQuestions: BOSS_ACTIVITY_QUESTIONS.finalboss, assessmentCount: 10, requiredAssessmentFocus: BOSS_ACTIVITY_FOCUS, isExam: true, unlockCondition: ['Chapter3'] },
 
   // ── Chapter 5: Expansion / Extra Quests ──
-  { id: 'nouns_quantifiers', chapter: 5, name: 'Countable & Quantifiers', description: 'คำนามและปริมาณ', icon: '🥛', color: 'from-cyan-600 to-blue-500', questions: ch5QuizQuestions('nouns_quantifiers') },
-  { id: 'adjectives_comp', chapter: 5, name: 'Adjective & Comparison', description: 'การเปรียบเทียบ', icon: '📏', color: 'from-amber-600 to-yellow-500', questions: ch5QuizQuestions('adjectives_comp') },
+  { id: 'nouns_quantifiers', chapter: 5, name: 'Countable & Quantifiers', description: 'คำนามและปริมาณ', icon: '🥛', color: 'from-cyan-600 to-blue-500', questions: EXPANDED_ONET_ASSESSMENTS.nouns_quantifiers },
+  { id: 'adjectives_comp', chapter: 5, name: 'Adjective & Comparison', description: 'การเปรียบเทียบ', icon: '📏', color: 'from-amber-600 to-yellow-500', questions: EXPANDED_ONET_ASSESSMENTS.adjectives_comp },
   { id: 'clothes_fashion', chapter: 5, name: 'Clothes & Fashion', description: 'เครื่องแต่งกาย', icon: '👕', color: 'from-pink-600 to-rose-500', questions: ch5QuizQuestions('clothes_fashion') },
-  { id: 'world_countries', chapter: 5, name: 'Countries & Nationalities', description: 'ประเทศและสัญชาติ', icon: '🇹🇭', color: 'from-red-600 to-rose-500', questions: ch5QuizQuestions('world_countries') },
-  { id: 'nature_environment', chapter: 5, name: 'Eco & Environment', description: 'สิ่งแวดล้อม', icon: '🌿', color: 'from-green-600 to-emerald-500', questions: ch5QuizQuestions('nature_environment') },
-  { id: 'school_subjects', chapter: 5, name: 'School Subjects', description: 'วิชาเรียน', icon: '📚', color: 'from-blue-600 to-cyan-500', questions: ch5QuizQuestions('school_subjects') },
+  { id: 'world_countries', chapter: 5, name: 'Countries & Nationalities', description: 'ประเทศและสัญชาติ', icon: '🇹🇭', color: 'from-red-600 to-rose-500', questions: EXPANDED_ONET_ASSESSMENTS.world_countries },
+  { id: 'nature_environment', chapter: 5, name: 'Eco & Environment', description: 'สิ่งแวดล้อม', icon: '🌿', color: 'from-green-600 to-emerald-500', questions: EXPANDED_ONET_ASSESSMENTS.nature_environment },
+  { id: 'school_subjects', chapter: 5, name: 'School Subjects', description: 'วิชาเรียน', icon: '📚', color: 'from-blue-600 to-cyan-500', questions: EXPANDED_ONET_ASSESSMENTS.school_subjects },
   { id: 'culture_festivals', chapter: 5, name: 'Festivals & Culture', description: 'เทศกาล วันสำคัญ และวัฒนธรรม', icon: '🎉', color: 'from-pink-600 to-amber-500', questions: cultureQuestions },
-  { id: 'chapter5_boss', chapter: 5, name: 'Knowledge Challenge', description: 'บูรณาการภาษาและวัฒนธรรมจากทั้งบท', icon: '⚔️', color: 'from-violet-600 to-pink-500', questions: CHAPTER_BOSS_QUESTIONS[5] },
+  { id: 'chapter5_boss', chapter: 5, name: 'Knowledge Challenge', description: 'ข้อสอบ O-NET จริงแบบบูรณาการ', icon: '⚔️', color: 'from-violet-600 to-pink-500', questions: OFFICIAL_ONET_BOSS_QUESTIONS.chapter5_boss, isExam: true },
 ];
 
 export const preTestQuestions = [

@@ -8,7 +8,7 @@ try {
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  await page.goto('http://127.0.0.1:5173/');
+  await page.goto(process.env.APP_URL || 'http://127.0.0.1:5173/');
   await mkdir('scratch/phase0-screenshots', { recursive: true });
   for (const questId of ['tenses_arena']) {
     await page.evaluate(async id => (await import('/tests/browser-harness.jsx')).setPendingAssessmentFixture(id, true), questId);

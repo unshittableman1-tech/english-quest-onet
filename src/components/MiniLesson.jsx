@@ -65,7 +65,11 @@ export default function MiniLesson({ questId }) {
             <div className="grid grid-cols-2 gap-2">
               {lesson.vocab.map((item, i) => (
                 <div key={i} className="glass-card p-3 flex items-center gap-2">
-                  <span className="text-xl shrink-0">{item.emoji}</span>
+                  {item.image ? (
+                    <img src={item.image} alt="" className="h-11 w-11 shrink-0 object-contain" loading="lazy" />
+                  ) : (
+                    <span className="text-xl shrink-0">{item.emoji}</span>
+                  )}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <div className="text-slate-800 font-bold text-sm truncate">{item.en}</div>

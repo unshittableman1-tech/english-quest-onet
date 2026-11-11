@@ -4,7 +4,8 @@ export function validateAssessmentEvidence(evidence, score, total) {
       !Array.isArray(evidence.items) || evidence.items.length !== total ||
       new Set(evidence.items.map(item => item?.id)).size !== total ||
       evidence.items.some(item => !item || typeof item.id !== 'string' || !item.id || typeof item.version !== 'string' || !item.version ||
-        typeof item.firstCorrect !== 'boolean' || typeof item.finalCorrect !== 'boolean' || typeof item.firstChoice !== 'string') ||
+        typeof item.firstCorrect !== 'boolean' || typeof item.finalCorrect !== 'boolean' || typeof item.firstChoice !== 'string' ||
+        (item.firstReasonChoice !== undefined && item.firstReasonChoice !== null && typeof item.firstReasonChoice !== 'string')) ||
       evidence.items.filter(item => item.firstCorrect).length !== score) {
     throw new TypeError('Invalid first-response assessment evidence');
   }

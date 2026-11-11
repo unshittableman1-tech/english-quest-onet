@@ -2,7 +2,7 @@ import UIIcon, { UIIconText } from './UIIcon';
 import { useState, useEffect } from 'react';
 import { toggleBGM } from '../utils/audio';
 
-export default function BGMToggle() {
+export default function BGMToggle({ aboveNavigation = false }) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const handleClick = () => {
@@ -12,8 +12,11 @@ export default function BGMToggle() {
 
   return (
     <button
+      type="button"
       onClick={handleClick}
-      className={`fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-2xl z-50 transition-all duration-300 hover:scale-110 active:scale-95 ${
+      aria-label={isPlaying ? 'ปิดเพลงประกอบ' : 'เปิดเพลงประกอบ'}
+      aria-pressed={isPlaying}
+      className={`bgm-toggle ${aboveNavigation ? 'above-navigation' : ''} fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-2xl z-50 transition-all duration-300 hover:scale-110 active:scale-95 ${
         isPlaying 
           ? 'bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-violet-500/50' 
           : 'bg-slate-50 border-2 border-amber-200 text-slate-500 hover:bg-slate-700'

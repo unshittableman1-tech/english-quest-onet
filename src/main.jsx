@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import './styles/theme.css'
+import './styles/questMapPremium.css'
+import './styles/onboarding.css'
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -33,10 +35,34 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  </React.StrictMode>,
-)
+async function clearLocalDevelopmentCaches() {
+  if (!import.meta.env.DEV || !['localhost', '127.0.0.1'].includes(window.location.hostname)) return
+
+  try {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations()
+      await Promise.all(registrations.map((registration) => registration.unregister()))
+    }
+
+    if ('caches' in window) {
+      const cacheNames = await caches.keys()
+      await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)))
+    }
+  } catch (error) {
+    console.warn('Unable to clear the local development cache:', error)
+  }
+}
+
+async function startApp() {
+  await clearLocalDevelopmentCaches()
+
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </React.StrictMode>,
+  )
+}
+
+startApp()

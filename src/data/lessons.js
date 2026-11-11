@@ -1,4 +1,5 @@
 // lessons.js — Mini Lesson content สำหรับแต่ละด่าน
+import { getVocabularyAsset } from './learningAssetPaths';
 
 export const LESSONS = {
   vocabulary: {
@@ -7,24 +8,24 @@ export const LESSONS = {
     subtitle: 'คำศัพท์ยานพาหนะและสถานที่',
     color: 'from-blue-600 to-cyan-500',
     vocab: [
-      { en: 'car', th: 'รถยนต์', emoji: '🚗' },
-      { en: 'bus', th: 'รถบัส/รถเมล์', emoji: '🚌' },
-      { en: 'van', th: 'รถตู้', emoji: '🚐' },
-      { en: 'bicycle', th: 'รถจักรยาน', emoji: '🚲' },
-      { en: 'taxi', th: 'รถแท็กซี่', emoji: '🚕' },
-      { en: 'ship', th: 'เรือใหญ่', emoji: '🚢' },
-      { en: 'boat', th: 'เรือเล็ก', emoji: '⛵' },
-      { en: 'motorcycle', th: 'รถจักรยานยนต์', emoji: '🏍️' },
-      { en: 'train', th: 'รถไฟ', emoji: '🚂' },
-      { en: 'plane', th: 'เครื่องบิน', emoji: '✈️' },
-      { en: 'school', th: 'โรงเรียน', emoji: '🏫' },
-      { en: 'hospital', th: 'โรงพยาบาล', emoji: '🏥' },
-      { en: 'bank', th: 'ธนาคาร', emoji: '🏦' },
-      { en: 'post office', th: 'ที่ทำการไปรษณีย์', emoji: '📮' },
-      { en: 'airport', th: 'สนามบิน', emoji: '✈️' },
-      { en: 'market', th: 'ตลาด', emoji: '🏪' },
-      { en: 'restaurant', th: 'ร้านอาหาร', emoji: '🍽️' },
-      { en: 'coffee shop', th: 'ร้านกาแฟ', emoji: '☕' },
+      { en: 'car', th: 'รถยนต์', image: getVocabularyAsset('car') },
+      { en: 'bus', th: 'รถบัส/รถเมล์', image: getVocabularyAsset('bus') },
+      { en: 'van', th: 'รถตู้', image: getVocabularyAsset('van') },
+      { en: 'bicycle', th: 'รถจักรยาน', image: getVocabularyAsset('bicycle') },
+      { en: 'taxi', th: 'รถแท็กซี่', image: getVocabularyAsset('taxi') },
+      { en: 'ship', th: 'เรือใหญ่', image: getVocabularyAsset('ship') },
+      { en: 'boat', th: 'เรือเล็ก', image: getVocabularyAsset('boat') },
+      { en: 'motorcycle', th: 'รถจักรยานยนต์', image: getVocabularyAsset('motorcycle') },
+      { en: 'train', th: 'รถไฟ', image: getVocabularyAsset('train') },
+      { en: 'plane', th: 'เครื่องบิน', image: getVocabularyAsset('plane') },
+      { en: 'school', th: 'โรงเรียน', image: getVocabularyAsset('school') },
+      { en: 'hospital', th: 'โรงพยาบาล', image: getVocabularyAsset('hospital') },
+      { en: 'bank', th: 'ธนาคาร', image: getVocabularyAsset('bank') },
+      { en: 'post office', th: 'ที่ทำการไปรษณีย์', image: getVocabularyAsset('post office') },
+      { en: 'airport', th: 'สนามบิน', image: getVocabularyAsset('airport') },
+      { en: 'market', th: 'ตลาด', image: getVocabularyAsset('market') },
+      { en: 'restaurant', th: 'ร้านอาหาร', image: getVocabularyAsset('restaurant') },
+      { en: 'coffee shop', th: 'ร้านกาแฟ', image: '/learning/places/coffee-shop-v1.png' },
     ],
     aiTip: {
       title: '💡 AI Tip: จำง่ายๆ',

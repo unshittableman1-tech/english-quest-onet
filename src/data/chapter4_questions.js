@@ -1,5 +1,7 @@
 import { QUESTS } from './questions';
 import { cultureQuestions } from './cultureQuestions';
+import { getOnetRealYearPool } from './onetRealExamPools';
+import { isPracticeQuestionReady, inspectQuestionMedia } from '../utils/questionMedia';
 // src/data/chapter4_questions.js
 // Chapter 4: O-NET Arena — Question Pools (O-NET ป.6 Style)
 // Format: { id, skill, question, options:[4], answer(0-3), correctFeedback, wrongFeedback, keyword }
@@ -346,6 +348,8 @@ export function getFinalExamPool(targetCount = 50) {
       if (!q || !q.question) continue;
       if (!isSingleStepMcq(q) || ['pending_teacher', 'rejected', 'quarantined'].includes(q.reviewStatus)) continue;
       if (Array.isArray(q.approvedModes) && !q.approvedModes.includes('school_final_50')) continue;
+      const inspection = inspectQuestionMedia(q);
+      if (inspection.blocked || inspection.status === 'present_unverified') continue;
       const key = q.question.trim().toLowerCase();
       if (!seen.has(key)) {
         seen.add(key);
@@ -426,3 +430,102 @@ export function getFinalExamPool(targetCount = 50) {
 
   return shuffleArray(selected.slice(0, targetCount));
 }
+
+
+/**
+ * Returns a 32-question O-NET Full Simulation pool for a specific year (2566, 2567, 2568).
+ * Balanced across 4 main O-NET domains:
+ * - Conversation & Situations: 8 questions
+ * - Signs, Notices & Directions: 8 questions
+ * - Reading Comprehension: 8 questions
+ * - Grammar, Vocabulary & Language Use: 8 questions
+ * Total: 32 questions (60 minutes, 100 points)
+ */
+export function getOnetYearSimulationPool(year = 2566) {
+  const y = Number(year);
+  if (y === 2565 || y === 2566 || y === 2567) {
+    return getOnetRealYearPool(y);
+  }
+  const allUnique = [];
+  const seen = new Set();
+
+  function addQuestions(arr) {
+    if (!Array.isArray(arr)) return;
+    for (const q of arr) {
+      if (!q || !q.question) continue;
+      if (!isSingleStepMcq(q) || !isPracticeQuestionReady(q)) continue;
+      const key = q.question.trim().toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        allUnique.push(q);
+      }
+    }
+  }
+
+  addQuestions(finalSimPool);
+  addQuestions(fullMockPool);
+  addQuestions(miniMockPool);
+  addQuestions(skillMixedPool);
+  addQuestions(speedMockPool);
+  addQuestions(cultureQuestions);
+
+  QUESTS.forEach(questGroup => {
+    let mappedSkill = questGroup.id;
+    if (['about_myself', 'family', 'school', 'food', 'weather_seasons', 'illness'].includes(questGroup.id)) mappedSkill = 'vocabulary';
+    if (['directions'].includes(questGroup.id)) mappedSkill = 'directions';
+    if (['conversation', 'conversation_rescue', 'emotions_feelings'].includes(questGroup.id)) mappedSkill = 'conversation';
+    if (['signs', 'sign_detective'].includes(questGroup.id)) mappedSkill = 'signs';
+    if (['grammar', 'tenses_boss'].includes(questGroup.id)) mappedSkill = 'grammar';
+    if (['reading', 'reading_detective', 'finalboss'].includes(questGroup.id)) mappedSkill = 'reading';
+    if (['question_words', 'yes_no'].includes(questGroup.id)) mappedSkill = 'question_words';
+
+    questGroup.questions.forEach(q => {
+      addQuestions([{ ...q, skill: mappedSkill }]);
+    });
+  });
+
+  if (weaknessMockBySkill) {
+    Object.values(weaknessMockBySkill).forEach(addQuestions);
+  }
+
+  const byDomain = {
+    conversation: allUnique.filter(q => ['conversation', 'conversation_rescue', 'emotions_feelings'].includes(q.skill)),
+    signs: allUnique.filter(q => ['signs', 'sign_detective', 'directions'].includes(q.skill)),
+    reading: allUnique.filter(q => ['reading', 'reading_detective', 'finalboss'].includes(q.skill)),
+    grammar: allUnique.filter(q => ['grammar', 'tenses_boss', 'vocabulary', 'question_words', 'yes_no'].includes(q.skill)),
+  };
+
+  const seedOffset = (Number(year) - 2566) * 7;
+  const quota = { conversation: 8, signs: 8, reading: 8, grammar: 8 };
+  let selected = [];
+  const selectedKeys = new Set();
+
+  for (const [domain, count] of Object.entries(quota)) {
+    const list = byDomain[domain] || [];
+    const len = Math.max(1, list.length);
+    const start = seedOffset % len;
+    const rotated = list.slice(start).concat(list.slice(0, start));
+    const pool = shuffleArray(rotated);
+    for (const q of pool) {
+      const key = q.question.trim().toLowerCase();
+      if (!selectedKeys.has(key)) {
+        selectedKeys.add(key);
+        selected.push(q);
+        if (selected.filter(item => (byDomain[domain] || []).includes(item)).length >= count) break;
+      }
+    }
+  }
+
+  // If still below 32, fill unique questions
+  if (selected.length < 32) {
+    const remaining = shuffleArray(allUnique.filter(q => !selectedKeys.has(q.question.trim().toLowerCase())));
+    selected = selected.concat(remaining.slice(0, 32 - selected.length));
+  }
+
+  return shuffleArray(selected.slice(0, 32));
+}
+
+export const onetYear2565Pool = getOnetYearSimulationPool(2565);
+export const onetYear2566Pool = getOnetYearSimulationPool(2566);
+export const onetYear2567Pool = getOnetYearSimulationPool(2567);
+export const onetYear2568Pool = getOnetYearSimulationPool(2568);

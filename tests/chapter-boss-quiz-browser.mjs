@@ -14,7 +14,7 @@ try {
     await page.evaluate(async id => (await import('/tests/browser-harness.jsx')).mountMissionSelect(id), questId);
     await page.getByRole('heading', { name: 'ด่านท้าทายท้ายบท' }).waitFor();
     assert.equal(await page.getByText('หรือ', { exact: true }).count(), 0);
-    await page.getByRole('button', { name: /เริ่มท้าทายบอส/ }).click();
+    await page.getByRole('button', { name: /เริ่มข้อสอบ O-NET/ }).click();
     assert.deepEqual(await page.evaluate(() => window.__missionNavigation.at(-1)), ['lesson', questId]);
 
     await page.evaluate(async id => (await import('/tests/browser-harness.jsx')).mountDraftAssessment(id), questId);

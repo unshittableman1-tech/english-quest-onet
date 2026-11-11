@@ -17,6 +17,7 @@ export default function ReviewMistakePage() {
     return Object.values(mistakeBank).filter(q => !q.mastered);
   }, [mistakeBank]);
 
+  const initialReviewCount = useRef(allMistakes.length);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selected, setSelected] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -50,13 +51,13 @@ export default function ReviewMistakePage() {
       playWrongSound();
       setShakeKey(k => k + 1);
       setWrongAttempts(prev => [...prev, idx]);
-      if (student && !student.isDemo) {
+      if (student) {
         await processReviewAnswer(student.id, q.id, false);
       }
     } else {
       playCorrectSound();
-      if (student && !student.isDemo) {
-        const willBeMastered = (q.correctInReview || 0) >= 1;
+      const willBeMastered = (q.correctInReview || 0) >= 1;
+      if (student) {
         await processReviewAnswer(student.id, q.id, true);
         await addXP(10, '🧠 ทบทวนถูกต้อง (XP x5!)');
         if (willBeMastered) {
@@ -104,6 +105,21 @@ export default function ReviewMistakePage() {
     setCurrentIdx(allMistakes.length ? (reviewedIndex < 0 ? currentIdx : reviewedIndex + 1) % allMistakes.length : 0);
   }, [feedbackData, allMistakes, currentIdx]);
 
+  const celebrationFired = useRef(false);
+  useEffect(() => {
+    if (allMistakes.length === 0 && initialReviewCount.current > 0 && !celebrationFired.current) {
+      celebrationFired.current = true;
+      confetti({
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.6 }
+      });
+      if (checkBadges) {
+        checkBadges();
+      }
+    }
+  }, [allMistakes.length, checkBadges]);
+
   if (q && mediaStatus !== 'ready') return <QuestionMediaGate status={mediaStatus} onBack={() => navigate('map')} />;
   if (allMistakes.length === 0 && !showFeedback) {
     return (
@@ -113,11 +129,24 @@ export default function ReviewMistakePage() {
           <p className="text-slate-500 text-sm">ทบทวนข้อผิดของคุณ</p>
         </div>
         <div className="flex-1 flex items-center justify-center p-4">
-          <div className="glass-card p-8 text-center max-w-sm w-full">
-            <div className="text-5xl mb-4"><UIIcon value={"🎉"} /></div>
-            <h2 className="text-xl font-bold text-slate-800 mb-2">ยอดเยี่ยมมาก!</h2>
-            <p className="text-slate-500 mb-6 text-sm">คุณไม่มีข้อผิดค้างในระบบแล้ว เก่งมาก!</p>
-            <button className="btn-primary w-full" onClick={() => navigate('map')}>กลับไปที่ Quest Map</button>
+          <div className="glass-card p-8 text-center max-w-sm w-full animate-bounce-in shadow-2xl border-amber-300">
+            <div className="text-6xl mb-4 animate-pulse"><UIIcon value={initialReviewCount.current > 0 ? "🏆" : "🎉"} /></div>
+            <h2 className="text-2xl font-black text-amber-800 mb-2">
+              {initialReviewCount.current > 0 ? 'ปราบข้อผิดครบทุกข้อแล้ว!' : 'ยังไม่มีข้อที่ต้องทบทวน'}
+            </h2>
+            <p className="text-slate-600 mb-6 text-sm">
+              {initialReviewCount.current > 0 
+                ? 'ยอดเยี่ยมมาก! คุณได้ทบทวนและแก้ไขจุดผิดพลาดจนหมดเกลี้ยง รับ XP และเหรียญรางวัลความพยายามไปเลย!' 
+                : 'เมื่อคุณตอบผิดในด่านต่างๆ ระบบจะบันทึกข้อผิดมาไว้ที่นี่เพื่อให้คุณกลับมาฝึกซ้ำ'}
+            </p>
+            <div className="space-y-3">
+              <button className="btn-primary w-full py-3 text-base font-bold shadow-lg" onClick={() => navigate('badge')}>
+                🏅 ดูเหรียญรางวัลที่ได้รับ
+              </button>
+              <button className="btn-ghost w-full py-2.5 text-sm font-semibold text-slate-700" onClick={() => navigate('map')}>
+                กลับไปที่ Quest Map
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -194,3 +223,4 @@ export default function ReviewMistakePage() {
     </div>
   );
 }
+

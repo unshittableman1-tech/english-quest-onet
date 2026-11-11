@@ -3,7 +3,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { getPreTestResult } from '../utils/preTestResult';
 import { useApp } from '../App';
 import { getAllStudents } from '../utils/storage';
-import { calculateRankScore, getRankingTier } from '../utils/scoring';
+import { calculateRankScore, getRankingTier, getTotalStars } from '../utils/scoring';
+import { loadRankingStudents } from '../utils/rankingData';
 
 // New Components
 import LeaderboardTabs from './ranking/LeaderboardTabs';
@@ -28,34 +29,33 @@ export default function RankingPage() {
   const [activeSkill, setActiveSkill] = useState('vocabulary');
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [reload, setReload] = useState(0);
   const [selectedRoom, setSelectedRoom] = useState('all'); // 'all' or specific class name
   const [visibleCount, setVisibleCount] = useState(10);
   
   const [showTierModal, setShowTierModal] = useState(false);
   const [selectedTierForModal, setSelectedTierForModal] = useState(null);
+  const [selectedStudentForModal, setSelectedStudentForModal] = useState(null);
 
   useEffect(() => {
+    let active = true;
     const fetchStudents = async () => {
       setLoading(true);
-      const allStudents = await getAllStudents();
-      // Filter out teachers/demo
-      const validStudents = allStudents.filter(s => s.role !== 'teacher' && !s.isDemo);
-      
-      let listToUse = validStudents;
-      if (listToUse.length < 3) {
-        const demoData = [
-          { id: 'demo1', name: 'ฟาตีมะ', avatar: '', xp: 2000, level: 7, class: 'ป.6/1', isDemo: true, rankingStats: { totalAnswered: 100, totalCorrect: 95, averageTimePerQuestion: 4 }, badgeStats: { pretestScore: 40, posttestScore: 80, streakDays: 5, mistakesFixed: 20, correctBySkill: { vocabulary: 15 } } },
-          { id: 'demo2', name: 'อาหมัด', avatar: '', xp: 1800, level: 6, class: 'ป.6/2', isDemo: true, rankingStats: { totalAnswered: 80, totalCorrect: 70, averageTimePerQuestion: 5 }, badgeStats: { pretestScore: 30, posttestScore: 60, streakDays: 3, mistakesFixed: 10, correctBySkill: { vocabulary: 10 } } },
-          { id: 'demo3', name: 'อาดีล', avatar: '', xp: 1500, level: 6, class: 'ป.6/1', isDemo: true, rankingStats: { totalAnswered: 60, totalCorrect: 40, averageTimePerQuestion: 6 }, badgeStats: { pretestScore: 20, posttestScore: 40, streakDays: 1, mistakesFixed: 5, correctBySkill: { vocabulary: 5 } } },
-        ];
-        listToUse = [...listToUse, ...demoData.slice(listToUse.length)];
+      setLoadError(false);
+      setStudents([]);
+      try {
+        const rows = await loadRankingStudents(student, options => getAllStudents({ ...options, forceRefresh: reload > 0 }));
+        if (active) setStudents(rows);
+      } catch {
+        if (active) setLoadError(true);
+      } finally {
+        if (active) setLoading(false);
       }
-
-      setStudents(listToUse);
-      setLoading(false);
     };
     fetchStudents();
-  }, []);
+    return () => { active = false; };
+  }, [student?.id, student?.school_id, student?.isDemo, reload]);
 
   // Derive available rooms from student data
   const availableRooms = useMemo(() => {
@@ -65,9 +65,11 @@ export default function RankingPage() {
 
   // Filtered students by selected room
   const filteredStudents = useMemo(() => {
-    if (selectedRoom === 'all') return students;
-    return students.filter(s => s.class === selectedRoom);
-  }, [students, selectedRoom]);
+    const rows = students.map(row => student?.avatar && row.id === student?.id && row.school_id === student?.school_id
+      && Boolean(row.isDemo) === Boolean(student?.isDemo) ? { ...row, avatar: student.avatar } : row);
+    if (selectedRoom === 'all') return rows;
+    return rows.filter(s => s.class === selectedRoom);
+  }, [students, selectedRoom, student?.id, student?.school_id, student?.isDemo, student?.avatar]);
 
   // Prepare leaderboard data
   const leaderboard = useMemo(() => {
@@ -86,7 +88,7 @@ export default function RankingPage() {
       const fastGuessCount = Math.max(0, rawFastGuess - (mistakesFromBank * 5));
       const adjustedRankingStats = { ...rStats, fastGuessCount };
 
-      const rankScore = s.isDemo ? s.xp : calculateRankScore({ ...s, rankingStats: adjustedRankingStats }, rawFastGuess);
+      const rankScore = calculateRankScore(s);
       
       const pre = getPreTestResult(s).percent;
       const post = bStats.posttestScore || 0;
@@ -115,6 +117,7 @@ export default function RankingPage() {
         avgTime: rStats.averageTimePerQuestion || 0,
         streakDays,
         mistakesFixed,
+        totalStars: getTotalStars(s.questProgress),
         skillScore,
         pre, post
       };
@@ -122,7 +125,7 @@ export default function RankingPage() {
 
     switch (activeTab) {
       case 'overall':
-        list.sort((a, b) => b.rankScore - a.rankScore);
+        list.sort((a, b) => b.rankScore - a.rankScore || b.totalStars - a.totalStars || b.totalAnswered - a.totalAnswered || b.accuracy - a.accuracy);
         break;
       case 'growth':
         list = list.filter(a => a.pre !== null && a.post > 0 || a.isDemo);
@@ -162,27 +165,29 @@ export default function RankingPage() {
 
   useEffect(() => { setVisibleCount(10); }, [activeTab, activeSkill, selectedRoom]);
 
-  const handleOpenTierInfo = (tierName = null) => {
+  const handleOpenTierInfo = (tierName = null, targetStudent = student) => {
     setSelectedTierForModal(tierName);
+    setSelectedStudentForModal(targetStudent);
     setShowTierModal(true);
   };
 
   return (
-    <div className="ranking-page min-h-screen text-white overflow-x-hidden font-sans pb-16">
+    <main className="ranking-page" aria-label="อันดับการฝึกและผลการเรียนรู้">
+      <div className="ranking-shell">
       
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between p-4 mb-2">
+      <header className="ranking-header">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate(student?.role === 'teacher' ? 'teacher' : 'map')} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+          <button onClick={() => navigate(student?.role === 'teacher' ? 'teacher' : 'map')} className="ranking-back" aria-label="กลับหน้า Quest Map">
             <span className="text-xl"><UIIcon value={"←"} /></span>
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-300 to-amber-500 flex items-center justify-center shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+            <div className="ranking-title-art">
               <span className="text-2xl drop-shadow-md"><UIIcon value={"🏆"} /></span>
             </div>
             <div>
-              <h1 className="text-2xl font-black drop-shadow-md leading-tight">Leaderboard</h1>
-              <p className="text-xs text-slate-500">
+              <h1>Leaderboard</h1>
+              <p>
                 <UIIconText value={selectedRoom === 'all' ? `ทั้งหมด ${students.length} คน` : `🏫 ${selectedRoom} · ${leaderboard.length} คน`} />
               </p>
             </div>
@@ -190,10 +195,19 @@ export default function RankingPage() {
         </div>
       </header>
 
+      <section className="ranking-next" aria-label="ภารกิจเพิ่มอันดับ">
+        <div>
+          <span>ภารกิจแนะนำ</span>
+          <strong>เล่นด่านถัดไปเพื่อสะสม XP</strong>
+          <p>ทำภารกิจ ตอบให้ถูก และผ่านด่านเพื่อเลื่อน Tier</p>
+        </div>
+        <button type="button" className="eq-btn" onClick={() => navigate('map')}>เล่นด่านถัดไป <UIIcon value="→" /></button>
+      </section>
+
 
       {/* Room Filter */}
       {availableRooms.length > 1 && (
-        <div className="relative z-10 flex gap-2 overflow-x-auto pb-2 px-4 mb-2 hide-scrollbar">
+        <div className="ranking-room-filter hide-scrollbar">
           <button
             onClick={() => setSelectedRoom('all')}
             className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap transition-all border ${
@@ -224,14 +238,21 @@ export default function RankingPage() {
       )}
 
       {/* Tabs */}
-      <div className="relative z-10">
+      <div className="ranking-tabs-wrap">
         <LeaderboardTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+        <p className="ranking-metric-note" role="status">
+          {activeTab === 'overall' ? 'อันดับ XP แสดงการสะสมจากกิจกรรม ไม่ใช่ระดับความสามารถภาษาอังกฤษทั้งหมด'
+            : activeTab === 'growth' ? 'Growth แสดงส่วนต่างคะแนนก่อน–หลังที่บันทึกไว้ ไม่ได้ยืนยันว่ากิจกรรมเป็นสาเหตุของพัฒนาการ'
+            : activeTab === 'accuracy' ? 'Accuracy แสดงสัดส่วนการตอบถูกตามข้อมูลที่บันทึก โดยใช้เงื่อนไขการจัดอันดับเดิม'
+            : 'อันดับนี้แสดงข้อมูลการฝึกเฉพาะด้าน ไม่ใช้สรุปความสามารถภาษาอังกฤษทั้งหมด'}
+        </p>
+        {student?.isDemo && <p className="ranking-source-note">ข้อมูลตัวอย่างสำหรับทดลอง ไม่ใช่อันดับนักเรียนจริง</p>}
       </div>
 
 
       {/* Skill Selector */}
       {activeTab === 'skill' && (
-        <div className="relative z-10 px-3 mb-4">
+        <div className="ranking-skill-select">
           <select 
             className="w-full bg-white/10 border border-amber-300 rounded-xl px-4 py-2 text-white font-bold outline-none focus:border-violet-400"
             value={activeSkill}
@@ -243,9 +264,11 @@ export default function RankingPage() {
       )}
 
       {/* Error / Empty States */}
-      <div className="relative z-10">
+      <div className="ranking-results" id="ranking-results" role="tabpanel" aria-labelledby={`ranking-tab-${activeTab}`} aria-busy={loading}>
         {loading ? (
-          <div className="flex justify-center p-10"><div className="w-10 h-10 border-4 border-amber-300 border-t-amber-400 rounded-full animate-spin" /></div>
+          <div className="ranking-feedback" role="status">กำลังโหลดอันดับ…</div>
+        ) : loadError ? (
+          <div className="ranking-feedback" role="alert"><p>ยังโหลดอันดับไม่ได้ ไม่แสดงข้อมูลตัวอย่างแทนข้อมูลจริง</p><button type="button" className="eq-btn ghost" onClick={() => setReload(value => value + 1)}>ลองโหลดอันดับอีกครั้ง</button></div>
         ) : leaderboard.length === 0 ? (
           <div className="text-center p-10 bg-white/5 rounded-2xl mx-4 border border-amber-200">
             <div className="text-4xl mb-3"><UIIcon value={"🤔"} /></div>
@@ -255,9 +278,9 @@ export default function RankingPage() {
         ) : (
           <>
             {/* Top 3 Podium */}
-            <TopThreePodium topThree={topThree} activeTab={activeTab} />
+            <TopThreePodium topThree={topThree} activeTab={activeTab} onTierClick={handleOpenTierInfo} />
 
-            <div className="bg-[#F8F9FA] rounded-t-[32px] pt-6 min-h-screen">
+            <div className="ranking-board">
               {/* My Rank Card */}
               {student && !student.isDemo && myData && (
                 <MyRankCard 
@@ -274,7 +297,7 @@ export default function RankingPage() {
                 students={leaderboard.slice(0, visibleCount)} 
                 startIndex={3} 
                 activeTab={activeTab} 
-                onTierClick={(tierName) => handleOpenTierInfo(tierName)} 
+                onTierClick={handleOpenTierInfo}
               />
               {visibleCount < leaderboard.length && <div className="ranking-more-wrap"><button type="button" className="eq-btn" onClick={() => setVisibleCount(count => count + 10)}>ดูอันดับถัดไปอีก 10 คน</button></div>}
 
@@ -288,12 +311,12 @@ export default function RankingPage() {
       {/* Modal */}
       {showTierModal && (
         <TierInfoModal 
-          student={student} 
+          student={selectedStudentForModal || student}
           selectedTierName={selectedTierForModal} 
-          onClose={() => setShowTierModal(false)} 
+          onClose={() => { setShowTierModal(false); setSelectedStudentForModal(null); }}
         />
       )}
-      
-    </div>
+      </div>
+    </main>
   );
 }

@@ -2,6 +2,11 @@ import { supabase } from '../config/supabase';
 import { getPreTestResult } from './preTestResult';
 import { calcLevel, calculateRankScore, getRankingTier } from './scoring';
 import { validateAssessmentEvidence } from './assessmentEvidence';
+import { isDemoMode, supabaseConfig } from '../config/runtimeMode';
+import { createDemoStudent, DEMO_RANKING_STUDENTS } from '../data/demoFixtures';
+import { submitQuestToServer, addXPToServer, syncStudentProgressToServer } from './studentProgressApi';
+import { recordQuestMistake, reviewQuestMistake } from './questReviewGate';
+import { normalizeClassName } from './studentImportFile';
 
 const PREFIX = 'eq_onet_';
 
@@ -77,6 +82,12 @@ export async function saveStudent(studentData) {
   current = initRankingStats(current);
   current.updatedAt = new Date().toISOString();
   if (!current.createdAt) current.createdAt = new Date().toISOString();
+
+  if (current.authVerified === true) {
+    current.level = calcLevel(current.xp || 0);
+    localStorage.setItem(`${PREFIX}current`, JSON.stringify(current));
+    return current;
+  }
 
   // If student already has an id
   if (studentData.id && !studentData.id.startsWith('local_')) {
@@ -322,9 +333,16 @@ export async function updateCurrentStudent(updates) {
   localStorage.setItem(`${PREFIX}current`, JSON.stringify(updated));
   
   if (current.role !== 'teacher' && current.id && !current.id.startsWith('local_')) {
-    supabase.from('students').update(updates).eq('id', current.id).then(({ error }) => {
-      if (error) console.error('Supabase update failed', error);
-    }).catch(e => console.error('Supabase update failed', e));
+    (async () => {
+      try {
+        const session = (await supabase?.auth?.getSession?.())?.data?.session;
+        if (session?.access_token) {
+          await syncStudentProgressToServer(updates, session.access_token);
+        }
+      } catch (e) {
+        // Fallback or offline
+      }
+    })();
   }
   
   return updated;
@@ -335,7 +353,12 @@ let _studentsCache = null;
 let _studentsCacheTime = 0;
 const STUDENTS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-export async function getAllStudents({ forceRefresh = false } = {}) {
+export async function getAllStudents({ forceRefresh = false, throwOnError = false } = {}) {
+  if (isDemoMode) {
+    const current = getCurrentStudent();
+    const demoStudent = current?.isDemo ? current : createDemoStudent();
+    return [demoStudent, ...DEMO_RANKING_STUDENTS.map(student => ({ ...student }))];
+  }
   const now = Date.now();
   if (!forceRefresh && _studentsCache && (now - _studentsCacheTime) < STUDENTS_CACHE_TTL) {
     return _studentsCache;
@@ -348,6 +371,7 @@ export async function getAllStudents({ forceRefresh = false } = {}) {
     return _studentsCache;
   } catch (err) {
     console.error("Failed to fetch students from Supabase:", err);
+    if (throwOnError) throw err;
     return _studentsCache || [];
   }
 }
@@ -393,6 +417,38 @@ export async function saveQuestResult(studentId, questId, score, total, extraSta
   const current = getCurrentStudent();
   if (!current || current.id !== studentId) return {};
   if (extraStats.assessmentEvidence) validateAssessmentEvidence(extraStats.assessmentEvidence, score, total);
+
+  if (current.authVerified === true && extraStats.assessmentEvidence) {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token;
+    if (!accessToken) throw new Error('Student session is unavailable. Please sign in again.');
+    const attemptId = extraStats.attemptId || crypto.randomUUID();
+    const response = await fetch(`${supabaseConfig.url}/functions/v1/student-progress`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': supabaseConfig.anonKey,
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ action: 'save-quest', questId, attemptId, extraStats }),
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok || !payload?.ok || !payload?.questProgress) {
+      throw new Error(payload?.message || 'Unable to save verified quest progress.');
+    }
+    const updated = {
+      ...current,
+      questProgress: payload.questProgress,
+      xp: payload.xp,
+      level: payload.level,
+      badgeStats: payload.badgeStats,
+      rankingStats: payload.rankingStats,
+      badges: payload.badges,
+      updatedAt: new Date().toISOString(),
+    };
+    localStorage.setItem(`${PREFIX}current`, JSON.stringify(updated));
+    return payload.questProgress;
+  }
 
   const progress = current.questProgress || {};
   const pct = Math.round((score / total) * 100);
@@ -494,23 +550,16 @@ export async function saveMistake(studentId, questionObj) {
   const current = getCurrentStudent();
   if (!current || current.id !== studentId) return;
 
-  const mistakeBank = current.mistakeBank || {};
-  
-  if (mistakeBank[questionObj.id]) {
-    mistakeBank[questionObj.id].timesWrong = (mistakeBank[questionObj.id].timesWrong || 1) + 1;
-    mistakeBank[questionObj.id].mastered = false; // Re-opened if they got it wrong again
-  } else {
-    mistakeBank[questionObj.id] = { ...questionObj, timesWrong: 1, correctInReview: 0, mastered: false, addedAt: new Date().toISOString() };
-  }
+  const mistakeBank = recordQuestMistake(current.mistakeBank || {}, questionObj);
   
   await updateCurrentStudent({ mistakeBank });
 }
 
 export async function processReviewAnswer(studentId, questionId, isCorrect) {
   const current = getCurrentStudent();
-  if (!current || current.id !== studentId) return;
+  if (!current || current.id !== studentId || typeof isCorrect !== 'boolean') return;
 
-  const mistakeBank = current.mistakeBank || {};
+  const mistakeBank = reviewQuestMistake(current.mistakeBank || {}, questionId, isCorrect);
   if (!mistakeBank[questionId]) return;
 
   const currentStats = current.badgeStats || {};
@@ -519,18 +568,11 @@ export async function processReviewAnswer(studentId, questionId, isCorrect) {
   let fastGuessCount = currentRankingStats.fastGuessCount || 0;
 
   if (isCorrect) {
-    mistakeBank[questionId].correctInReview = (mistakeBank[questionId].correctInReview || 0) + 1;
-    if (mistakeBank[questionId].correctInReview >= 2) {
-      mistakeBank[questionId].mastered = true;
-    }
     mistakesFixed += 1;
     // Clear / reduce fast guess count penalty by 5 for every review answer
     if (fastGuessCount > 0) {
       fastGuessCount = Math.max(0, fastGuessCount - 5);
     }
-  } else {
-    mistakeBank[questionId].correctInReview = 0; // reset
-    mistakeBank[questionId].timesWrong += 1;
   }
 
   const newBadgeStats = { ...currentStats, mistakesFixed };
@@ -541,12 +583,15 @@ export async function processReviewAnswer(studentId, questionId, isCorrect) {
 
 // ── Pre-test ──────────────────────────────────────────────────
 export async function savePreTest(studentId, categoryScores, totalScore) {
+  const current = getCurrentStudent();
+  if (!current || current.id !== studentId) throw new TypeError('Student session does not match pre-test result');
   const categories = Object.values(categoryScores || {});
   if (!categories.length || categories.some(category => !category || !Number.isInteger(category.total) || category.total <= 0 ||
     !Number.isInteger(category.correct) || category.correct < 0 || category.correct > category.total)) throw new TypeError('Invalid pre-test category scores');
   const total = categories.reduce((sum, category) => sum + category.total, 0);
   if (categories.reduce((sum, category) => sum + category.correct, 0) !== totalScore) throw new TypeError('Invalid pre-test score');
-  const data = { categoryScores, totalScore, total, version: 'pretest-v1', date: new Date().toISOString() };
+  if (current.preTest != null) throw new TypeError('Pre-test result already exists');
+  const data = { categoryScores, totalScore, total, version: 'pretest-v2', date: new Date().toISOString() };
   await updateCurrentStudent({ preTest: data });
   return data;
 }
@@ -559,12 +604,30 @@ export function getPreTest(studentId) {
   return null;
 }
 
-// ── XP & Level ────────────────────────────────────────────────
 export async function addXP(studentId, amount) {
   const current = getCurrentStudent();
   if (!current || current.id !== studentId) return { student: current, leveledUp: false, newLevel: current?.level || 1 };
   
   if (!Number.isFinite(amount)) throw new TypeError('XP reward must be a finite number');
+  if (current.authVerified === true) {
+    return { student: current, leveledUp: false, newLevel: current.level || 1 };
+  }
+
+  if (!current.isDemo && current.role === 'student' && !current.id.startsWith('local_') && amount > 0) {
+    try {
+      const session = (await supabase?.auth?.getSession?.())?.data?.session;
+      if (session?.access_token) {
+        const res = await addXPToServer({ amount, token: session.access_token });
+        if (res?.student) {
+          localStorage.setItem(`${PREFIX}current`, JSON.stringify(res.student));
+          return { student: res.student, leveledUp: res.leveledUp, newLevel: res.newLevel };
+        }
+      }
+    } catch {
+      // fallback to local calculation
+    }
+  }
+
   const previousXP = Number(current.xp);
   const newXP = Math.max(0, (Number.isFinite(previousXP) ? previousXP : 0) + amount);
   const newLevel  = calcLevel(newXP);
@@ -670,8 +733,17 @@ export async function parseCSVData(csvText) {
   
   const firstLine = lines[0].toLowerCase();
   let startIndex = 0;
-  if (firstLine.includes('ชื่อ') || firstLine.includes('name')) {
+  let idIdx = -1, nameIdx = -1, classIdx = -1, numberIdx = -1;
+
+  if (firstLine.includes('ชื่อ') || firstLine.includes('name') || firstLine.includes('student_id')) {
     startIndex = 1;
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^"|"$/g, ''));
+    headers.forEach((h, idx) => {
+      if (h.includes('student_id') || h.includes('รหัส') || h === 'id') idIdx = idx;
+      else if (h.includes('name') || h.includes('ชื่อ')) nameIdx = idx;
+      else if (h.includes('class') || h.includes('ชั้น') || h.includes('ห้อง')) classIdx = idx;
+      else if (h.includes('number') || h.includes('เลขที่') || h.includes('ลำดับ')) numberIdx = idx;
+    });
   }
   
   const results = [];
@@ -689,25 +761,33 @@ export async function parseCSVData(csvText) {
     const cleanCols = cols.map(c => c.trim().replace(/^"|"$/g, ''));
     
     if (cleanCols.length >= 3) {
-      let name, className, number;
+      let studentId = '', name = '', className = '', number = '';
       
-      if (cleanCols.length >= 4 && !isNaN(cleanCols[0]) && isNaN(cleanCols[1])) {
+      if (idIdx !== -1 && nameIdx !== -1 && classIdx !== -1 && numberIdx !== -1) {
+        studentId = cleanCols[idIdx] || '';
+        name = cleanCols[nameIdx] || '';
+        className = cleanCols[classIdx] || '';
+        number = cleanCols[numberIdx] || '';
+      } else if (cleanCols.length >= 4 && !isNaN(cleanCols[0]) && isNaN(cleanCols[1])) {
         number = cleanCols[0];
         name = cleanCols[1];
         className = cleanCols[3];
+      } else if (cleanCols.length >= 4 && isNaN(cleanCols[0]) && isNaN(cleanCols[1])) {
+        studentId = cleanCols[0];
+        name = cleanCols[1];
+        className = cleanCols[2];
+        number = cleanCols[3];
       } else {
         name = cleanCols[0];
         className = cleanCols[1];
         number = cleanCols[2];
       }
       
-      if (className) {
-        className = className.replace(/^ป\.?/, '').trim();
-        className = 'ป.' + className;
-      }
+      className = normalizeClassName(className);
       
       if (name && className && number) {
         results.push({
+          student_id: studentId,
           name: name,
           class: className,
           number: number.toString(),

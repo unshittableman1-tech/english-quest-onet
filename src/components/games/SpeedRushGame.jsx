@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { playCorrectSound, playWrongSound } from '../../utils/audio';
 import { useSpeech } from '../../utils/useSpeech';
 
-export default function SpeedRushGame({ cards, title, onBack, onComplete }) {
+export default function SpeedRushGame({ cards, title, onBack, onComplete, onEvidence }) {
   const { speak } = useSpeech();
   const [timeLeft, setTimeLeft] = useState(60);
   const [score, setScore] = useState(0);
@@ -15,6 +15,8 @@ export default function SpeedRushGame({ cards, title, onBack, onComplete }) {
   const [currentPrompt, setCurrentPrompt] = useState(null);
   const [feedbackEffect, setFeedbackEffect] = useState(null); // 'correct' | 'wrong'
   const timerRef = useRef(null);
+  const observationIndex = useRef(0);
+  const choiceLocked = useRef(false);
 
   // High score key
   const highScoreKey = `onet_speedrush_high_${title}`;
@@ -47,6 +49,8 @@ export default function SpeedRushGame({ cards, title, onBack, onComplete }) {
 
   const nextPrompt = () => {
     if (!cards || cards.length === 0) return;
+    choiceLocked.current = false;
+    observationIndex.current += 1;
 
     // Pick 1 target card
     const card = cards[Math.floor(Math.random() * cards.length)];
@@ -75,8 +79,11 @@ export default function SpeedRushGame({ cards, title, onBack, onComplete }) {
 
   const handleChoice = (userSaidTrue) => {
     if (gameOver || !currentPrompt) return;
+    if (choiceLocked.current) return;
+    choiceLocked.current = true;
 
     const correct = userSaidTrue === currentPrompt.isTrueAnswer;
+    onEvidence?.({ card: currentPrompt.card, mode: 'speed', correct, assisted: false, observationId: String(observationIndex.current) });
 
     if (correct) {
       playCorrectSound();

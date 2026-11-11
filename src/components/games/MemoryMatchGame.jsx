@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { playCorrectSound, playWrongSound } from '../../utils/audio';
 import { useSpeech } from '../../utils/useSpeech';
 
-export default function MemoryMatchGame({ cards, title, onBack, onComplete }) {
+export default function MemoryMatchGame({ cards, title, onBack, onComplete, onMatch }) {
   const { speak } = useSpeech();
   const [deck, setDeck] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -87,6 +87,7 @@ export default function MemoryMatchGame({ cards, title, onBack, onComplete }) {
 
       // Match check: same pairId but different types (en vs th)
       if (card1.pairId === card2.pairId && card1.type !== card2.type) {
+        onMatch?.({ cardId: card1.pairId, otherCardId: card2.pairId });
         // MATCH!
         playCorrectSound();
         setCombo(c => c + 1);
@@ -152,6 +153,7 @@ export default function MemoryMatchGame({ cards, title, onBack, onComplete }) {
           return (
             <button
               key={idx}
+              aria-label={isFlipped ? card.text : `เปิดการ์ด ${idx + 1}`}
               onClick={() => handleCardClick(idx)}
               className={`h-24 md:h-28 rounded-2xl p-2 flex flex-col items-center justify-center text-center transition-all duration-300 transform border-2 ${
                 isMatched
@@ -184,7 +186,7 @@ export default function MemoryMatchGame({ cards, title, onBack, onComplete }) {
           <div className="bg-slate-900 border-2 border-emerald-400 rounded-3xl p-6 text-center max-w-sm w-full animate-bounce-in shadow-2xl space-y-4">
             <div className="text-6xl"><UIIcon value={"🎉"} /></div>
             <h2 className="text-2xl font-black text-emerald-400">ยอดเยี่ยมมาก!</h2>
-            <p className="text-slate-300 text-sm">จับคู่คำศัพท์ครบ 6 คู่เรียบร้อย!</p>
+            <p className="text-slate-300 text-sm">จับคู่คำศัพท์ครบ {deck.length / 2} คู่เรียบร้อย!</p>
             <div className="bg-slate-800/80 rounded-2xl p-4 flex justify-around font-mono text-sm border border-slate-700">
               <div>
                 <span className="text-slate-400 text-xs block">เวลาที่ใช้</span>

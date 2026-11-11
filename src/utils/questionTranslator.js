@@ -62,7 +62,16 @@ const KNOWN_QUESTION_TRANSLATIONS = {
   'What is your favourite subject?': 'วิชาโปรดของคุณคือวิชาอะไร?',
   'How much is this shirt?': 'เสื้อตัวนี้ราคาเท่าไหร่?',
   'What do you want to be?': 'คุณอยากโตขึ้นเป็นอะไร?',
-  'Where is the hospital?': 'โรงพยาบาลอยู่ที่ไหน?'
+  'Where is the hospital?': 'โรงพยาบาลอยู่ที่ไหน?',
+  // Visual vocabulary questions
+  'What shape is shown?': 'ภาพนี้เป็นรูปทรงอะไร?',
+  'Which word matches the shape?': 'คำใดตรงกับรูปทรงในภาพ?',
+  'What color is the shape?': 'รูปทรงในภาพมีสีอะไร?',
+  'Which phrase matches the picture?': 'วลีใดตรงกับภาพ?',
+  'Nina says, “I enjoy drawing pictures after school.” What is her hobby?':
+    'นีน่าพูดว่า “ฉันชอบวาดภาพหลังเลิกเรียน” งานอดิเรกของเธอคืออะไร?',
+  'Read the card. “Ben, Grade 6/2, Chess Club, Room 14.” Where should Ben go for his club?':
+    'อ่านบัตร: “เบน ชั้น ป.6/2 ชมรมหมากรุก ห้อง 14” เบนควรไปที่ใดเพื่อเข้าชมรม?'
 };
 
 // แปลประโยคสั้นๆ หรือบทสนทนา A: / B:

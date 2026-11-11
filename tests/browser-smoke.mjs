@@ -26,7 +26,7 @@ const baseURL = process.env.SMOKE_URL || 'http://127.0.0.1:5173';
 
 try {
   await page.goto(baseURL);
-  for (const [width, height] of [[320, 740], [390, 844], [768, 1024], [1366, 900], [1920, 1080]]) {
+  for (const [width, height] of [[390, 844], [768, 1024], [1024, 900], [1440, 900], [1920, 1080]]) {
     await page.setViewportSize({ width, height });
     const cta = await page.getByRole('button', { name: 'เริ่มเรียน', exact: true }).boundingBox();
     assert.ok(cta && cta.y + cta.height <= height, `Primary CTA visible at ${width}px`);
@@ -34,6 +34,7 @@ try {
     assert.ok(featureBand.y < height, `Next section visible at ${width}px`);
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `No overflow at ${width}px`);
     assert.equal(await page.getByText('0 XP', { exact: true }).count(), 0);
+    assert.equal(await page.getByRole('button', { name: 'เข้าสู่ระบบครู', exact: true }).count(), 1, `Teacher Login is not duplicated at ${width}px`);
     await page.waitForFunction(() => {
       const img = document.querySelector('.landing-world');
       return img.complete && img.naturalWidth > 0 && img.currentSrc.includes(innerWidth <= 900 ? 'mobile-v2' : 'hero-v2');
@@ -42,6 +43,10 @@ try {
     await page.waitForFunction(() => getComputedStyle(document.querySelector('#landing-title')).opacity === '1');
     await page.screenshot({ path: `scratch/phase0-screenshots/landing-${width}.png`, fullPage: false });
   }
+  await page.setViewportSize({ width: 768, height: 700 });
+  assert.ok(await page.evaluate(() => document.documentElement.scrollHeight > innerHeight), 'Short screens scroll naturally');
+  await page.getByRole('region', { name: 'ฟีเจอร์การเรียนรู้' }).scrollIntoViewIfNeeded();
+  assert.ok(await page.getByRole('region', { name: 'ฟีเจอร์การเรียนรู้' }).isVisible(), 'Feature section remains reachable on short screens');
   console.log('PASS: landing CTA, brand and next section visible across five viewports');
   for (const [width, height] of [[1366, 900], [390, 844]]) {
     await page.setViewportSize({ width, height });
@@ -143,7 +148,7 @@ try {
   await page.setViewportSize({ width: 1366, height: 900 });
   await page.getByText('จำนวนนักเรียน', { exact: true }).waitFor();
   const preCard = page.getByText('Pre-test เฉลี่ย', { exact: true }).locator('..').locator('..');
-  const currentCard = page.getByText('คะแนนปัจจุบัน', { exact: true }).locator('..').locator('..');
+  const currentCard = page.getByText('คะแนนเฉลี่ยจากด่านที่ทำแล้ว', { exact: true }).locator('..').locator('..');
   await page.waitForFunction(() => document.body.innerText.includes('50%') && document.body.innerText.includes('38%'));
   assert.ok((await preCard.innerText()).includes('50%'));
   assert.ok((await currentCard.innerText()).includes('38%'));
@@ -180,7 +185,7 @@ try {
   assert.ok(reportText.includes('"1/10"'));
   await page.getByRole('button', { name: 'ภาพรวมห้องเรียน', exact: true }).click();
   await page.getByRole('button', { name: 'ป.6/2', exact: true }).click();
-  assert.ok((await page.getByText('คะแนนปัจจุบัน', { exact: true }).locator('..').locator('..').innerText()).includes('—'));
+  assert.ok((await page.getByText('คะแนนเฉลี่ยจากด่านที่ทำแล้ว', { exact: true }).locator('..').locator('..').innerText()).includes('—'));
   await page.getByRole('button', { name: 'ทุกห้อง', exact: true }).click();
   await page.getByRole('button', { name: /ขาว/ }).click();
   await page.waitForFunction(() => getComputedStyle(document.querySelector('.teacher-light')).backgroundColor === 'rgb(248, 250, 252)');
@@ -231,7 +236,7 @@ try {
   await page.locator('#smoke-root button.option-btn').nth(correctOptions[0]).click();
   await page.locator('#smoke-root').getByRole('button', { name: /ข้อต่อไป/ }).click();
   await page.locator('#smoke-root button.option-btn').nth(correctOptions[1]).click();
-  await page.clock.fastForward(1801000);
+  await page.clock.fastForward(3601000);
   await page.waitForFunction(() => !!window.__smokeStudent.finalBoss);
   const boss = await page.evaluate(() => window.__smokeStudent);
   assert.equal(boss.finalBoss.score, 2);

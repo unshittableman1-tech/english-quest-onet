@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import React, { useId } from 'react';
 
 export default function QuestionChart({ stimulus: s }) {
   const titleId = useId();

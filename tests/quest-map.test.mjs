@@ -1,8 +1,13 @@
 import './helpers/environment.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 const { QUEST_CHAPTERS, getNextQuestAction, getChapterMistakes, getQuestPracticeStats, getQuestLearningState, isChapterChallenge } = await import('../src/utils/questMapModel.js');
 const { QUESTS } = await import('../src/data/questions.js');
+const { CHAPTER3_LOCAL_MISSIONS } = await import('../src/data/chapter3LocalMissions.js');
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 test('learning states distinguish new lessons, recorded failures, passed and locked lessons', () => {
   assert.equal(getQuestLearningState(undefined, true), 'new');
@@ -38,6 +43,15 @@ test('chapter navigation covers the entire catalog including eight expansion que
   assert.equal(QUEST_CHAPTERS.find(c => c.id === 5).quests.at(-1).id, 'chapter5_boss');
 });
 
+test('next activity uses the same extended chapter catalog as the report', () => {
+  const chapters = QUEST_CHAPTERS.map(chapter => chapter.id === 3
+    ? { ...chapter, quests: [...chapter.quests, ...CHAPTER3_LOCAL_MISSIONS] } : chapter);
+  const progress = Object.fromEntries(QUESTS.map(quest => [quest.id, { passed: true }]));
+  const unlocked = Object.fromEntries(CHAPTER3_LOCAL_MISSIONS.map(quest => [quest.id, true]));
+  assert.equal(getNextQuestAction(progress, unlocked, {}, chapters).quest.id, CHAPTER3_LOCAL_MISSIONS[0].id);
+  assert.equal(getNextQuestAction(progress, {}, {}, chapters).kind, 'locked');
+});
+
 test('next activity prefers a started, unlocked, unfinished lesson', () => {
   const [first, second, third] = QUEST_CHAPTERS[0].quests;
   const progress = { [second.id]: { roundsPlayed: 2 }, [third.id]: { roundsPlayed: 3 } };
@@ -65,4 +79,27 @@ test('all passed quests recommend the exam area', () => {
   const progress = Object.fromEntries(QUESTS.map(q => [q.id, { passed: true }]));
   const unlocked = Object.fromEntries(QUESTS.map(q => [q.id, true]));
   assert.equal(getNextQuestAction(progress, unlocked).kind, 'complete');
+});
+
+test('quest map UX exposes the validated next action, remaining XP and distinct route states', () => {
+  const questMap = readFileSync(path.join(root, 'src/components/QuestMap.jsx'), 'utf8');
+  const adventureMap = readFileSync(path.join(root, 'src/components/quest/AdventureQuestMap.jsx'), 'utf8');
+  const lessonCard = readFileSync(path.join(root, 'src/components/quest/QuestLessonCard.jsx'), 'utf8');
+  const styles = readFileSync(path.join(root, 'src/index.css'), 'utf8');
+
+  assert.match(questMap, /needed - xpInfo\.current/);
+  assert.match(questMap, /เหลืออีก \$\{xpRemaining\} XP/);
+  assert.match(questMap, /qm-primary qm-continue/);
+  assert.match(questMap, /ผจญภัยต่อ/);
+  assert.match(adventureMap, /qm-map-state-label/);
+  assert.match(adventureMap, /<ChapterWorldBackground chapterId=\{chapter.id\}/);
+  assert.match(adventureMap, /qm-map-avatar/);
+  assert.match(adventureMap, /qm-map-path \$\{state === 'completed' \? 'is-travelled'/);
+  assert.match(lessonCard, /qm-completion-reward/);
+  assert.match(styles, /\.qm-map-node\.is-completed/);
+  assert.match(styles, /\.qm-map-node\.is-current/);
+  assert.match(styles, /\.qm-map-node\.is-locked/);
+  assert.match(styles, /\.qm-world-sky/);
+  assert.match(styles, /min-height: 490px/);
+  assert.match(styles, /@media \(max-width: 420px\)/);
 });

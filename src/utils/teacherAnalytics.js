@@ -41,6 +41,17 @@ export function getRiskStudents(students, now = Date.now()) {
   }).filter(s => s.reasons.length > 0).sort((a, b) => b.riskLevel - a.riskLevel || b.reasons.length - a.reasons.length);
 }
 
+export function hasRiskEvidence(student) {
+  const lastActive = student.lastActive || student.badgeStats?.lastLoginDate;
+  const totalAnswered = Number(student.rankingStats?.totalAnswered) || 0;
+  const hasMistakes = Object.keys(student.mistakeBank || {}).length > 0;
+  return getStudentCurrentPercent(student) !== null
+    || getStudentPreTestPercent(student) !== null
+    || Boolean(lastActive)
+    || totalAnswered >= 10
+    || hasMistakes;
+}
+
 export function getTeacherOverview(students) {
   const distribution = [
     { label: 'ดีมาก ≥80%', value: 0, color: '#10b981' },
@@ -79,6 +90,31 @@ export function getTeacherOverview(students) {
   weakQuests.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
   const total = students.length * (QUESTS.length + ARENA_MODES.length);
   return { distribution, completed, total, completionPct: total ? Math.round(completed / total * 100) : 0, weakQuests };
+}
+
+export function getLatestLearningActivities(students, limit = 5) {
+  const questNames = new Map(QUESTS.map(quest => [quest.id, quest.name]));
+  return students.flatMap(student => Object.entries(student.questProgress || {}).flatMap(([questId, result]) => {
+    if (questId === 'finalboss') return [];
+    const completedAt = result?.lastAssessment?.completedAt || result?.lastPlayed;
+    const timestamp = completedAt ? Date.parse(completedAt) : NaN;
+    if (!Number.isFinite(timestamp)) return [];
+    const score = hasScore(result?.lastAssessment?.score) ? Number(result.lastAssessment.score) : null;
+    const total = hasScore(result?.lastAssessment?.total) ? Number(result.lastAssessment.total) : null;
+    return [{
+      studentId: student.id,
+      studentName: student.name,
+      studentClass: student.class,
+      questId,
+      questName: questNames.get(questId) || questId,
+      completedAt,
+      timestamp,
+      score,
+      total,
+      pct: hasScore(result?.pct) ? Number(result.pct) : null,
+      xp: Number(student.xp) || 0,
+    }];
+  })).sort((a, b) => b.timestamp - a.timestamp).slice(0, Math.max(0, limit));
 }
 
 export function getReviewTasks(student) {

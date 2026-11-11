@@ -1,4 +1,5 @@
 import { QUESTS } from '../data/questions';
+import { getPendingQuestReviews } from './questReviewGate';
 
 const titles = {
   1: ['The Foundation', 'พื้นฐานใกล้ตัว'],
@@ -11,7 +12,7 @@ const titles = {
 export const QUEST_CHAPTERS = [...new Set(QUESTS.map(q => q.chapter))].sort((a, b) => a - b)
   .map(id => ({ id, name: titles[id]?.[0] || `Chapter ${id}`, label: titles[id]?.[1] || `บท ${id}`, quests: QUESTS.filter(q => q.chapter === id) }));
 
-export const isQuestPassed = (progress) => progress?.passed === true || Number(progress?.pct) >= 70;
+export const isQuestPassed = (progress) => progress?.verifiedLearningRun ? progress.passed === true : progress?.passed === true || Number(progress?.pct) >= 70;
 
 export const isChapterChallenge = quest => ['grammar', 'chapter2_boss', 'strategy_boss', 'finalboss', 'chapter5_boss'].includes(quest.id);
 
@@ -36,11 +37,14 @@ export function getQuestPracticeStats(progress) {
 }
 
 export function getChapterMistakes(student, chapter) {
-  return Object.values(student?.mistakeBank || {}).filter(m => !m.mastered && QUESTS.find(q => q.id === m.quest)?.chapter === chapter).length;
+  return getPendingQuestReviews(student).filter(item => item.chapter === chapter).reduce((total, item) => total + item.count, 0);
 }
 
-export function getNextQuestAction(progress = {}, unlocked = {}, student = {}) {
-  for (const chapter of QUEST_CHAPTERS) {
+export function getNextQuestAction(progress = {}, unlocked = {}, student = {}, chapters = QUEST_CHAPTERS) {
+  const pending = getPendingQuestReviews(student);
+  if (pending.length) return { kind: 'review', chapter: pending[0].chapter, questId: pending[0].questId,
+    mistakes: pending.filter(item => item.chapter === pending[0].chapter).reduce((total, item) => total + item.count, 0) };
+  for (const chapter of chapters) {
     const available = chapter.quests.filter(q => unlocked[q.id]);
     if (!available.length) continue;
     const remaining = available.filter(q => !isQuestPassed(progress[q.id]));
@@ -53,5 +57,5 @@ export function getNextQuestAction(progress = {}, unlocked = {}, student = {}) {
       return { kind: 'review', chapter: chapter.id, mistakes };
     }
   }
-  return { kind: QUESTS.every(q => isQuestPassed(progress[q.id])) ? 'complete' : 'locked', chapter: 1 };
+  return { kind: chapters.flatMap(chapter => chapter.quests).every(q => isQuestPassed(progress[q.id])) ? 'complete' : 'locked', chapter: 1 };
 }

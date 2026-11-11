@@ -1,122 +1,108 @@
 import UIIcon, { UIIconText } from './UIIcon';
 import { useState, useEffect } from 'react';
 import { useApp } from '../App';
-import { getAllSchools, getSchoolByCode } from '../utils/schoolStorage';
+import { normalizeSchoolCode, readSchoolEntry, resolveStudentSchool, schoolEntryUrl } from '../utils/schoolEntry';
 import CuteUpdateModal from './CuteUpdateModal';
 import EnglishQuestLogo from './landing/EnglishQuestLogo';
 
-const STUDENT_SCHOOL_KEY = 'eq_onet_student_school';
-
 export default function StudentLoginPage() {
   const { navigate, handleLogin } = useApp();
-  const [form, setForm] = useState({ name: '', class: '6/2', number: '' });
+  const [form, setForm] = useState({ studentId: '', pin: '' });
+  const [showPin, setShowPin] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1);
 
-  // School Selection State
-  const [schools, setSchools] = useState(() => getAllSchools());
-  const [selectedSchool, setSelectedSchool] = useState(() => {
-    // 1. Check URL parameters
-    const params = new URLSearchParams(window.location.search);
-    const urlSchoolCode = params.get('school') || params.get('schoolCode');
-    if (urlSchoolCode) {
-      const found = getSchoolByCode(urlSchoolCode);
-      if (found) {
-        localStorage.setItem(STUDENT_SCHOOL_KEY, JSON.stringify(found));
-        return found;
-      }
-    }
+  const [entry, setEntry] = useState(() => readSchoolEntry(window.location));
+  const [schoolCodeInput, setSchoolCodeInput] = useState(() => readSchoolEntry(window.location).code || '');
+  const [selectedSchool, setSelectedSchool] = useState(null);
+  const [schoolState, setSchoolState] = useState('idle');
+  const [schoolRetry, setSchoolRetry] = useState(0);
 
-    // 2. Check localStorage
-    try {
-      const saved = localStorage.getItem(STUDENT_SCHOOL_KEY);
-      if (saved) return JSON.parse(saved);
-    } catch {}
-
-    // 3. Fallback to first active school (BNS01 default)
-    const all = getAllSchools();
-    return all.find(s => s.code === 'BNS01') || all[0] || null;
-  });
-
-  const [showSchoolModal, setShowSchoolModal] = useState(false);
-  const [schoolSearch, setSchoolSearch] = useState('');
-
-  // Auto-hide update modal if page was just refreshed/updated via URL parameters
+  // Show update modal only if requested via URL parameters (e.g. ?update=1)
   const [showUpdateModal, setShowUpdateModal] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return !params.has('route') && !params.has('refresh') && !params.has('updated');
+    return params.get('update') === '1' || params.has('forceUpdate');
   });
 
-  // Handle URL change or popstate
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const urlCode = params.get('school') || params.get('schoolCode');
-    if (urlCode) {
-      const found = getSchoolByCode(urlCode);
-      if (found) {
-        setSelectedSchool(found);
-        localStorage.setItem(STUDENT_SCHOOL_KEY, JSON.stringify(found));
-      }
-    }
+    const onPopState = () => setEntry(readSchoolEntry(window.location));
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
-  const handleSelectSchool = (school) => {
-    setSelectedSchool(school);
-    localStorage.setItem(STUDENT_SCHOOL_KEY, JSON.stringify(school));
-    setShowSchoolModal(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    setSelectedSchool(null);
+    setForm({ studentId: '', pin: '' });
+    setShowPin(false);
+    setErrors({});
+    if (entry.kind !== 'school') {
+      setSchoolState('idle');
+      return () => controller.abort();
+    }
+    if (!entry.code) {
+      setSchoolState('unavailable');
+      return () => controller.abort();
+    }
+    setSchoolState('loading');
+    resolveStudentSchool(entry.code, controller.signal)
+      .then((school) => {
+        if (controller.signal.aborted) return;
+        setSelectedSchool(school);
+        setSchoolState('ready');
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setSchoolState('unavailable');
+      });
+    return () => controller.abort();
+  }, [entry, schoolRetry]);
+
+  const handleSchoolCodeSubmit = () => {
+    const code = normalizeSchoolCode(schoolCodeInput);
+    if (!code) {
+      setErrors({ schoolCode: 'กรุณากรอกรหัสโรงเรียนที่ถูกต้อง (เช่น BNS01)' });
+      return;
+    }
+    setSchoolCodeInput(code);
+    window.history.pushState({}, '', schoolEntryUrl(window.location.origin, code));
+    setEntry({ kind: 'school', code });
   };
 
-  const handleNext = async () => {
+  const handleSwitchSchool = () => {
+    if (loading) return;
+    window.history.pushState({}, '', '/?route=student-login');
+    setSchoolCodeInput('');
+    setEntry({ kind: 'general', code: null });
+    setSelectedSchool(null);
+    setForm({ studentId: '', pin: '' });
+    setErrors({});
+  };
+
+  const handleLoginSubmit = async () => {
     const e = {};
-    if (!form.class) e.class = 'กรุณาเลือกชั้นเรียน';
-    if (!form.number) e.number = 'กรุณากรอกเลขที่';
-    
+    if (!selectedSchool || schoolState !== 'ready') e.general = 'กรุณายืนยันโรงเรียนก่อนเข้าสู่ระบบ';
+    if (!form.studentId.trim()) e.studentId = 'กรุณากรอกรหัสนักเรียน';
+    if (!form.pin.trim()) e.pin = 'กรุณากรอกรหัส PIN';
+    else if (!/^\d{6}$/.test(form.pin.trim())) e.pin = 'รหัส PIN ต้องเป็นตัวเลข 6 หลัก';
+
     if (Object.keys(e).length > 0) {
       setErrors(e);
       return;
     }
-    
+
     setLoading(true);
+    setErrors({});
     try {
-      const { getStudentByClassAndNumber, saveStudent } = await import('../utils/storage');
-      const numStr = form.number.toString().trim();
-      const classStr = form.class.trim();
-      const schoolCode = selectedSchool?.code || null;
+      const { loginStudent } = await import('../utils/studentAuth');
+      const result = await loginStudent({
+        schoolCode: selectedSchool.code,
+        studentId: form.studentId.trim(),
+        pin: form.pin.trim(),
+      });
 
-      console.log('[Login] Searching student for school:', schoolCode, 'class:', classStr, 'number:', numStr);
-
-      let student = await getStudentByClassAndNumber(classStr, numStr, schoolCode);
-      
-      if (!student && classStr.startsWith('ป.')) {
-        const altClass = classStr.substring(2);
-        student = await getStudentByClassAndNumber(altClass, numStr, schoolCode);
-      }
-      
-      if (!student && !classStr.startsWith('ป.')) {
-        const altClass = 'ป.' + classStr;
-        student = await getStudentByClassAndNumber(altClass, numStr, schoolCode);
-      }
-
-      console.log('[Login] Found student:', student);
-      
-      if (student) {
-        const studentData = {
-          ...student,
-          school_code: selectedSchool?.code || student.school_code || 'BNS01',
-          school_id: selectedSchool?.id || student.school_id || 'sch_bns_01',
-          school_name: selectedSchool?.name || student.school_name || 'โรงเรียนบ้านนาสาร'
-        };
-        const saved = await saveStudent(studentData);
-        handleLogin(saved);
-      } else {
-        setErrors({
-          number: `ไม่พบเลขที่ ${numStr} ในชั้น ${classStr} ${selectedSchool ? `ของ ${selectedSchool.name}` : ''} กรุณาตรวจสอบข้อมูลหรือแจ้งครู`
-        });
-      }
+      handleLogin(result.student);
     } catch (err) {
-      console.error('[Login] Error:', err);
-      setErrors({ number: 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง' });
+      setErrors({ general: err.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ กรุณาลองใหม่อีกครั้ง' });
     } finally {
       setLoading(false);
     }
@@ -124,17 +110,10 @@ export default function StudentLoginPage() {
 
   const handleChange = (field) => (e) => {
     setForm(p => ({ ...p, [field]: e.target.value }));
-    if (errors[field]) setErrors(p => ({ ...p, [field]: '' }));
+    if (errors[field] || errors.general) {
+      setErrors(p => ({ ...p, [field]: '', general: '' }));
+    }
   };
-
-  // Filter schools for modal
-  const filteredSchools = schools.filter(s => {
-    return (
-      s.name.toLowerCase().includes(schoolSearch.toLowerCase()) ||
-      s.code.toLowerCase().includes(schoolSearch.toLowerCase()) ||
-      (s.province && s.province.toLowerCase().includes(schoolSearch.toLowerCase()))
-    );
-  });
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative">
@@ -143,6 +122,13 @@ export default function StudentLoginPage() {
       <CuteUpdateModal
         isOpen={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
+        onContinue={() => {
+          setShowUpdateModal(false);
+          const url = new URL(window.location.href);
+          url.searchParams.delete('update');
+          url.searchParams.delete('forceUpdate');
+          window.history.replaceState({}, '', url);
+        }}
       />
 
       {/* Decorative top glow */}
@@ -163,174 +149,138 @@ export default function StudentLoginPage() {
         {/* Header */}
         <div className="text-center mb-5">
           <div className="mx-auto mb-4 w-64 max-w-full"><EnglishQuestLogo /></div>
-          <h1 className="text-2xl font-black text-amber-800">กรอกข้อมูลนักเรียน</h1>
-          <p className="text-slate-500 text-xs mt-1">เพื่อบันทึกคะแนนและประเมินผลความพร้อม O-NET</p>
+          <h1 className="text-2xl font-black text-amber-800">เข้าสู่ระบบนักเรียน</h1>
+          <p className="text-slate-500 text-xs mt-1">ผจญภัยสู่ความพร้อมสอบ O-NET ภาษาอังกฤษ ป.6</p>
         </div>
 
-        {step === 1 && (
-          <div className="glass-card p-6 space-y-4 shadow-xl">
+        <div className="glass-card p-6 space-y-4 shadow-xl">
 
-            {/* School Banner Card */}
-            {selectedSchool ? (
-              <div className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/30 rounded-2xl p-3 flex items-center justify-between gap-2 shadow-sm">
-                <div className="flex items-center gap-2.5 truncate">
-                  <span className="text-2xl"><UIIcon value={"🏫"} /></span>
-                  <div className="truncate">
-                    <div className="font-black text-slate-800 text-xs truncate">
-                      {selectedSchool.name}
-                    </div>
-                    <div className="text-[10px] text-amber-700 font-mono font-medium">
-                      รหัส รร: <span className="font-bold">{selectedSchool.code}</span> {selectedSchool.province ? `• ${selectedSchool.province}` : ''}
-                    </div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowSchoolModal(true)}
-                  className="text-[11px] text-amber-800 hover:text-amber-950 font-bold bg-amber-500/20 hover:bg-amber-500/30 px-2.5 py-1 rounded-xl border border-amber-500/30 transition-all shrink-0"
-                  title="เปลี่ยนโรงเรียน"
-                >
-                  สลับ รร.
-                </button>
-              </div>
+          <div className="rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-50 to-white p-4 text-center shadow-sm" aria-live="polite">
+            <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-2xl text-amber-800" aria-hidden="true"><UIIcon value="🏫" /></div>
+            <p className="text-xs font-bold text-amber-800">ยินดีต้อนรับสู่การผจญภัย</p>
+            {schoolState === 'ready' && selectedSchool ? (
+              <h2 className="mt-1 break-words text-xl font-black leading-snug text-slate-900">{selectedSchool.name}</h2>
+            ) : schoolState === 'loading' ? (
+              <p className="mt-1 text-sm text-slate-600">กำลังตรวจสอบโรงเรียน...</p>
+            ) : schoolState === 'unavailable' ? (
+              <p className="mt-1 text-sm font-bold text-rose-700">ไม่สามารถเปิดหน้าโรงเรียนนี้ได้</p>
             ) : (
+              <p className="mt-1 text-sm text-slate-700">กรอกรหัสโรงเรียนเพื่อเริ่มต้น</p>
+            )}
+            {selectedSchool && <p className="mt-1 text-xs text-slate-600">พื้นที่การเรียนรู้ของโรงเรียนคุณ</p>}
+          </div>
+          {schoolState === 'unavailable' && entry.code && (
+            <button type="button" className="min-h-11 w-full rounded-xl border border-sky-700 px-3 text-sm font-semibold text-sky-800"
+              onClick={() => setSchoolRetry(previous => previous + 1)}>
+              ลองตรวจสอบโรงเรียนอีกครั้ง
+            </button>
+          )}
+
+          {entry.kind === 'general' && (
+            <div>
+              <label htmlFor="school-code-input" className="mb-1.5 block text-xs font-bold text-slate-700">รหัสโรงเรียน</label>
+              <div className="flex gap-2">
+                <input id="school-code-input" className="input-field min-w-0 flex-1 text-sm uppercase" value={schoolCodeInput}
+                  aria-invalid={Boolean(errors.schoolCode)} aria-describedby={errors.schoolCode ? 'school-code-error' : undefined}
+                  onChange={event => { setSchoolCodeInput(event.target.value); setErrors({}); }}
+                  onKeyDown={event => event.key === 'Enter' && handleSchoolCodeSubmit()} autoComplete="off" />
+                <button type="button" className="rounded-xl bg-amber-400 px-3 text-xs font-bold text-amber-950" onClick={handleSchoolCodeSubmit}>ตรวจสอบ</button>
+              </div>
+              {errors.schoolCode && <p id="school-code-error" className="mt-1 text-xs text-rose-700" role="alert">{errors.schoolCode}</p>}
+            </div>
+          )}
+
+          {/* General Error Alert */}
+          {errors.general && (
+            <div role="alert" className="bg-rose-50 border border-rose-200 text-rose-700 px-3 py-2 rounded-xl text-xs flex items-center gap-2 animate-shake">
+              <span className="text-base shrink-0"><UIIcon value={"⚠️"} /></span>
+              <span className="leading-tight">{errors.general}</span>
+            </div>
+          )}
+
+          {/* Student ID */}
+          <div>
+            <label htmlFor="student-id-input" className="block text-xs font-bold text-slate-700 mb-1.5">
+              <UIIcon value={"👤"} /> รหัสนักเรียน (Student ID) <span className="text-rose-500">*</span>
+            </label>
+            <input
+              id="student-id-input"
+              className="input-field text-sm"
+              type="text"
+              placeholder="เช่น STU001 หรือ เลขประจำตัว"
+              value={form.studentId}
+              onChange={handleChange('studentId')}
+              onKeyDown={e => e.key === 'Enter' && handleLoginSubmit()}
+              autoComplete="username"
+              aria-required="true"
+              aria-invalid={Boolean(errors.studentId)}
+              aria-describedby={errors.studentId ? 'student-id-error' : undefined}
+              disabled={loading || schoolState !== 'ready'}
+            />
+            {errors.studentId && (
+              <p id="student-id-error" className="text-rose-700 text-xs mt-1 leading-tight"><UIIcon value={"⚠️"} /> {errors.studentId}</p>
+            )}
+          </div>
+
+          {/* PIN Input */}
+          <div>
+            <label htmlFor="student-pin-input" className="block text-xs font-bold text-slate-700 mb-1.5">
+              <UIIcon value={"🔑"} /> รหัสผ่าน PIN (6 หลัก) <span className="text-rose-500">*</span>
+            </label>
+            <div className="relative">
+              <input
+                id="student-pin-input"
+                className="input-field text-sm pr-16 tracking-widest font-mono"
+                type={showPin ? "text" : "password"}
+                placeholder="••••••"
+                maxLength={6}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={form.pin}
+                onChange={handleChange('pin')}
+                onKeyDown={e => e.key === 'Enter' && handleLoginSubmit()}
+                autoComplete="current-password"
+                aria-required="true"
+                aria-invalid={Boolean(errors.pin)}
+                aria-describedby={errors.pin ? 'student-pin-error' : undefined}
+                disabled={loading || schoolState !== 'ready'}
+              />
               <button
                 type="button"
-                onClick={() => setShowSchoolModal(true)}
-                className="w-full bg-amber-500/15 border-2 border-dashed border-amber-500/40 rounded-2xl p-3 text-center text-xs font-bold text-amber-800 hover:bg-amber-500/25 transition-all flex items-center justify-center gap-2"
+                className="absolute right-1 top-1/2 -translate-y-1/2 min-h-11 min-w-11 text-slate-600 hover:text-slate-800 text-xs font-bold cursor-pointer"
+                onClick={() => setShowPin(!showPin)}
+                aria-label={showPin ? 'ซ่อนรหัส PIN' : 'แสดงรหัส PIN'}
+                aria-pressed={showPin}
               >
-                <span><UIIcon value={"🏫"} /></span>
-                <span>คลิกเพื่อเลือกโรงเรียนของคุณ</span>
+                {showPin ? 'ซ่อน' : 'แสดง'}
               </button>
-            )}
-
-            <p className="text-slate-500 text-xs text-center">เลือกระดับชั้นและพิมพ์เลขที่เพื่อเข้าสู่ระบบ</p>
-
-            {/* Class & Number */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  <UIIcon value={"🏫"} /> ชั้น <span className="text-rose-500">*</span>
-                </label>
-                <select
-                  className="input-field appearance-none cursor-pointer text-sm"
-                  value={form.class}
-                  onChange={handleChange('class')}
-                >
-                  <option className="text-slate-900" value="" disabled>-- เลือกชั้น --</option>
-                  <option className="text-slate-900" value="6/1">ป.6/1</option>
-                  <option className="text-slate-900" value="6/2">ป.6/2</option>
-                  <option className="text-slate-900" value="6/3">ป.6/3</option>
-                  <option className="text-slate-900" value="6/4">ป.6/4</option>
-                  <option className="text-slate-900" value="6/5">ป.6/5</option>
-                  <option className="text-slate-900" value="6/6">ป.6/6</option>
-                </select>
-                {errors.class && <p className="text-rose-500 text-[11px] mt-1"><UIIcon value={"⚠️"} /> {errors.class}</p>}
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  <UIIcon value={"🔢"} /> เลขที่ <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  className="input-field text-sm"
-                  type="number"
-                  placeholder="เช่น 1"
-                  min="1"
-                  max="60"
-                  value={form.number}
-                  onChange={handleChange('number')}
-                  onKeyDown={e => e.key === 'Enter' && handleNext()}
-                />
-                {errors.number && <p className="text-rose-500 text-[11px] mt-1 leading-tight"><UIIcon value={"⚠️"} /> {errors.number}</p>}
-              </div>
             </div>
-
-            <button
-              className="btn-primary w-full text-base py-3.5 mt-2 cursor-pointer shadow-lg shadow-amber-500/20 active:scale-95 transition-all"
-              onClick={handleNext}
-              disabled={loading}
-            >
-              <UIIconText value={loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ →'} />
-            </button>
+            {errors.pin && (
+              <p id="student-pin-error" className="text-rose-700 text-xs mt-1 leading-tight"><UIIcon value={"⚠️"} /> {errors.pin}</p>
+            )}
           </div>
-        )}
+
+          <button
+            id="student-login-submit-btn"
+            className="btn-primary w-full text-base py-3.5 mt-2 cursor-pointer shadow-lg shadow-amber-500/20 active:scale-95 transition-all disabled:opacity-50"
+            onClick={handleLoginSubmit}
+            disabled={loading || schoolState !== 'ready'}
+          >
+            <UIIconText value={loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ →'} />
+          </button>
+
+          <p className="text-slate-400 text-[11px] text-center pt-1">
+            พบปัญหาการเข้าสู่ระบบ หรือลืมรหัส PIN กรุณาติดต่อคุณครู
+          </p>
+          {entry.kind === 'school' && (
+            <button type="button" onClick={handleSwitchSchool} disabled={loading}
+              className="block w-full text-center text-xs font-semibold text-sky-800 underline underline-offset-2 hover:text-sky-950">
+              ไม่ใช่โรงเรียนของคุณ? เปลี่ยนโรงเรียน
+            </button>
+          )}
+        </div>
 
       </div>
-
-      {/* ── School Selection Modal ──────────────────────────────────── */}
-      {showSchoolModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
-          <div className="glass-card w-full max-w-sm p-5 rounded-3xl shadow-2xl space-y-3.5 max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-amber-200/60 pb-2.5">
-              <h3 className="font-black text-slate-800 text-sm flex items-center gap-2">
-                <span><UIIcon value={"🏫"} /></span>
-                <span>เลือกโรงเรียนของคุณ</span>
-              </h3>
-              <button
-                onClick={() => setShowSchoolModal(false)}
-                className="text-slate-400 hover:text-slate-700 text-lg"
-              >
-                <UIIcon value={"✕"} />
-              </button>
-            </div>
-
-            {/* Search Box */}
-            <input
-              type="text"
-              placeholder="🔍 ค้นหาชื่อโรงเรียน หรือ รหัส (เช่น BNS01)..."
-              value={schoolSearch}
-              onChange={e => setSchoolSearch(e.target.value)}
-              className="w-full bg-white/90 border border-amber-300/80 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500"
-              autoFocus
-            />
-
-            {/* School List */}
-            <div className="overflow-y-auto space-y-2 flex-1 pr-1">
-              {filteredSchools.length === 0 ? (
-                <div className="text-center py-6 text-slate-400 text-xs">
-                  ไม่พบโรงเรียนที่ค้นหา
-                </div>
-              ) : (
-                filteredSchools.map(sch => {
-                  const isSelected = selectedSchool?.id === sch.id;
-                  return (
-                    <button
-                      key={sch.id}
-                      onClick={() => handleSelectSchool(sch)}
-                      className={`w-full text-left p-3 rounded-2xl border transition-all flex items-center justify-between gap-2 ${
-                        isSelected
-                          ? 'bg-amber-500 text-slate-950 font-black border-amber-500 shadow-md shadow-amber-500/20'
-                          : 'bg-white/80 hover:bg-amber-50/80 border-amber-200/60 text-slate-800'
-                      }`}
-                    >
-                      <div className="truncate">
-                        <div className="font-bold text-xs truncate leading-tight">
-                          {sch.name}
-                        </div>
-                        <div className={`text-[10px] mt-0.5 truncate ${isSelected ? 'text-slate-900/80' : 'text-slate-500'}`}>
-                          {sch.area || sch.province}
-                        </div>
-                      </div>
-                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded-lg shrink-0 font-bold ${
-                        isSelected ? 'bg-slate-950/20 text-slate-950' : 'bg-amber-100 text-amber-800 border border-amber-300'
-                      }`}>
-                        {sch.code}
-                      </span>
-                    </button>
-                  );
-                })
-              )}
-            </div>
-
-            <button
-              onClick={() => setShowSchoolModal(false)}
-              className="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl text-xs transition-colors"
-            >
-              ยกเลิก
-            </button>
-          </div>
-        </div>
-      )}
 
     </div>
   );

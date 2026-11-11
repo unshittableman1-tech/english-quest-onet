@@ -1,6 +1,11 @@
-import UIIcon, { UIIconText } from './UIIcon';
+import UIIcon from './UIIcon';
+import { imageForChoice, demoPracticeScene, demoBossScenes } from '../utils/demoVehicleChoice.mjs';
+import { demoChapter3BossPool } from '../utils/demoChapter3Boss.mjs';
+import { demoChapter4BossPool } from '../utils/demoChapter4Boss.mjs';
+import Chapter5DemoVisual from './Chapter5DemoVisual';
+import SocialChallengeDemo from './SocialChallengeDemo';
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { ArrowLeft, Languages, RotateCcw, Map, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Languages, RotateCcw, Map, CheckCircle2, BookOpenCheck, Star } from 'lucide-react';
 import { useApp } from '../App';
 import { QUESTS } from '../data/questions';
 import { XP_RULES } from '../utils/scoring';
@@ -15,22 +20,50 @@ import { playCorrectSound, playWrongSound } from '../utils/audio';
 import { updateBadgeStats } from '../utils/storage';
 import { getQuestionTranslation } from '../utils/questionTranslator';
 import { isPracticeQuestionReady } from '../utils/questionMedia';
+import { selectBossAssessmentQuestions } from '../utils/bossAssessment';
+import ServerBossExamPage from './ServerBossExamPage';
+import { SERVER_BOSS_EXAM_ENABLED, SERVER_BOSS_IDS } from '../utils/bossExam';
+import QuestionDecoder from './QuestionDecoder';
+import { REVIEWED_QUESTION_GUIDES } from '../data/questionUnderstandingReviewed';
+import { getReviewedGuide } from '../utils/questionUnderstanding';
+import CreditGlossary, { CreditGlossText, CreditGlossWallet } from './vocabularyCredits/CreditGlossary';
+import { vocabularyCreditsPilotEnabled } from '../utils/vocabularyCreditsPilot';
+import { questCreditActivityId } from '../utils/vocabularyCreditText';
 
 export default function QuizPage({ questId }) {
+  const { student, navigate } = useApp();
+  if (student?.isDemo && questId === 'chapter2_boss') return <SocialChallengeDemo onBack={() => navigate('map')} />;
+  if (SERVER_BOSS_EXAM_ENABLED && student?.authVerified === true && SERVER_BOSS_IDS.has(questId)) {
+    return <ServerBossExamPage questId={questId} />;
+  }
+  return <LegacyQuizPage questId={questId} />;
+}
+
+function LegacyQuizPage({ questId }) {
   const { navigate, addXP, completeQuest, student, showToast, saveMistake, checkBadges } = useApp();
 
   const quest     = QUESTS.find(q => q.id === questId);
   const selectionLock = useRef(false);
   const nextLock = useRef(false);
   const firstResponses = useRef({});
-  const firstResponseScoring = Boolean(quest?.questions?.length && quest.questions.every(item => item.scoringPolicy === 'first_response_v1'));
+  const firstResponseScoring = Boolean(quest?.questions?.length && quest.questions.every(item =>
+    typeof item.id === 'string' && item.id && Array.isArray(item.options || item.choices) &&
+    Number.isInteger(item.answer ?? item.correctIndex)));
   const isExamMode = questId === 'finalboss' || quest?.isExam;
-  const practicePool = isExamMode ? (quest?.questions || []) : (quest?.questions?.filter(isPracticeQuestionReady) || []);
+  const demoChapter3Boss = student?.isDemo === true && questId === 'strategy_boss';
+  const demoChapter4Boss = student?.isDemo === true && questId === 'finalboss';
+  const practicePool = demoChapter3Boss ? (demoChapter3BossPool(QUESTS, true) || []) : demoChapter4Boss ? (demoChapter4BossPool(QUESTS, true, isPracticeQuestionReady) || []) : isExamMode
+    ? [...(quest?.questions || []), ...(quest?.supplementalBossQuestions || [])]
+    : (quest?.questions?.filter(isPracticeQuestionReady) || []);
   const heldItems = (quest?.questions?.length || 0) - practicePool.length;
 
   const [questions] = useState(() => {
     const allQ = practicePool;
-    return [...allQ].sort(() => Math.random() - 0.5).slice(0, 10).map(q => {
+    const itemLimit = demoChapter3Boss || demoChapter4Boss ? 20 : isExamMode ? (quest?.assessmentCount || allQ.length) : Math.min(10, allQ.length);
+    const selectedQuestions = isExamMode && quest?.requiredAssessmentFocus
+      ? selectBossAssessmentQuestions(allQ, itemLimit, quest.requiredAssessmentFocus)
+      : [...allQ].sort(() => Math.random() - 0.5).slice(0, itemLimit);
+    return selectedQuestions.map(q => {
       // Shuffle options (support both options and choices key)
       const rawOptions = q.options || q.choices || [];
       const opts = rawOptions.map((text, originalIndex) => ({ text, originalIndex }));
@@ -94,12 +127,14 @@ export default function QuizPage({ questId }) {
   const xp = student?.xp || 0;
   const level = student?.level || 1;
   const q = questions[currentIdx];
+  const questionGuide = getReviewedGuide(q, REVIEWED_QUESTION_GUIDES[q?.id], { questId, isExamMode });
   const { mediaStatus, onMediaFailure } = useQuestionMedia(questions);
   const translation = getQuestionTranslation(q);
 
   const studentPermission = student?.translatePermission || 'full';
   // Effective Translate Mode: 'full' | 'vocab_only' | 'off'
   const effectiveTranslateMode = isExamMode ? 'off' : studentPermission;
+  const creditGlossEnabled = vocabularyCreditsPilotEnabled(student) && !isExamMode;
 
   const totalCorrect = answers.filter(a => a.correct).length;
   const progress = Math.round(((currentIdx) / questions.length) * 100);
@@ -135,6 +170,12 @@ export default function QuizPage({ questId }) {
       return;
     }
 
+    if (firstResponseScoring && q.type === 'two_step' && firstResponses.current[currentIdx]
+      && firstResponses.current[currentIdx].reasonChoice === undefined) {
+      firstResponses.current[currentIdx].reasonChoice = q.reasonChoices[idx];
+      firstResponses.current[currentIdx].reasonCorrect = idx === q.correctReasonIndex;
+    }
+
     setSelected(idx);
     
     let isCorrect = false;
@@ -168,8 +209,8 @@ export default function QuizPage({ questId }) {
       }
       
       addXP(-5, 'ตอบผิด');
-      if (student && !student.isDemo) {
-        saveMistake(student.id, q);
+      if (student) {
+        saveMistake(student.id, { ...q, quest: questId });
       }
     } else {
       playCorrectSound();
@@ -186,10 +227,11 @@ export default function QuizPage({ questId }) {
       isMainCorrect,
       isReasonCorrect,
       question: q,
+      questionGuide,
       timeSpent // pass to handleNext
     });
     setShowFeedback(true);
-  }, [selected, showFeedback, wrongAttempts, q, questionStartTime, addXP, student, saveMistake, currentStep, mainSelected, showToast, twoStepSessionStats, firstResponseScoring, currentIdx]);
+  }, [selected, showFeedback, wrongAttempts, q, questionGuide, questionStartTime, addXP, student, saveMistake, currentStep, mainSelected, showToast, twoStepSessionStats, firstResponseScoring, currentIdx]);
 
   const handleNext = useCallback((retrying = false) => {
     if (nextLock.current) return;
@@ -303,7 +345,12 @@ export default function QuizPage({ questId }) {
       completeQuest(questId, totalRight, questions.length, {
          ...(firstResponseScoring ? { assessmentEvidence: {
            policy: 'first_response_v1', score: totalRight, total: questions.length,
-           items: newAnswers.map(a => ({ id: a.q.id, version: a.q.itemVersion, firstCorrect: a.correct, firstChoice: a.firstResponse.choice, finalCorrect: a.practiceCorrect })),
+           items: newAnswers.map(a => ({
+             id: a.q.id, version: a.q.itemVersion || 'legacy-v1',
+             firstCorrect: a.correct, firstChoice: a.firstResponse.choice,
+             firstReasonChoice: a.firstResponse.reasonChoice ?? null,
+             finalCorrect: a.practiceCorrect,
+           })),
          } } : {}),
          twoStepBothCorrect: twoStepSessionStats.bothCorrect,
          mainCorrect: twoStepSessionStats.mainCorrect,
@@ -339,10 +386,11 @@ export default function QuizPage({ questId }) {
   }
 
   if (showSummary) {
-    return <QuestSummary quest={quest} answers={answers} roundResult={roundResult} firstResponseScoring={firstResponseScoring} onBack={() => navigate('map')} onRetry={() => { firstResponses.current = {}; setCurrentIdx(0); setAnswers([]); setCombo(0); setWrongAttempts([]); setRoundResult(null); setCurrentStep(1); setMainSelected(null); setSelected(null); setQuestionStartTime(Date.now()); selectionLock.current = false; nextLock.current = false; Object.assign(twoStepSessionStats, { mainCorrect: 0, reasonCorrect: 0, bothCorrect: 0, fastGuessCount: 0 }); setShowSummary(false); }} />;
+    return <QuestSummary quest={quest} answers={answers} roundResult={roundResult} firstResponseScoring={firstResponseScoring} onBack={() => navigate('map')} onReview={() => navigate('review')} onRetry={() => { firstResponses.current = {}; setCurrentIdx(0); setAnswers([]); setCombo(0); setWrongAttempts([]); setRoundResult(null); setCurrentStep(1); setMainSelected(null); setSelected(null); setQuestionStartTime(Date.now()); selectionLock.current = false; nextLock.current = false; Object.assign(twoStepSessionStats, { mainCorrect: 0, reasonCorrect: 0, bothCorrect: 0, fastGuessCount: 0 }); setShowSummary(false); }} />;
   }
 
   return (
+    <CreditGlossary key={questCreditActivityId(questId, q)} enabled={creditGlossEnabled} activityId={questCreditActivityId(questId, q)} showWallet={false} onOpenVocabulary={() => navigate('vocab-drill')}>
     <div className="quiz-workspace min-h-screen flex flex-col">
       {/* Top HUD */}
       <header className="quiz-hud">
@@ -365,7 +413,7 @@ export default function QuizPage({ questId }) {
           <span className="quiz-correct-count"><CheckCircle2 size={15} />ถูก {totalCorrect}/{answers.length} ข้อ</span>
           
           <div className="ml-auto flex items-center gap-3">
-             {effectiveTranslateMode === 'full' && (
+             {!creditGlossEnabled && effectiveTranslateMode === 'full' && (
                <button 
                   onClick={toggleGlobalTranslate}
                   className="quiz-translate-toggle" aria-pressed={globalTranslate} aria-label="แปลภาษาไทย"
@@ -384,6 +432,7 @@ export default function QuizPage({ questId }) {
 
       {/* Question */}
       <div className="quiz-content">
+        {creditGlossEnabled && <CreditGlossWallet />}
         {heldItems > 0 && <p className="text-sm text-slate-600" role="status">ชุดฝึก {questions.length} ข้อ · พักข้อที่ยังไม่พร้อม {heldItems} ข้อ</p>}
         {q.type === 'two_step' && (
            <div className="mb-2 text-center text-xs font-bold text-slate-500 tracking-wider uppercase">
@@ -395,7 +444,12 @@ export default function QuizPage({ questId }) {
             ข้อ {currentIdx + 1}
           </span>
 
-          <QuestionStimulus question={q} allowSpeech={!isExamMode} onFailure={onMediaFailure} />
+          <QuestionStimulus question={q} allowSpeech={!isExamMode} onFailure={onMediaFailure} renderText={creditGlossEnabled ? text => <CreditGlossText text={String(text)} /> : undefined} />
+          {currentStep === 1 && <Chapter5DemoVisual demo={student?.isDemo === true} isExam={!!isExamMode} questId={questId} questionId={q.id} />}
+          {currentStep === 1 && demoBossScenes({ demo: student?.isDemo === true, questId, questionId: q.id }).length > 0 && <div aria-hidden="true" style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>{demoBossScenes({ demo: true, questId, questionId: q.id }).map(src => <img key={src} src={src} alt="" loading="lazy" onError={event => { event.currentTarget.hidden = true; }} style={{ width: 130, maxWidth: '40%', height: 120, objectFit: 'contain' }} />)}</div>}
+          {currentStep === 1 && demoPracticeScene({ demo: student?.isDemo === true, isExam: !!isExamMode, questId, questionId: q.id }) && (
+            <img src={demoPracticeScene({ demo: true, isExam: false, questId, questionId: q.id })} alt="" loading="lazy" onError={event => { event.currentTarget.hidden = true; }} style={{ display: 'block', width: 'min(100%, 230px)', maxHeight: '180px', objectFit: 'contain', margin: '12px auto' }} />
+          )}
           
           {currentStep === 2 && (
              <div className="mb-4 p-3 bg-white/5 rounded-xl border border-amber-200 text-sm opacity-80">
@@ -407,17 +461,18 @@ export default function QuizPage({ questId }) {
 
           <div className="flex items-start gap-3">
             <p className="quiz-question-text">
-              <VocabTooltip 
+              {creditGlossEnabled ? <CreditGlossText text={currentStep === 1 ? q.question : (q.reasonQuestion || 'ทำไมคำตอบนี้จึงถูก?')} /> : <VocabTooltip 
                 text={currentStep === 1 ? q.question : (q.reasonQuestion || "ทำไมคำตอบนี้จึงถูก?")} 
                 vocab={q.vocab} 
-                targetedOnly keyword={q.keyword}
+                keyword={q.keyword} enableDynamic={effectiveTranslateMode !== 'off'}
+                blockedMeanings={q.options}
                 disabled={effectiveTranslateMode === 'off'}
-              />
+              />}
             </p>
             {currentStep === 1 && <SpeakButton text={q.question} label="ฟังโจทย์" />}
           </div>
 
-          {currentStep === 1 && translation && effectiveTranslateMode === 'full' && (
+          {!creditGlossEnabled && currentStep === 1 && translation && effectiveTranslateMode === 'full' && (
             globalTranslate ? (
               <div className="mt-4 p-3 bg-white/5 border border-amber-200 rounded-xl transition-all duration-300">
                 <div className="flex items-center gap-2 mb-2">
@@ -436,11 +491,13 @@ export default function QuizPage({ questId }) {
               </div>
             )
           )}
+          {currentStep === 1 && questionGuide?.preAnswerDecoderAllowed !== false && <QuestionDecoder guide={questionGuide} questionId={q.id} />}
         </section>
 
         {/* Options */}
         <div className="quiz-choices" aria-label="ตัวเลือกคำตอบ">
           {(currentStep === 1 ? q.options : q.reasonChoices).map((opt, i) => {
+            const visual = currentStep === 1 ? imageForChoice({ demo: student?.isDemo === true, questionId: q.id, choice: opt }) : null;
             let cls = 'option-btn';
             const isWrongAttempt = currentStep === 1 ? wrongAttempts.includes(i) : false; // We don't track wrong attempts for step 2 retry since it shows feedback immediately
             const isCompleted = answers.length >= questions.length;
@@ -464,14 +521,17 @@ export default function QuizPage({ questId }) {
             
             return (
               <div key={i} className="quiz-choice-row">
-              <button className={`${cls} quiz-answer`} aria-label={`คำตอบ ${String.fromCharCode(65 + i)}: ${opt}`} onClick={() => handleSelect(i)} disabled={selected !== null || isWrongAttempt || isCompleted}>
+              {creditGlossEnabled ? <div className={`${cls} quiz-answer quiz-credit-choice`} onClick={() => { if (!(selected !== null || isWrongAttempt || isCompleted)) handleSelect(i); }}>
+                <button type="button" aria-label={`คำตอบ ${String.fromCharCode(65 + i)}: ${opt}`} onClick={event => { event.stopPropagation(); handleSelect(i); }} disabled={selected !== null || isWrongAttempt || isCompleted}>{String.fromCharCode(65 + i)}.</button>
+                <span>{visual && <img src={visual} alt="" style={{ display: 'block', width: '100%', maxWidth: 160, aspectRatio: '1 / 1', objectFit: 'contain', borderRadius: 12, marginBottom: 8 }} onError={event => { event.currentTarget.style.display = 'none'; }} />}<CreditGlossText text={opt} /></span>
+              </div> : <button className={`${cls} quiz-answer`} aria-label={`คำตอบ ${String.fromCharCode(65 + i)}: ${opt}`} onClick={() => handleSelect(i)} disabled={selected !== null || isWrongAttempt || isCompleted}>
                 <div className="flex items-start w-full">
                   <span className="mr-3 text-slate-500 font-bold text-sm shrink-0 mt-0.5">{String.fromCharCode(65 + i)}.</span>
                   <span className="text-left flex-1 break-words leading-tight">
-                    <VocabTooltip text={opt} vocab={q.vocab} targetedOnly keyword={q.keyword} disabled={effectiveTranslateMode === 'off'} />
+                    {visual && <img src={visual} alt="" style={{ display: 'block', width: '100%', maxWidth: 160, aspectRatio: '1 / 1', objectFit: 'contain', borderRadius: 12, marginBottom: 8 }} onError={event => { event.currentTarget.style.display = 'none'; }} />}<VocabTooltip text={opt} vocab={q.vocab} keyword={q.keyword} enableDynamic={effectiveTranslateMode !== 'off'} blockedMeanings={q.options} disabled={effectiveTranslateMode === 'off'} />
                   </span>
                 </div>
-              </button>
+              </button>}
               {currentStep === 1 && <SpeakButton text={opt} label={`ฟังตัวเลือก ${String.fromCharCode(65 + i)}`} />}
               </div>
             );
@@ -485,16 +545,19 @@ export default function QuizPage({ questId }) {
           feedbackData={feedbackData}
           onNext={() => handleNext(false)}
           onRetry={() => handleNext(true)}
+          aiVerificationPending
         />
       )}
     </div>
+    </CreditGlossary>
   );
 }
 
 // ── Quest Summary ─────────────────────────────────────────────
-function QuestSummary({ quest, answers, roundResult, onBack, onRetry, firstResponseScoring = false }) {
+function QuestSummary({ quest, answers, roundResult, onBack, onReview, onRetry, firstResponseScoring = false }) {
   const score = answers.filter(a => a.correct).length;
   const total = answers.length;
+  const finalCorrect = answers.filter(answer => answer.practiceCorrect ?? answer.correct).length;
   const pct   = Math.round((score / total) * 100);
   
   let star = 0;
@@ -521,8 +584,11 @@ function QuestSummary({ quest, answers, roundResult, onBack, onRetry, firstRespo
   return (
     <div className="quiz-workspace quiz-summary min-h-screen flex flex-col items-center justify-center px-4 py-8">
       <section className="quiz-summary-inner w-full p-7 text-center" aria-labelledby="quiz-summary-title">
-        <div className="text-5xl mb-3" aria-label={`ได้รับ ${star} ดาวในรอบนี้`}>
-          <UIIconText value={star === 3 ? '⭐⭐⭐' : star === 2 ? '⭐⭐' : star === 1 ? '⭐' : '☆'} />
+        <div className="mb-3 flex justify-center gap-2" aria-label={`ได้รับ ${star} ดาวในรอบนี้`} role="img">
+          {[0, 1, 2].map(index => (
+            <Star key={index} size={46} strokeWidth={2.2}
+              className={index < star ? 'fill-amber-400 text-amber-500 drop-shadow-sm' : 'text-slate-300'} />
+          ))}
         </div>
         <h2 id="quiz-summary-title" className="text-2xl font-black text-slate-800 mb-1">
           {star === 3 ? 'ยอดเยี่ยม!' : passedRound ? 'ผ่านรอบนี้แล้ว!' : 'ลองใหม่อีกครั้ง!'}
@@ -542,6 +608,9 @@ function QuestSummary({ quest, answers, roundResult, onBack, onRetry, firstRespo
               style={{ width: `${pct}%`, height: '100%' }}
             />
           </div>
+          {firstResponseScoring && finalCorrect > score && (
+            <p className="mt-3 text-sm text-slate-600">หลังทบทวน คุณตอบถูก {finalCorrect}/{total} ข้อ แต่คะแนนด่านยึดคำตอบครั้งแรก</p>
+          )}
         </div>
 
         <div className="quiz-summary-totals p-3 mb-5 flex justify-between items-center px-6">
@@ -570,6 +639,7 @@ function QuestSummary({ quest, answers, roundResult, onBack, onRetry, firstRespo
         {/* Buttons */}
         <div className="quiz-summary-actions">
           <button className="qm-secondary" onClick={onBack}><Map size={18} />Quest Map</button>
+          {score < total && <button className="qm-secondary" onClick={onReview}><BookOpenCheck size={18} />ทบทวนข้อผิด</button>}
           <button className="qm-primary" onClick={onRetry}><RotateCcw size={18} />เล่นอีกครั้ง</button>
         </div>
       </section>

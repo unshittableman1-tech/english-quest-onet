@@ -1,3 +1,4 @@
+@import './assessment-document.css';
 .question-stimuli { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; margin-bottom: 16px; color: #173c4e; }
 .question-stimuli > div { min-width: 0; }
 .question-stimuli:empty { display: none; }
@@ -31,3 +32,28 @@
 .question-stimulus-sequence ol { display: flex; flex-wrap: wrap; gap: 16px; padding: 0; list-style: none; }
 .question-stimulus-sequence li { display: flex; flex: 1 1 100px; align-items: center; gap: 8px; padding: 12px 0; border-top: 2px solid #007da6; }
 .question-stimulus-sequence li span { flex: 0 0 28px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #e3f3f8; font-weight: 700; }
+
+/* Editorial assessment surfaces: readable type and flat, exact data graphics. */
+.question-stimulus-image {padding:12px 12px 56px;border-color:#c8d7de;border-radius:12px}
+.question-stimulus-image > button {top:auto;bottom:6px;right:8px;border-radius:8px}
+.question-stimulus-image img {max-height:480px}
+.question-stimulus-image--document {border:0;padding:0 0 48px;background:transparent}
+.question-stimulus-image--document .assessment-document {margin:0 auto}
+.question-stimulus-table {margin:20px 0;border:1px solid #c8d7de;border-radius:10px;font-variant-numeric:tabular-nums}
+.question-stimulus-table table {font-size:18px;line-height:1.55}
+.question-stimulus-table caption {font:700 23px/1.4 'Trebuchet MS',Tahoma,Arial,sans-serif;color:#183e53;padding:20px;text-align:left}
+.question-stimulus-table th,.question-stimulus-table td {border:0;border-bottom:1px solid #d7e1e6;padding:14px 18px;overflow-wrap:anywhere}
+.question-stimulus-table thead {background:#175b78;color:#fff}
+.question-stimulus-table tbody tr:nth-child(even) {background:#f1f6f8}
+.question-stimulus-table tbody th {font-weight:500}
+.question-stimulus-table:focus-visible,.question-chart-scroll:focus-visible {outline:3px solid #b68a32;outline-offset:3px}
+.question-stimulus-chart {border:0;border-top:3px solid #175b78;border-radius:0;padding:18px 0;background:#fff}
+.question-stimulus-chart figcaption {font:700 23px/1.4 'Trebuchet MS',Tahoma,Arial,sans-serif;color:#183e53}
+.question-chart-scroll svg {min-width:480px}
+.question-chart-data summary {color:#175b78;text-decoration:underline;text-underline-offset:3px}
+.question-stimulus-sequence {border:0;padding:8px 0}
+.question-stimulus-sequence ol {display:grid;gap:26px}
+.question-stimulus-sequence li {position:relative;border:1px solid #bdd3c7;border-radius:9px;padding:12px 16px;background:#f2f7f4;font-size:18px;min-height:58px}
+.question-stimulus-sequence li:not(:last-child)::after {content:'↓';position:absolute;left:24px;bottom:-25px;color:#28624f;font-size:22px}
+.question-stimulus-sequence li span {color:#fff;background:#28624f}
+@media(max-width:480px){.question-stimulus-table table{font-size:17px}.question-stimulus-table th,.question-stimulus-table td{padding:12px 10px}.question-stimulus-table caption{font-size:21px;padding:16px 12px}.question-stimulus-image{padding:6px 6px 52px}.question-stimulus-image--document{padding:0 0 48px}}

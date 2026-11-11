@@ -132,7 +132,7 @@ export default function SpellGame({ mission, onComplete, onBack }) {
           </button>
 
           {current.image ? (
-            <div className="text-8xl animate-fade-in">{current.image}</div>
+            <img src={current.image} alt={current.imageAlt || ''} className="h-28 w-36 object-contain animate-fade-in" />
           ) : current.hints ? (
             <div className="space-y-3 w-full text-center">
               <div className="text-3xl mb-2"><UIIcon value={"🕵️‍♂️"} /></div>

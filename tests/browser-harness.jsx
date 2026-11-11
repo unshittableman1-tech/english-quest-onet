@@ -8,6 +8,7 @@ import { finalBossQuestions } from '../src/data/finalBossQuestions';
 import QuizPage from '../src/components/QuizPage';
 import BadgeModal from '../src/components/BadgeModal';
 import MissionSelect from '../src/components/MissionSelect';
+import GameMissionRouter from '../src/components/games/GameMissionRouter';
 import StudentReport from '../src/components/StudentReport';
 import RealOnetSimulator from '../src/components/RealOnetSimulator';
 import ReviewMistakePage from '../src/components/ReviewMistakePage';
@@ -15,7 +16,13 @@ import { QUESTS } from '../src/data/questions';
 import QuestMap from '../src/components/QuestMap';
 import VocabDrillHub from '../src/components/VocabDrillHub';
 import BadgePage from '../src/components/BadgePage';
+import TierInfoModal from '../src/components/ranking/TierInfoModal';
 import { VOCAB_CATEGORIES, getDrillCards } from '../src/data/vocabDrill';
+import { CH1_MISSIONS } from '../src/data/missions/ch1_missions';
+import { getUnlockedQuests } from '../src/utils/scoring';
+import { getQuestMissions } from '../src/utils/missionAccess';
+import { buildGameMissionRewardProgress } from '../src/utils/gameMissionRewards';
+import { selectBossAssessmentQuestions } from '../src/utils/bossAssessment';
 
 const pendingFixtureOriginals = new Map();
 
@@ -45,6 +52,23 @@ export function mountBadgePage() {
     arenaBadges: ['arena_challenger'], bestMiniMock: { percent: 85 }, bestFullMock: { percent: 75 },
   }));
   isolatedRoot().render(<AppContext.Provider value={{ student, navigate: () => {}, checkBadges: () => {} }}><BadgePage /></AppContext.Provider>);
+}
+
+export function mountTierInfoModal() {
+  document.getElementById('root').style.display = 'none';
+  window.__smokeRoot?.unmount();
+  document.getElementById('smoke-root')?.remove();
+  const element = document.createElement('div');
+  element.id = 'smoke-root';
+  document.body.append(element);
+  window.__smokeRoot = createRoot(element);
+  window.__smokeRoot.render(
+    <TierInfoModal
+      student={{ name: 'Synthetic Student', xp: 900, totalStars: 12 }}
+      selectedTierName="Bronze Adventurer"
+      onClose={() => {}}
+    />,
+  );
 }
 
 export function mountVocabHub(id = 'local_vocab_fixture') {
@@ -123,7 +147,11 @@ export async function mountDraftAssessment(questId) {
   const element = document.createElement('div'); element.id = 'smoke-root'; document.body.append(element);
   window.__smokeRoot = createRoot(element);
   window.__assessmentCalls = []; window.__quizXP = [];
-  window.__assessmentItems = quest.questions.map(q => ({ id: q.id, answer: q.answer, text: q.options[q.answer] }));
+  const assessmentPool = [...quest.questions, ...(quest.supplementalBossQuestions || [])];
+  const assessmentQuestions = quest.requiredAssessmentFocus
+    ? selectBossAssessmentQuestions(assessmentPool, quest.assessmentCount, quest.requiredAssessmentFocus)
+    : quest.questions;
+  window.__assessmentItems = assessmentQuestions.map(q => ({ id: q.id, answer: q.answer, text: q.options[q.answer], focus: q.assessmentFocus || null }));
   const { saveQuestResult } = await import('../src/utils/storage');
   const student = { id: 'local_browser_assessment', isDemo: true, xp: 0, questProgress: {} };
   localStorage.setItem('eq_onet_current', JSON.stringify(student));
@@ -134,7 +162,7 @@ export async function mountDraftAssessment(questId) {
   window.__smokeRoot.render(<AppContext.Provider value={app}><QuizPage questId={questId}/></AppContext.Provider>);
 }
 
-export function mountMissionSelect(questId) {
+export function mountMissionSelect(questId, { locked = false, completed = false } = {}) {
   document.getElementById('root').style.display = 'none';
   window.__smokeRoot?.unmount();
   document.getElementById('smoke-root')?.remove();
@@ -143,7 +171,41 @@ export function mountMissionSelect(questId) {
   document.body.append(element);
   window.__smokeRoot = createRoot(element);
   window.__missionNavigation = [];
-  window.__smokeRoot.render(<AppContext.Provider value={{ currentQuest: questId, navigate: (...args) => window.__missionNavigation.push(args), addXP: async () => {} }}><MissionSelect /></AppContext.Provider>);
+  const questProgress = locked ? {} : Object.fromEntries(QUESTS.map(quest => [quest.id, { passed: true, pct: 100 }]));
+  if (completed) questProgress[questId] = { ...questProgress[questId], gameMissions: Object.fromEntries(getQuestMissions(questId).map(mission => [mission.id, { rewardClaimed: true, xpAwarded: mission.xpReward }])) };
+  const student = { id: 'ordering_access_synthetic', questProgress };
+  window.__smokeRoot.render(<AppContext.Provider value={{ student, unlockedQuests: getUnlockedQuests(questProgress, student), currentQuest: questId, navigate: (...args) => window.__missionNavigation.push(args), addXP: async () => {} }}><MissionSelect /></AppContext.Provider>);
+}
+
+export function mountGameMission(questId, missionId) {
+  document.getElementById('root').style.display = 'none';
+  window.__smokeRoot?.unmount();
+  document.getElementById('smoke-root')?.remove();
+  const element = document.createElement('div');
+  element.id = 'smoke-root';
+  document.body.append(element);
+  window.__smokeRoot = createRoot(element);
+  const mission = CH1_MISSIONS[questId]?.find(item => item.id === missionId);
+  window.__gameMissionComplete = [];
+  window.__smokeRoot.render(
+    <GameMissionRouter
+      mission={mission}
+      onComplete={(...args) => window.__gameMissionComplete.push(args)}
+      onBack={() => {}}
+    />,
+  );
+}
+
+export function mountOrderingFixture(mission, { preserveRewards = false } = {}) {
+  const root = isolatedRoot();
+  window.__orderingComplete = [];
+  window.__orderingBack = 0;
+  if (!preserveRewards) window.__orderingStudent = { xp: 0, questProgress: {} };
+  root.render(<GameMissionRouter mission={mission} onBack={() => { window.__orderingBack += 1; }} onComplete={async xp => {
+    const reward = buildGameMissionRewardProgress(window.__orderingStudent, mission.questId || 'synthetic', mission, xp);
+    window.__orderingStudent = { xp: window.__orderingStudent.xp + reward.awardedXP, questProgress: reward.questProgress };
+    window.__orderingComplete.push({ requestedXP: xp, awardedXP: reward.awardedXP });
+  }} />);
 }
 
 export function mountQuiz(twoStep = false, hasTranslation = true, mediaFixture = null) {

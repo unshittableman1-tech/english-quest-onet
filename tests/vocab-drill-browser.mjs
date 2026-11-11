@@ -11,7 +11,7 @@ try {
   await page.goto(process.env.APP_URL || 'http://127.0.0.1:5173/');
   const mount = () => page.evaluate(async () => (await import('/tests/browser-harness.jsx')).mountVocabHub());
   await mount();
-  await page.getByRole('heading', { name: 'Vocab Drill Center' }).waitFor();
+  await page.getByRole('heading', { name: 'Vocab Adventure' }).waitFor();
   assert.equal(await page.locator('.vocab-category').count(), 23);
   await mkdir('scratch/phase0-screenshots', { recursive: true });
   for (const width of [320, 390, 768, 1366]) {

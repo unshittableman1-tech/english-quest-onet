@@ -2,6 +2,7 @@ import UIIcon, { UIIconText } from './UIIcon';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useApp } from '../App';
 import { finalBossQuestions } from '../data/finalBossQuestions';
+import { BLUEPRINT_CONFIG } from '../utils/blueprintSampler';
 import { saveFinalBossResult, getCurrentStudent, saveQuestResult, updateBadgeStats } from '../utils/storage';
 import { XP_RULES } from '../utils/scoring';
 import SpeakButton from './SpeakButton';
@@ -11,7 +12,7 @@ import useQuestionMedia from '../hooks/useQuestionMedia';
 import confetti from 'canvas-confetti';
 import { playCorrectSound, playWrongSound } from '../utils/audio';
 
-const TOTAL_TIME = 30 * 60; // 30 minutes in seconds
+const TOTAL_TIME = BLUEPRINT_CONFIG.timeLimitSeconds;
 
 export default function FinalBoss() {
   const { student, navigate, addXP, setStudent, checkBadges } = useApp();
@@ -191,7 +192,7 @@ export default function FinalBoss() {
           <div className="glass-card p-4 mb-6 text-left space-y-2">
             {[
               `📝 ${questions.length} ข้อ ผสมทุกหมวด`,
-              '⏱️ เวลา 30 นาที',
+              `⏱️ เวลา ${TOTAL_TIME / 60} นาที`,
               '🎯 ≥70% ผ่าน | ≥80% ได้ Badge',
               '💡 มี AI Tutor feedback',
               '🚫 เริ่มแล้วหยุดไม่ได้!',

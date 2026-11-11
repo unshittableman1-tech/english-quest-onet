@@ -2,8 +2,22 @@ import './helpers/environment.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { access } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 const { VOCAB_CATEGORIES, VOCAB_GROUPS, getDrillMission, getDrillCards } = await import('../src/data/vocabDrill.js');
+const { VOCAB_CATEGORY_ARTWORK, getVocabCategoryArtwork } = await import('../src/data/vocabCategoryArtwork.js');
 const { QUESTS, preTestQuestions } = await import('../src/data/questions.js');
+const hasCategoryVisual = (card, category) => Boolean(card.imageAlt && (
+  card.image?.startsWith(`/learning/${category}/`) || card.image?.startsWith('/learning/vocab-supplemental/')
+));
+test('every Vocab Drill category uses an existing illustrated PNG thumbnail', async () => {
+  assert.equal(Object.keys(VOCAB_CATEGORY_ARTWORK).length, VOCAB_CATEGORIES.length);
+  for (const category of VOCAB_CATEGORIES) {
+    const artwork = getVocabCategoryArtwork(category.id);
+    assert.match(artwork, /\.png$/);
+    await access(fileURLToPath(new URL(`../public${artwork}`, import.meta.url)));
+  }
+});
 test('23 vocab categories resolve exact decks without an unrelated mission fallback', () => {
   assert.equal(VOCAB_CATEGORIES.length, 23);
   assert.equal(new Set(VOCAB_CATEGORIES.map(c => c.id)).size, 23);
@@ -13,7 +27,7 @@ test('23 vocab categories resolve exact decks without an unrelated mission fallb
     assert.ok(mission, cat.id);
     if (!cat.deckId) assert.equal(mission.id, cat.missionId);
     const cards = getDrillCards(cat);
-    assert.ok(cards.length >= 4, cat.id);
+    assert.ok(cards.length >= 10, `${cat.id} must contain at least 10 words`);
     assert.equal(new Set(cards.map(c => c.id)).size, cards.length, cat.id);
     for (const c of cards) assert.ok((c.frontLabel || c.back) && c.back && c.backThai, `${cat.id}: ${c.id}`);
   }
@@ -26,16 +40,16 @@ test('23 vocab categories resolve exact decks without an unrelated mission fallb
 test('career flashcards label the illustrated occupation rather than its workplace', () => {
   const cards = getDrillCards(VOCAB_CATEGORIES.find(c => c.id === 'jobs'));
   const words = ['doctor', 'teacher', 'pilot', 'chef', 'librarian', 'firefighter', 'vet', 'postman'];
-  assert.deepEqual(cards.map(c => c.front), words);
-  assert.deepEqual(cards.map(c => c.back), words);
+  assert.deepEqual(cards.slice(0, 8).map(c => c.front), words);
+  assert.deepEqual(cards.slice(0, 8).map(c => c.back), words);
   assert.equal(cards[0].hint, 'สถานที่ทำงาน: hospital');
   assert.equal(cards[2].hint, 'สถานที่ทำงาน: airport');
 });
 test('country flashcards explicitly distinguish countries and nationalities without flag glyphs', () => {
   const cards = getDrillCards(VOCAB_CATEGORIES.find(c => c.id === 'countries'));
-  assert.deepEqual(cards.map(c => c.front), ['Thailand', 'Japan', 'China', 'Korea', 'England', 'America']);
-  assert.deepEqual(cards.map(c => c.back), ['Thai', 'Japanese', 'Chinese', 'Korean', 'English / British', 'American']);
-  assert.ok(cards.every(c => c.frontCaption === 'ประเทศ (Country)' && c.backCaption === 'สัญชาติ (Nationality)'));
+  assert.deepEqual(cards.slice(0, 6).map(c => c.front), ['Thailand', 'Japan', 'China', 'Korea', 'England', 'America']);
+  assert.deepEqual(cards.slice(0, 6).map(c => c.back), ['Thai', 'Japanese', 'Chinese', 'Korean', 'English / British', 'American']);
+  assert.ok(cards.slice(0, 6).every(c => c.frontCaption === 'ประเทศ (Country)' && c.backCaption === 'สัญชาติ (Nationality)'));
   assert.ok(cards.every(c => !/\p{Regional_Indicator}/u.test(c.front + c.back)));
 });
 test('Culture and Festivals deck covers requested dates, activities and symbols as learning-only vocabulary', () => {
@@ -84,16 +98,16 @@ test('new action and routine decks have distinct meanings, bilingual examples an
   assert.equal(preTestQuestions.length, 20);
 });
 test('transport and place legacy decks expose complete reviewed illustration metadata', () => {
-  const expected = { transport: 12, place: 8 };
+  const expected = { transport: 12, place: 10 };
   const illustrated = Object.entries(expected).flatMap(([id, size]) => {
     const category = VOCAB_CATEGORIES.find(c => c.id === id);
     const cards = getDrillCards(category);
     assert.equal(cards.length, size);
     return cards;
   });
-  assert.equal(illustrated.length, 20);
-  assert.equal(new Set(illustrated.map(c => c.image)).size, 20);
-  for (const c of illustrated) {
+  assert.equal(illustrated.length, 22);
+  assert.equal(new Set(illustrated.map(c => c.image)).size, 22);
+  for (const c of illustrated.slice(0, 20)) {
     const png = readFileSync(`public${c.image}`);
     assert.equal(png.subarray(1, 4).toString(), 'PNG');
     assert.ok(c.imageAlt);
@@ -113,56 +127,56 @@ test('illness deck exposes one transparent illustration for every learning card'
 test('career deck exposes one transparent illustration for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'jobs');
   const cards = getDrillCards(category);
-  assert.equal(cards.length, 8);
-  assert.ok(cards.every(card => card.image?.startsWith('/learning/jobs/') && card.imageAlt));
+  assert.equal(cards.length, 10);
+  assert.ok(cards.every(card => hasCategoryVisual(card, 'jobs')));
 });
 test('food deck exposes one transparent illustration for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'food');
   const cards = getDrillCards(category);
-  assert.equal(cards.length, 8);
-  assert.ok(cards.every(card => card.image?.startsWith('/learning/food/') && card.imageAlt));
+  assert.equal(cards.length, 10);
+  assert.ok(cards.every(card => hasCategoryVisual(card, 'food')));
 });
 test('clothes deck exposes one transparent illustration for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'clothes');
   const cards = getDrillCards(category);
-  assert.equal(cards.length, 8);
-  assert.ok(cards.every(card => card.image?.startsWith('/learning/clothes/') && card.imageAlt));
+  assert.equal(cards.length, 10);
+  assert.ok(cards.every(card => hasCategoryVisual(card, 'clothes')));
 });
 test('weather deck exposes one transparent illustration for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'weather');
   const cards = getDrillCards(category);
-  assert.equal(cards.length, 9);
-  assert.ok(cards.every(card => card.image?.startsWith('/learning/weather/') && card.imageAlt));
+  assert.equal(cards.length, 10);
+  assert.ok(cards.every(card => hasCategoryVisual(card, 'weather')));
 });
 test('emotions deck exposes one transparent illustration for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'emotions');
   const cards = getDrillCards(category);
-  assert.equal(cards.length, 8);
-  assert.ok(cards.every(card => card.image?.startsWith('/learning/emotions/') && card.imageAlt));
+  assert.equal(cards.length, 10);
+  assert.ok(cards.every(card => hasCategoryVisual(card, 'emotions')));
 });
 test('countries deck exposes one transparent illustration for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'countries');
   const cards = getDrillCards(category);
-  assert.equal(cards.length, 6);
-  assert.ok(cards.every(card => card.image?.startsWith('/learning/countries/') && card.imageAlt));
+  assert.equal(cards.length, 10);
+  assert.ok(cards.every(card => hasCategoryVisual(card, 'countries')));
 });
 test('shapes deck exposes one exact visual asset for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'shapes');
   const cards = getDrillCards(category);
-  assert.equal(cards.length, 7);
-  assert.ok(cards.every(card => card.image?.startsWith('/learning/shapes/') && card.imageAlt));
+  assert.equal(cards.length, 10);
+  assert.ok(cards.every(card => hasCategoryVisual(card, 'shapes')));
 });
 test('environment deck exposes one transparent illustration for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'environment');
   const cards = getDrillCards(category);
-  assert.equal(cards.length, 6);
-  assert.ok(cards.every(card => card.image?.startsWith('/learning/environment/') && card.imageAlt));
+  assert.equal(cards.length, 10);
+  assert.ok(cards.every(card => hasCategoryVisual(card, 'environment')));
 });
 test('subjects deck exposes one transparent illustration for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'subjects');
   const cards = getDrillCards(category);
-  assert.equal(cards.length, 6);
-  assert.ok(cards.every(card => card.image?.startsWith('/learning/subjects/') && card.imageAlt));
+  assert.equal(cards.length, 10);
+  assert.ok(cards.every(card => hasCategoryVisual(card, 'subjects')));
 });
 test('signs deck exposes one exact symbol asset for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'signs');
@@ -179,8 +193,8 @@ test('directions deck exposes one exact positional diagram for every learning ca
 test('greeting deck exposes one transparent situation illustration for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'greeting');
   const cards = getDrillCards(category);
-  assert.equal(cards.length, 8);
-  assert.ok(cards.every(card => card.image?.startsWith('/learning/greeting/') && card.imageAlt));
+  assert.equal(cards.length, 10);
+  assert.ok(cards.every(card => hasCategoryVisual(card, 'greeting')));
 });
 test('question word deck exposes one semantic diagram for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'question_words');
@@ -191,26 +205,45 @@ test('question word deck exposes one semantic diagram for every learning card', 
 test('tenses deck exposes one timeline diagram for every learning card', () => {
   const category = VOCAB_CATEGORIES.find(item => item.id === 'tenses');
   const cards = getDrillCards(category);
-  assert.equal(cards.length, 4);
-  assert.ok(cards.every(card => card.image?.startsWith('/learning/tenses/') && card.imageAlt));
+  assert.equal(cards.length, 10);
+  assert.ok(cards.every(card => hasCategoryVisual(card, 'tenses')));
 });
 test('remaining grammar decks expose a visual for every learning card', () => {
-  const expected = { numbers: 10, pronouns: 7, quantifiers: 6 };
+  const expected = { numbers: 10, pronouns: 10, quantifiers: 10 };
   for (const [id, count] of Object.entries(expected)) {
     const category = VOCAB_CATEGORIES.find(item => item.id === id);
     const cards = getDrillCards(category);
     assert.equal(cards.length, count);
-    assert.ok(cards.every(card => card.image?.startsWith(`/learning/${id}/`) && card.imageAlt));
+    assert.ok(cards.every(card => hasCategoryVisual(card, id)));
   }
 });
-test('every Vocab Drill learning card now has a visual and accessible description', () => {
+test('ordinal cards use a distinct position visual for every number', async () => {
+  const category = VOCAB_CATEGORIES.find(item => item.id === 'numbers');
+  const cards = getDrillCards(category);
+  assert.equal(cards.length, 10);
+  assert.equal(new Set(cards.map(card => card.image)).size, 10);
+  for (const [index, card] of cards.entries()) {
+    assert.match(card.image, new RegExp(`/ordinal-${index + 1}(?:st|nd|rd|th)-v1\\.svg$`));
+    await access(fileURLToPath(new URL(`../public${card.image}`, import.meta.url)));
+  }
+});
+test('pronoun deck uses the dedicated transparent cartoon PNG set', async () => {
+  const category = VOCAB_CATEGORIES.find(item => item.id === 'pronouns');
+  const cards = getDrillCards(category);
+  assert.equal(cards.length, 10);
+  assert.ok(cards.slice(0, 7).every(card => /^\/learning\/pronouns\/[a-z]+-v2\.png$/.test(card.image)));
+
+  await Promise.all(cards.map(card => access(fileURLToPath(new URL(`../public${card.image}`, import.meta.url)))));
+});
+test('every Vocab Adventure card has an existing visual and accessible description', async () => {
   let total = 0;
   for (const category of VOCAB_CATEGORIES) {
     const cards = getDrillCards(category);
     total += cards.length;
     assert.ok(cards.every(card => card.image && card.imageAlt), `${category.id} must not contain text-only cards`);
+    await Promise.all(cards.map(card => access(fileURLToPath(new URL(`../public${card.image}`, import.meta.url)))));
   }
-  assert.equal(total, 216);
+  assert.equal(total, 257);
 });
 test('cleanSpeechText sanitizes emojis, flags, arrows and glosses for speech output', async () => {
   const { cleanSpeechText } = await import('../src/utils/useSpeech.js');

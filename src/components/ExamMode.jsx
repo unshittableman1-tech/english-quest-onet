@@ -3,8 +3,9 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { ARENA_MISSIONS, FINAL_EXAM_CONFIG } from '../data/chapter4_config';
 import {
   miniMockPool, speedMockPool, skillMixedPool, fullMockPool, finalSimPool,
-  weaknessMockBySkill, getFinalExamPool
+  weaknessMockBySkill, getFinalExamPool, getOnetYearSimulationPool
 } from '../data/chapter4_questions';
+import { getOnetRealYearPool } from '../data/onetRealExamPools';
 import { getArenaStats } from '../utils/arenaStorage';
 import QuestionStimulus from './QuestionStimulus';
 import QuestionMediaGate from './QuestionMediaGate';
@@ -49,6 +50,10 @@ export default function ExamMode({ missionId, student, onFinish, onCancel }) {
     else if (missionId === 'full_mock_test') pool = fullMockPool;
     else if (missionId === 'final_exam_simulation') pool = finalSimPool;
     else if (missionId === 'final_exam') pool = getFinalExamPool(config.questions || 50);
+    else if (missionId === 'onet_year_2565') pool = getOnetRealYearPool(2565);
+    else if (missionId === 'onet_year_2566') pool = getOnetRealYearPool(2566);
+    else if (missionId === 'onet_year_2567') pool = getOnetRealYearPool(2567);
+    else if (missionId === 'onet_year_2568') pool = getOnetYearSimulationPool(2568);
     else if (missionId === 'weakness_mock') {
       // Build weakness mock from student's past data
       const stats = getArenaStats(student.id);
@@ -95,15 +100,15 @@ export default function ExamMode({ missionId, student, onFinish, onCancel }) {
       return;
     }
     setInitError(null);
-    // Select questions and shuffle (final_exam is already stratified and picked)
-    const selected = (missionId === 'final_exam')
-      ? pool
+    // Select questions (final_exam and authentic year simulations keep official question order)
+    const selected = (missionId === 'final_exam' || config.isYearSim)
+      ? pool.slice(0, config.questions)
       : shuffle(pool).slice(0, config.questions);
     
     // Add originalIndex to options to keep track of correct answer after shuffle
     const formattedQuestions = selected.map(q => {
       const optionsWithIndex = q.options.map((opt, idx) => ({ text: opt, originalIndex: idx }));
-      const shuffledOptions = shuffle(optionsWithIndex);
+      const shuffledOptions = config.isYearSim ? optionsWithIndex : shuffle(optionsWithIndex);
       return { ...q, shuffledOptions };
     });
 

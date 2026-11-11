@@ -1,7 +1,8 @@
 import React from 'react';
 import TierBadge from './TierBadge';
 import { getRankingTier } from '../../utils/scoring';
-import { getAvatarUrl } from '../../utils/avatar';
+import StudentAvatar from '../StudentAvatar';
+import RankingBadges from './RankingBadges';
 
 export default function LeaderboardList({ students, startIndex = 3, activeTab, onTierClick }) {
   if (!students || students.length <= startIndex) return null;
@@ -9,13 +10,13 @@ export default function LeaderboardList({ students, startIndex = 3, activeTab, o
   const list = students.slice(startIndex);
 
   return (
-    <div className="mx-2 mb-6 space-y-2">
+    <div className="ranking-list" aria-label="อันดับถัดจากสามอันดับแรก">
       {list.map((student, index) => {
         const rank = startIndex + index + 1;
         const tier = getRankingTier(student?.rankScore || 0);
         
         let scoreText = '';
-        if (activeTab === 'overall') scoreText = `${(student?.rankScore || 0).toLocaleString()} pts`;
+        if (activeTab === 'overall') scoreText = `${(student?.xp || 0).toLocaleString()} XP`;
         else if (activeTab === 'growth') scoreText = `+${student?.growthScore || 0}%`;
         else if (activeTab === 'accuracy') scoreText = `${student?.accuracy || 0}%`;
         else if (activeTab === 'streak') scoreText = `${student?.streakDays || 0} วัน`;
@@ -24,37 +25,40 @@ export default function LeaderboardList({ students, startIndex = 3, activeTab, o
         else if (activeTab === 'fastguess') scoreText = `${student?.rankingStats?.fastGuessCount || 0} ครั้ง`;
 
         return (
-          <div key={student.id || index} className="flex items-center gap-3 bg-white p-3 rounded-2xl shadow-sm border border-slate-100">
+          <button type="button" key={student.id || index} className="ranking-student-row" onClick={() => onTierClick(tier.name, student)} aria-label={`ดู Rank ของ ${student.name} อันดับ ${rank}`}>
             {/* Rank Number */}
-            <div className="w-8 text-center font-black text-slate-500 text-lg">
+            <div className="ranking-row-rank">
               {rank}
             </div>
 
             {/* Avatar */}
-            <div className="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm flex-shrink-0">
-              <img src={getAvatarUrl(student.name)} alt={student.name} className="w-full h-full object-cover rounded-full" />
+            <div className="ranking-list-avatar w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm flex-shrink-0">
+              <StudentAvatar student={student} className="w-full h-full" />
             </div>
 
             {/* Name & Tier */}
-            <div className="flex-1 min-w-0">
-              <div className="font-bold text-slate-800 text-sm truncate flex items-center gap-1.5">
+            <div className="ranking-row-info">
+              <div className="ranking-row-name">
                 <span>{student.name}</span>
-                <span className="text-[10px] font-black bg-purple-900 text-purple-100 px-1.5 py-0.5 rounded-md border border-purple-400/40 shrink-0">
+                <span className="ranking-row-level">
                   Lv.{student.level || 1}
                 </span>
               </div>
               {activeTab === 'overall' && (
-                <div className="scale-75 origin-left -mt-0.5">
-                  <TierBadge tier={tier} onClick={() => onTierClick(tier.name)} className="!px-2 !py-0.5" />
+                <div className="ranking-row-meta">
+                  <TierBadge tier={tier} className="!px-2 !py-0.5" />
+                  <span className="ranking-star-stat" aria-label={`ดาวสะสม ${student.totalStars || 0} ดาว`}><span aria-hidden="true">★</span> {student.totalStars || 0} ดาว</span>
                 </div>
               )}
+              <RankingBadges student={student} />
             </div>
 
             {/* Score */}
-            <div className="font-black text-slate-700 text-sm">
+            <div className="ranking-row-score">
               {scoreText}
             </div>
-          </div>
+            <span className="ranking-row-action" aria-hidden="true">ดู Rank →</span>
+          </button>
         );
       })}
     </div>

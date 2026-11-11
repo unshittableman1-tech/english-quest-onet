@@ -1,8 +1,8 @@
-import UIIcon, { UIIconText } from './UIIcon';
 import React, { useEffect, useState } from 'react';
 import confetti from 'canvas-confetti';
+import BadgeArtwork from './BadgeArtwork';
 
-export default function BadgeModal({ badge, badges, onClose }) {
+export default function BadgeModal({ badge, badges, onClose, showXpReward = true }) {
   const [show, setShow] = useState(false);
   const earned = badges?.length ? badges : badge ? [badge] : [];
   const reward = earned.reduce((sum, item) => sum + (Number(item.xpReward) || 0), 0);
@@ -77,11 +77,9 @@ export default function BadgeModal({ badge, badges, onClose }) {
             {earned.length > 1 ? `ได้รับ ${earned.length} Badge ใหม่!` : 'ได้รับ Badge ใหม่!'}
           </h2>
 
-          <div className="w-24 h-24 mx-auto mb-4 bg-amber-50 border-2 border-amber-300 rounded-full flex items-center justify-center text-5xl shadow-lg">
-            <UIIcon value={badge.icon} />
-          </div>
+          <BadgeArtwork badgeId={badge.id} className="badge-reward-art" label={badge.name} />
 
-          {earned.length > 1 ? <ul className="text-left mb-4 divide-y divide-amber-200">{earned.map(item => <li key={item.id} className="py-3"><strong className="text-amber-800"><UIIcon value={item.icon} /> {item.name}</strong><p className="text-slate-600 text-sm">{item.description}</p></li>)}</ul> : <><h3 className="text-2xl font-black text-amber-800 mb-2">
+          {earned.length > 1 ? <ul className="text-left mb-4 divide-y divide-amber-200">{earned.map(item => <li key={item.id} className="badge-reward-row py-3"><BadgeArtwork badgeId={item.id} /><div><strong className="text-amber-800">{item.name}</strong><p className="text-slate-600 text-sm">{item.description}</p></div></li>)}</ul> : <><h3 className="text-2xl font-black text-amber-800 mb-2">
             {badge.name}
           </h3>
 
@@ -90,7 +88,7 @@ export default function BadgeModal({ badge, badges, onClose }) {
           </p></>}
 
           <div className="bg-emerald-50 border border-emerald-200 rounded-xl py-2 px-4 mb-6 inline-block">
-            <span className="text-emerald-700 font-bold text-lg">+{reward} XP</span>
+            <span className="text-emerald-700 font-bold text-lg">{showXpReward ? `+${reward} XP` : 'บันทึกเหรียญความสำเร็จแล้ว'}</span>
           </div>
 
           <button

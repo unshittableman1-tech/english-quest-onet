@@ -145,7 +145,8 @@ using (membership_private.is_platform_admin() or membership_private.has_school_a
 
 create policy plans_read on public.plans for select to authenticated
 using (is_active or membership_private.is_platform_admin() or exists (
-  select 1 from public.subscriptions s where s.plan_id = plans.id
+  select 1 from public.subscriptions s
+  where s.plan_id = plans.id and membership_private.has_school_access(s.school_id)
 ));
 
 commit;

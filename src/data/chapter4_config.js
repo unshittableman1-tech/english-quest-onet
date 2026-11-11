@@ -53,6 +53,71 @@ export const ARENA_MISSIONS = [
     timeLimit: 1800, // 30 minutes
     isBoss: true,
     unlock: (stats) => (stats?.bestFullMock?.percent || 0) >= 70 // ต้องผ่าน Full Mock 70% ขึ้นไป
+  },
+  { 
+    id: 'onet_year_2564', 
+    name: 'แนวข้อสอบ O-NET ปี 64', 
+    icon: '📕', 
+    description: 'แนวข้อสอบเสมือนจริง อิง Test Blueprint สทศ. ป.6 (32 ข้อ · 100 คะแนน · 60 นาที)',
+    questions: 32, 
+    timeLimit: 3600, // 60 minutes
+    isYearSim: true,
+    year: 2564,
+    passRate: '60%',
+    badgeLabel: 'ปี 2564',
+    unlock: () => true
+  },
+  { 
+    id: 'onet_year_2565', 
+    name: 'แนวข้อสอบ O-NET ปี 65', 
+    icon: '📘', 
+    description: 'แนวข้อสอบเสมือนจริง อิง Test Blueprint สทศ. ป.6 (32 ข้อ · 100 คะแนน · 60 นาที)',
+    questions: 32, 
+    timeLimit: 3600, // 60 minutes
+    isYearSim: true,
+    year: 2565,
+    passRate: '64%',
+    badgeLabel: 'ปี 2565',
+    unlock: () => true
+  },
+  { 
+    id: 'onet_year_2566', 
+    name: 'แนวข้อสอบ O-NET ปี 66', 
+    icon: '📗', 
+    description: 'แนวข้อสอบเสมือนจริง อิง Test Blueprint สทศ. ป.6 (32 ข้อ · 100 คะแนน · 60 นาที)',
+    questions: 32, 
+    timeLimit: 3600, // 60 minutes
+    isYearSim: true,
+    year: 2566,
+    passRate: '65%',
+    badgeLabel: 'ปี 2566',
+    unlock: () => true
+  },
+  { 
+    id: 'onet_year_2567', 
+    name: 'แนวข้อสอบ O-NET ปี 67', 
+    icon: '📙', 
+    description: 'แนวข้อสอบเสมือนจริง อิง Test Blueprint สทศ. ป.6 (32 ข้อ · 100 คะแนน · 60 นาที)',
+    questions: 32, 
+    timeLimit: 3600, // 60 minutes
+    isYearSim: true,
+    year: 2567,
+    passRate: '58%',
+    badgeLabel: 'ปี 2567',
+    unlock: () => true
+  },
+  { 
+    id: 'onet_year_2568', 
+    name: 'จำลอง O-NET ปี 2568', 
+    icon: '🎯', 
+    description: 'ข้อสอบจำลองตามโครงสร้าง O-NET ป.6 ปี 2568 (32 ข้อ · 60 นาที)',
+    questions: 32, 
+    timeLimit: 3600, // 60 minutes
+    isYearSim: true,
+    year: 2568,
+    passRate: '62%',
+    badgeLabel: 'ปี 2568',
+    unlock: () => true
   }
 ];
 

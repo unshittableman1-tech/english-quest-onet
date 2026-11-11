@@ -1,12 +1,19 @@
 import './helpers/environment.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { access } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 
 const scoring = await import('../src/utils/scoring.js');
 const { QUESTS } = await import('../src/data/questions.js');
-const { XP_RULES, calcLevel, xpToNextLevel, calculateRankScore, getRankingTier,
+const { XP_RULES, calcLevel, xpToNextLevel, calculateRankScore, getRankingTier, getTotalStars,
   RANKING_TIERS, getUnlockedQuests, getClassPreTestAverage, getClassCurrentAverage,
   getClassWeakAreas } = scoring;
+
+test('ranking star total safely aggregates every completed practice round', () => {
+  assert.equal(getTotalStars({ a: { stars: [3, 2, 1] }, b: { stars: [3, NaN, -2, 8] } }), 12);
+  assert.equal(getTotalStars(), 0);
+});
 
 test('rewards used by pre-test, quest completion and Final Boss remain numeric', () => {
   assert.deepEqual([XP_RULES.PRETEST_DONE, XP_RULES.PASS_70, XP_RULES.PASS_90, XP_RULES.FINALBOSS_PASS], [15, 50, 100, 150]);
@@ -23,7 +30,7 @@ test('XP progress uses within-level values expected by the map and report', () =
   assert.equal(xpToNextLevel(NaN).pct, 0);
 });
 
-test('ranking aggregates capped learning activity and penalties into a finite score', () => {
+test('ranking uses authoritative XP as its single score everywhere', () => {
   const student = {
     xp: 3000,
     badges: ['a', 'b', 'a'],
@@ -35,21 +42,21 @@ test('ranking aggregates capped learning activity and penalties into a finite sc
     badgeStats: { mistakesFixed: 4, pretestScore: 40, posttestScore: 80 },
     finalBoss: { pct: 80 },
   };
-  assert.equal(calculateRankScore(student), 4790);
+  assert.equal(calculateRankScore(student), 3000);
   assert.equal(calculateRankScore(null), 0);
   assert.equal(calculateRankScore({ xp: Infinity }), 0);
   assert.equal(calculateRankScore(500), 500);
-  assert.equal(calculateRankScore({ xp: 1000000, rankingStats: { totalAnswered: 100, fastGuessCount: 100 } }), 0);
+  assert.equal(calculateRankScore({ xp: 1000000, rankingStats: { totalAnswered: 100, fastGuessCount: 100 } }), 1000000);
 });
 
-test('review forgiveness is consistent between map, watcher and pre-adjusted leaderboard callers', () => {
+test('stars, badges, attempts, and penalties do not create a second ranking currency', () => {
   const student = {
     xp: 10000,
     rankingStats: { totalAnswered: 10, fastGuessCount: 10 },
     mistakeBank: { q1: { mastered: true, correctInReview: 0 } },
   };
   const adjusted = { ...student, rankingStats: { ...student.rankingStats, fastGuessCount: 0 } };
-  assert.equal(calculateRankScore(student), 2020);
+  assert.equal(calculateRankScore(student), 10000);
   assert.equal(calculateRankScore(adjusted, 10), calculateRankScore(student));
 });
 
@@ -63,6 +70,15 @@ test('all ten tiers expose the fields required by the tier modal and transition 
     if (index > 0) assert.equal(getRankingTier(tier.min - 1).name, RANKING_TIERS[index - 1].name);
   }
   assert.equal(getRankingTier(NaN).name, 'Novice Trainee');
+});
+
+test('all ranking tiers use an existing illustrated badge asset', async () => {
+  assert.equal(RANKING_TIERS.length, 10);
+  assert.equal(new Set(RANKING_TIERS.map(tier => tier.artwork)).size, 10);
+  for (const tier of RANKING_TIERS) {
+    assert.match(tier.artwork, /^\/assets\/ranking\/tiers\/.+\.svg$/);
+    await access(fileURLToPath(new URL(`../public${tier.artwork}`, import.meta.url)));
+  }
 });
 
 const completedChapters = (...chapters) => Object.fromEntries(QUESTS.filter(q => chapters.includes(q.chapter)).map(q => [q.id, { passed: true, pct: 70, attempts: 1 }]));

@@ -404,6 +404,15 @@ function Wizard({ step, setStep, form, setForm, activePlans, close, goNext, crea
   const otherPlans = activePlans.filter(p => !schoolPlans.some(sp => sp.id === p.id));
   const selectedPlan = activePlans.find(p => p.id === form.planId);
 
+  const formatPlanOption = (p) => {
+    const icon = p.features?.icon || (p.code === 'student_hero' ? '🎒' : p.code === 'teacher_pro' ? '👩‍🏫' : p.code === 'school_starter' ? '🏫' : p.code === 'school_growth' ? '🚀' : p.code === 'superpower' ? '🏛️' : '📋');
+    const semPrice = p.features?.price_semester ? `฿${Number(p.features.price_semester).toLocaleString('th-TH')}/เทอม` : '';
+    const yrPrice = p.price_yearly ? `฿${Number(p.price_yearly).toLocaleString('th-TH')}/ปี` : '';
+    const priceStr = [semPrice, yrPrice].filter(Boolean).join(' · ');
+    const popular = p.code === 'school_growth' ? ' ⭐ ยอดนิยม' : '';
+    return `${icon} ${p.name} · ${p.max_students} ที่นั่ง ${priceStr ? `(${priceStr})` : ''}${popular}`;
+  };
+
   const setQuickDuration = (months) => {
     const start = form.startsAt ? new Date(form.startsAt) : new Date();
     const end = new Date(start);
@@ -469,40 +478,63 @@ function Wizard({ step, setStep, form, setForm, activePlans, close, goNext, crea
                 <optgroup label="── แพ็กเกจระดับโรงเรียน ──">
                   {schoolPlans.map(p => (
                     <option key={p.id} value={p.id}>
-                      {p.name} · {p.max_students} ที่นั่ง {p.price_yearly ? `(฿${Number(p.price_yearly).toLocaleString('th-TH')}/ปี)` : ''}
+                      {formatPlanOption(p)}
                     </option>
                   ))}
                 </optgroup>
                 {otherPlans.length > 0 && (
-                  <optgroup label="── แพ็กเกจอื่นๆ ──">
+                  <optgroup label="── แพ็กเกจครู / นักเรียน ──">
                     {otherPlans.map(p => (
                       <option key={p.id} value={p.id}>
-                        {p.name} · {p.max_students} ที่นั่ง {p.price_yearly ? `(฿${Number(p.price_yearly).toLocaleString('th-TH')}/ปี)` : ''}
+                        {formatPlanOption(p)}
                       </option>
                     ))}
                   </optgroup>
                 )}
               </select>
               {selectedPlan && (
-                <div className="mt-2 rounded-xl border border-amber-400/20 bg-amber-400/5 p-3 text-xs">
-                  <div className="flex items-center justify-between font-bold text-amber-300">
-                    <span>{selectedPlan.name} ({selectedPlan.code})</span>
-                    <span className="rounded-md bg-amber-400/20 px-2 py-0.5 text-amber-200">
-                      โควตา {selectedPlan.max_students} ที่นั่ง
+                <div className="mt-2.5 rounded-2xl border border-amber-400/30 bg-slate-950 p-4 text-xs shadow-inner">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-2xl">{selectedPlan.features?.icon || '🏫'}</span>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <b className="text-sm text-slate-100">{selectedPlan.name}</b>
+                          {selectedPlan.code === 'school_growth' && (
+                            <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-400/30">
+                              ⭐ ยอดนิยม
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-amber-400 font-mono">{selectedPlan.code} · {selectedPlan.features?.badge || selectedPlan.name}</div>
+                      </div>
+                    </div>
+                    <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-300 border border-emerald-500/30">
+                      {selectedPlan.max_students} ที่นั่ง
                     </span>
                   </div>
-                  <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-slate-400">
-                    <span>ครู: {selectedPlan.max_teachers ? `${selectedPlan.max_teachers} ท่าน` : 'ไม่จำกัด'}</span>
-                    <span>ห้องเรียน: {selectedPlan.max_classes ? `${selectedPlan.max_classes} ห้อง` : 'ไม่จำกัด'}</span>
-                    {selectedPlan.features?.price_semester && (
-                      <span className="text-emerald-400 font-semibold">รายเทอม: ฿{Number(selectedPlan.features.price_semester).toLocaleString('th-TH')}</span>
-                    )}
-                    {selectedPlan.price_yearly && (
-                      <span className="text-amber-300 font-semibold">รายปี: ฿{Number(selectedPlan.price_yearly).toLocaleString('th-TH')}</span>
-                    )}
+
+                  <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[11px]">
+                    <div className="rounded-xl bg-slate-900 border border-white/5 p-2.5">
+                      <span className="text-slate-400 block text-[10px]">นักเรียน</span>
+                      <b className="text-emerald-400 text-xs">{selectedPlan.max_students} คน</b>
+                    </div>
+                    <div className="rounded-xl bg-slate-900 border border-white/5 p-2.5">
+                      <span className="text-slate-400 block text-[10px]">ครูผู้สอน</span>
+                      <b className="text-amber-300 text-xs">{selectedPlan.max_teachers ? `${selectedPlan.max_teachers} ท่าน` : 'ไม่จำกัด'}</b>
+                    </div>
+                    <div className="rounded-xl bg-slate-900 border border-white/5 p-2.5">
+                      <span className="text-slate-400 block text-[10px]">รายเทอม (5 เดือน)</span>
+                      <b className="text-white text-xs">{selectedPlan.features?.price_semester ? `฿${Number(selectedPlan.features.price_semester).toLocaleString('th-TH')}` : '—'}</b>
+                    </div>
+                    <div className="rounded-xl bg-slate-900 border border-white/5 p-2.5">
+                      <span className="text-slate-400 block text-[10px]">รายปี (12 เดือน)</span>
+                      <b className="text-white text-xs">{selectedPlan.price_yearly ? `฿${Number(selectedPlan.price_yearly).toLocaleString('th-TH')}` : '—'}</b>
+                    </div>
                   </div>
+
                   {selectedPlan.description && (
-                    <div className="mt-1 text-[11px] text-slate-400">{selectedPlan.description}</div>
+                    <p className="mt-2.5 text-[11px] text-slate-300 border-t border-white/5 pt-2">{selectedPlan.description}</p>
                   )}
                 </div>
               )}

@@ -20,7 +20,7 @@ test('the unchanged 20-item pre-test has complete renderable text and passage me
 });
 
 test('every chapter 1 quest has a usable practice pool and blocked media never enters it', async () => {
-  for (const quest of QUESTS.filter(q => q.chapter === 1)) {
+  for (const quest of QUESTS.filter(q => q.chapter === 1 && !q.isExam)) {
     const eligible = quest.questions.filter(isPracticeQuestionReady);
     assert.ok(eligible.length > 0, quest.id);
     await preloadQuestionMedia(eligible, async () => {});
@@ -32,15 +32,28 @@ test('every chapter 1 quest has a usable practice pool and blocked media never e
   assert.ok(isPracticeQuestionReady(family.questions.find(q => q.id === 'pdf_1.2_ครอบครัว_9')));
 });
 
-test('pre-test saves the actual denominator and version and rejects inconsistent totals', async () => {
+test('the chapter 1 boss is a complete 32-item exam instead of a practice pool', () => {
+  const grammarBoss = QUESTS.find(q => q.id === 'grammar');
+  assert.equal(grammarBoss.isExam, true);
+  assert.equal(grammarBoss.questions.length, 32);
+  assert.ok(grammarBoss.questions.every(question => question.reviewStatus === 'approved'));
+});
+
+test('pre-test saves v2 without overwriting a completed result', async () => {
   localStorage.setItem('eq_onet_current', JSON.stringify({ id: 'local_new_learner', questProgress: {} }));
   const categories = { vocabulary: { correct: 2, total: 3 }, reading: { correct: 3, total: 3 }, rest: { correct: 10, total: 14 } };
   const data = await savePreTest('local_new_learner', categories, 15);
   assert.equal(data.total, 20);
-  assert.equal(data.version, 'pretest-v1');
+  assert.equal(data.version, 'pretest-v2');
   assert.equal(getStudentPreTestPercent(getCurrentStudent()), 75);
   const snapshot = localStorage.getItem('eq_onet_current');
   await assert.rejects(savePreTest('local_new_learner', categories, 16), /Invalid pre-test score/);
   await assert.rejects(savePreTest('local_new_learner', { reading: { total: 0, correct: 0 } }, 0), /Invalid pre-test category/);
   assert.equal(localStorage.getItem('eq_onet_current'), snapshot);
+  await assert.rejects(savePreTest('local_new_learner', categories, 15), /already exists/);
+  assert.equal(localStorage.getItem('eq_onet_current'), snapshot);
+  const legacy = { id: 'local_new_learner', preTest: { version: 'pretest-v1', totalScore: 12, total: 20 } };
+  localStorage.setItem('eq_onet_current', JSON.stringify(legacy));
+  await assert.rejects(savePreTest('local_new_learner', categories, 15), /already exists/);
+  assert.deepEqual(getCurrentStudent().preTest, legacy.preTest);
 });

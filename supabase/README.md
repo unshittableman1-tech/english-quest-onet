@@ -1,17 +1,18 @@
 # Membership Foundation: Staging Runbook
 
-Status: implemented and tested locally, NOT deployed and NOT connected to the login UI.
-This is an additive Phase 3/4 foundation, not a production security upgrade by itself.
+Status: staff Auth and tenant-scoped student RPCs are implemented and tested locally,
+but the migrations are NOT deployed. This is not production-safe until hosted RLS and
+authorization tests pass and the legacy anonymous student access is replaced.
 
 ## Local Findings
 
 - No SQL schema/migration history was present in the repository before this delivery.
 - `src/utils/schoolStorage.js` keeps school fixtures and edits in localStorage. Those
   fixtures are not verified customer records and must not be automatically seeded.
-- `src/components/TeacherLoginPage.jsx` still contains hardcoded login accounts and
-  an admin shortcut. `App.jsx` restores their local session without server verification.
-- `src/utils/storage.js` reads all students, caches them without tenant identity, and
-  contains class-wide/global deletion paths. Filtering in the dashboard is not RLS.
+- `src/components/TeacherLoginPage.jsx` now uses Supabase Auth; `App.jsx` revalidates
+  staff sessions against the membership tables instead of trusting localStorage roles.
+- Teacher Dashboard student reads and mutations use the tenant-scoped RPCs in
+  `202610150001_staff_student_authorization.sql`. These fail closed until deployed.
 - `src/utils/arenaStorage.js` uses a global exam session and a sentinel student row.
 - There are two Supabase client modules. Integration must consolidate them before
   adding an auth listener; the service in this delivery accepts an injected client.
@@ -62,7 +63,7 @@ in a `VITE_*` variable or client bundle. Do not add `membership_private` as an e
    isolation tests, anonymous denial, suspended membership and denied writes. PGlite
    verifies SQL/RLS logic but does not emulate hosted Auth, PostgREST or API settings.
 
-## Required Before Login Cutover
+## Required Before Production Cutover
 
 - Add a verified student identity/session mechanism. A public school code + class +
   number does not prove ownership. Do not preserve open anon policies to bypass this.
@@ -70,11 +71,8 @@ in a `VITE_*` variable or client bundle. Do not add `membership_private` as an e
   student/exam RLS. Replace global exam sessions with school-scoped records.
 - Scope reads, writes, exports and deletes; remove global reset pathways from teachers.
   Clear or namespace caches on user/school changes and sign-out.
-- Replace the login screen with `createMembershipService(existingClient)`; handle a
-  school picker for users with multiple memberships. Do not silently choose the first.
-- Restore staff sessions with `getIdentity()`, not the localStorage role. Protect both
-  navigation and rendering, handle auth sign-out/token expiry, and remove the existing
-  hardcoded accounts and admin shortcut in the same cutover.
+- Apply both migrations to an isolated staging project, provision verified Auth users,
+  and test teacher, school admin, platform admin, suspended and cross-school JWTs.
 - Implement email recovery callback and reset-password UI with allowlisted redirect URLs.
 - Do not let staff identities pass through student XP/heartbeat/storage functions.
 - Implement provisioning/membership changes and quota checks on a trusted server with

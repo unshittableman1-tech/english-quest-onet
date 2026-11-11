@@ -7,6 +7,8 @@ import StoryTapGame from './StoryTapGame';
 import RearrangeGame from './RearrangeGame';
 import VoiceGame from './VoiceGame';
 import SpellGame from './SpellGame';
+import LabelingGame from './LabelingGame';
+import GraphComparisonGame from './GraphComparisonGame';
 import { TECHNIQUE_CARDS } from '../../data/missions/ch1_missions';
 
 // ── GameMissionRouter ──────────────────────────────────────────
@@ -24,6 +26,10 @@ export default function GameMissionRouter({ mission, onComplete, onBack }) {
   const props = { mission, onComplete, onBack };
 
   switch (mission.type) {
+    case 'graph_comparison':
+      return <GraphComparisonGame mission={mission} onBack={onBack} />;
+    case 'image_labeling':
+      return <LabelingGame mission={mission} onBack={onBack} />;
     case 'flashcard':
       return <FlashcardGame {...props} techniqueCard={techniqueCard} />;
     case 'matching':

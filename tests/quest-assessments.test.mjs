@@ -60,6 +60,31 @@ test('human approvals apply only to the three previewed versions for practice Qu
   }
 });
 
+test('shapes assessment uses the matching reviewed 2.5D SVG stimulus', async () => {
+  const expectedAssets = ['f01', 'f02', 'f03', 'f04', 'f05', 'f06', 'f01', 'f02', 'f03', 'f01'];
+  const expectedLabels = ['circle', 'square', 'triangle', 'rectangle', 'oval', 'diamond'];
+  for (const [index, question] of QUEST_ASSESSMENTS.shapes_colors.entries()) {
+    assert.equal(question.itemVersion, 'practice-draft-v1');
+    assert.equal(question.image, `/assessment/forms/${expectedAssets[index]}.svg`);
+    assert.equal(question.mediaSource.style, '2.5d');
+  }
+  for (const [index, label] of expectedLabels.entries()) {
+    const svg = await readFile(`public/assessment/forms/f0${index + 1}.svg`, 'utf8');
+    assert.match(svg, new RegExp(`aria-label="[^"]*2\\.5D ${label}"`, 'i'));
+    assert.match(svg, /Gradient/);
+    assert.match(svg, /filter="url\(#s\)"/);
+  }
+});
+
+test('shapes assessment evidence version stays compatible with the server answer catalog', async () => {
+  const catalog = JSON.parse(await readFile('supabase/functions/_shared/quest-answer-catalog.json', 'utf8'));
+  for (const question of QUEST_ASSESSMENTS.shapes_colors) {
+    const serverItem = catalog[`shapes_colors:${question.id}`];
+    assert.ok(serverItem, `missing server catalog entry for ${question.id}`);
+    assert.equal(question.itemVersion, serverItem.version);
+  }
+});
+
 test('pending copies of approved items still fail release and preflight without mutating the bank', async () => {
   const pending = QUEST_ASSESSMENTS.tenses_arena.map(q => ({ ...q, reviewStatus: 'pending_teacher', approvedModes: [] }));
   assert.ok(pending.every(q => !isMediaReleaseEligible(q)));

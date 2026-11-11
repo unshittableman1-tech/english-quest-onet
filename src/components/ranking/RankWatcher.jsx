@@ -1,83 +1,44 @@
 import { useEffect, useRef } from 'react';
 import { getAllStudents } from '../../utils/storage';
-import { calculateRankScore } from '../../utils/scoring';
+import { getTotalStars } from '../../utils/scoring';
+import { supabase } from '../../config/supabase';
 
-const RANK_KEY = 'onet_prev_class_rank';
-
-export default function RankWatcher({ student, onLoginRank, onRankShift }) {
-  const isFirstLoad = useRef(true);
-
+export default function RankWatcher({ student, onLoginRank, onRankShift, refreshToken = 0 }) {
+  const previous = useRef({ id: null, rank: null });
   useEffect(() => {
-    if (!student || student.role === 'teacher' || student.isDemo) {
-      isFirstLoad.current = true; // Reset on logout
-      return;
-    }
-
+    let active = true;
+    if (!student || student.role === 'teacher' || student.isDemo) return;
     const checkRank = async () => {
+      onLoginRank({ loading: true });
       try {
-        // Fetch all students (this uses the 5-min cache)
-        const allStudents = await getAllStudents();
-        
-        // Filter to same class and exclude teachers/demo
-        let classStudents = allStudents.filter(s => s.role !== 'teacher' && !s.isDemo && s.class === student.class);
-        
-        // If the current student is not in the list (e.g. just registered and cache is stale), add them
-        if (!classStudents.find(s => s.id === student.id)) {
-          classStudents.push(student);
+        let currentRank; let total;
+        if (student.authVerified) {
+          const { data, error } = await supabase.rpc('student_class_rank');
+          if (error) throw error;
+          currentRank = data?.rank; total = data?.total;
         } else {
-          // Update the list with the current student's latest data to ensure accurate ranking for themselves
-          classStudents = classStudents.map(s => s.id === student.id ? student : s);
+          const rows = await getAllStudents({ throwOnError: true });
+          const peers = rows.filter(s => !s.isDemo && (!s.role || s.role === 'student')
+            && s.school_id === student.school_id && s.class === student.class && s.id !== student.id);
+          peers.push(student);
+          peers.sort((a,b) => (Number(b.xp)||0)-(Number(a.xp)||0) || getTotalStars(b.questProgress)-getTotalStars(a.questProgress));
+          currentRank = peers.findIndex(s => s.id === student.id)+1; total = peers.length;
         }
-
-        // Calculate scores and sort
-        const withScores = classStudents.map(s => ({
-          ...s,
-          rankScore: calculateRankScore(s)
-        })).sort((a, b) => b.rankScore - a.rankScore);
-
-        // Find current rank
-        const currentRankIndex = withScores.findIndex(s => s.id === student.id);
-        const currentRank = currentRankIndex + 1;
-        const totalInClass = withScores.length;
-
-        // Get previous rank from localStorage
-        const prevRankRaw = localStorage.getItem(RANK_KEY);
-        const previousRank = prevRankRaw ? parseInt(prevRankRaw, 10) : null;
-
-        if (isFirstLoad.current) {
-          // On login (first mount with a student)
-          if (currentRank > 0) {
-            onLoginRank({ rank: currentRank, total: totalInClass });
-            localStorage.setItem(RANK_KEY, currentRank.toString());
-          }
-          isFirstLoad.current = false;
-        } else {
-          // Subsequent updates (XP or score changed during gameplay)
-          if (previousRank && currentRank > 0 && currentRank !== previousRank) {
-            // Rank changed!
-            const direction = currentRank < previousRank ? 'up' : 'down';
-            onRankShift({ direction, newRank: currentRank, oldRank: previousRank });
-            localStorage.setItem(RANK_KEY, currentRank.toString());
-          } else if (!previousRank && currentRank > 0) {
-            // Edge case: no prev rank but it's an update, just set it
-            localStorage.setItem(RANK_KEY, currentRank.toString());
-          }
+        if (!active) return;
+        if (!Number.isInteger(currentRank) || currentRank < 1 || !Number.isInteger(total) || total < currentRank) {
+          onLoginRank(null); return;
         }
-      } catch (err) {
-        console.error("RankWatcher error:", err);
+        onLoginRank({ rank: currentRank, total });
+        if (previous.current.id === student.id && previous.current.rank && previous.current.rank !== currentRank) {
+          onRankShift({ direction: currentRank < previous.current.rank ? 'up' : 'down', newRank: currentRank, oldRank: previous.current.rank });
+        }
+        previous.current = { id: student.id, rank: currentRank };
+      } catch {
+        if (active) onLoginRank(null);
       }
     };
-
     checkRank();
-
-  }, [
-    student?.id, 
-    student?.xp, 
-    student?.badges?.length, 
-    student?.badgeStats?.mistakesFixed, 
-    student?.questProgress 
-    // We only trigger when score-related fields change
-  ]);
-
-  return null; // Background component, no UI
+    return () => { active = false; };
+  }, [student?.id, student?.school_id, student?.class, student?.xp, student?.questProgress, student?.authVerified, student?.isDemo, onLoginRank, onRankShift, refreshToken]);
+  return null;
 }

@@ -24,6 +24,10 @@ test('explicit translations, verified common sentences and Thai source questions
   assert.equal(getQuestionTranslation({ thaiTranslation: 'คำแปลจริง' }), 'คำแปลจริง');
   assert.equal(getQuestionTranslation({ questionThai: 'คำแปลจริง' }), 'คำแปลจริง');
   assert.equal(getQuestionTranslation({ question: 'How old are you?' }), 'คุณอายุเท่าไหร่?');
+  assert.equal(getQuestionTranslation({ question: 'Which phrase matches the picture?' }), 'วลีใดตรงกับภาพ?');
+  assert.equal(getQuestionTranslation({ question: 'What color is the shape?' }), 'รูปทรงในภาพมีสีอะไร?');
+  assert.match(getQuestionTranslation({ question: 'Nina says, “I enjoy drawing pictures after school.” What is her hobby?' }), /งานอดิเรก/);
+  assert.match(getQuestionTranslation({ question: 'Read the card. “Ben, Grade 6\/2, Chess Club, Room 14.” Where should Ben go for his club?' }), /ห้อง 14/);
   assert.equal(getQuestionTranslation({ question: 'คำถามภาษาไทย' }), 'คำถามภาษาไทย');
 });
 

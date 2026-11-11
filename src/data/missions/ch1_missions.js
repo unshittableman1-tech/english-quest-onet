@@ -1,9 +1,11 @@
+import { getVocabularyAsset } from '../learningAssetPaths.js';
+
 // ============================================================
 // ch1_missions.js — Mission data สำหรับ Chapter 1 (7 Quests)
-// ข้อมูลจาก: English Worksheet P6.pdf + เฉลยใบงานครู + โค้งหักศอก
+// ข้อมูลจาก: English Worksheet P6.pdf + เฉลยใบงานครู + สูตรลัด O-NET
 // ============================================================
 
-// ── Technique Cards (จากโค้งหักศอก) ─────────────────────────
+// ── Technique Cards (สูตรลัด O-NET) ─────────────────────────
 export const TECHNIQUE_CARDS = {
   signs: {
     title: '🧠 เทคนิคพิชิต Signs',
@@ -62,18 +64,17 @@ export const vocabularyMissions = [
     xpReward: 30,
     description: 'พลิกการ์ดเพื่อดูคำแปล แล้วบอกว่าจำได้หรือยัง',
     cards: [
-      { id: 'vf1', front: '✈️', frontLabel: 'plane', back: 'plane', backThai: 'เครื่องบิน', hint: 'p_ane', category: 'transport' },
-      { id: 'vf2', front: '🚗', frontLabel: 'car', back: 'car', backThai: 'รถยนต์', hint: 'c_r', category: 'transport' },
-      { id: 'vf3', front: '🚌', frontLabel: 'bus', back: 'bus', backThai: 'รถบัส/รถเมล์', hint: 'b_s', category: 'transport' },
-      { id: 'vf4', front: '🚐', frontLabel: 'van', back: 'van', backThai: 'รถตู้', hint: 'v_n', category: 'transport' },
-      { id: 'vf5', front: '🚲', frontLabel: 'bicycle', back: 'bicycle', backThai: 'รถจักรยาน', hint: 'bi_y_le', category: 'transport' },
-      { id: 'vf6', front: '🚢', frontLabel: 'ship', back: 'ship', backThai: 'เรือใหญ่', hint: 'sh_p', category: 'transport' },
-      { id: 'vf7', front: '🚂', frontLabel: 'train', back: 'train', backThai: 'รถไฟ', hint: 'tr_in', category: 'transport' },
-      { id: 'vf8', front: '🚕', frontLabel: 'taxi', back: 'taxi', backThai: 'แท็กซี่', hint: 'ta_i', category: 'transport' },
-      { id: 'vf9', front: '⛵', frontLabel: 'boat', back: 'boat', backThai: 'เรือเล็ก', hint: 'bo_t', category: 'transport' },
-      { id: 'vf10', front: '🏍️', frontLabel: 'motorcycle', back: 'motorcycle', backThai: 'รถจักรยานยนต์', hint: 'mot_r_y_le', category: 'transport' },
-      { id: 'vf11', front: '🚑', frontLabel: 'ambulance', back: 'ambulance', backThai: 'รถพยาบาล', hint: 'am_ul_nce', category: 'transport' },
-      { id: 'vf12', front: '🛻', frontLabel: 'pick-up truck', back: 'pick-up truck', backThai: 'รถกระบะ', hint: 'p_ck-up', category: 'transport' },
+      ...[
+        ['vf1', 'plane', 'เครื่องบิน', 'p_ane'], ['vf2', 'car', 'รถยนต์', 'c_r'],
+        ['vf3', 'bus', 'รถบัส/รถเมล์', 'b_s'], ['vf4', 'van', 'รถตู้', 'v_n'],
+        ['vf5', 'bicycle', 'รถจักรยาน', 'bi_y_le'], ['vf6', 'ship', 'เรือใหญ่', 'sh_p'],
+        ['vf7', 'train', 'รถไฟ', 'tr_in'], ['vf8', 'taxi', 'แท็กซี่', 'ta_i'],
+        ['vf9', 'boat', 'เรือเล็ก', 'bo_t'], ['vf10', 'motorcycle', 'รถจักรยานยนต์', 'mot_r_y_le'],
+        ['vf11', 'ambulance', 'รถพยาบาล', 'am_ul_nce'], ['vf12', 'pick-up truck', 'รถกระบะ', 'p_ck-up'],
+      ].map(([id, word, backThai, hint]) => ({
+        id, frontLabel: word, back: word, backThai, hint, category: 'transport',
+        image: getVocabularyAsset(word), imageAlt: word,
+      })),
     ],
   },
   {
@@ -81,18 +82,18 @@ export const vocabularyMissions = [
     questId: 'vocabulary',
     type: 'matching',
     title: '🔗 Place Match',
-    subtitle: 'จับคู่สถานที่กับ emoji',
+    subtitle: 'จับคู่สถานที่กับภาพ',
     xpReward: 30,
-    description: 'แตะคำภาษาอังกฤษ แล้วแตะ emoji ที่ตรงกัน',
+    description: 'แตะคำภาษาอังกฤษ แล้วแตะภาพที่ตรงกัน',
     pairs: [
-      { id: 'vm1', left: 'hospital', right: '🏥', leftThai: 'โรงพยาบาล' },
-      { id: 'vm2', left: 'school', right: '🏫', leftThai: 'โรงเรียน' },
-      { id: 'vm3', left: 'bank', right: '🏦', leftThai: 'ธนาคาร' },
-      { id: 'vm4', left: 'airport', right: '✈️', leftThai: 'สนามบิน' },
-      { id: 'vm5', left: 'market', right: '🏪', leftThai: 'ตลาด' },
-      { id: 'vm6', left: 'restaurant', right: '🍽️', leftThai: 'ร้านอาหาร' },
-      { id: 'vm7', left: 'cinema', right: '🎬', leftThai: 'โรงภาพยนตร์' },
-      { id: 'vm8', left: 'post office', right: '📮', leftThai: 'ไปรษณีย์' },
+      ...[
+        ['vm1', 'hospital', 'โรงพยาบาล'], ['vm2', 'school', 'โรงเรียน'],
+        ['vm3', 'bank', 'ธนาคาร'], ['vm4', 'airport', 'สนามบิน'],
+        ['vm5', 'market', 'ตลาด'], ['vm6', 'restaurant', 'ร้านอาหาร'],
+        ['vm7', 'cinema', 'โรงภาพยนตร์'], ['vm8', 'post office', 'ไปรษณีย์'],
+      ].map(([id, left, leftThai]) => ({
+        id, left, leftThai, right: left, image: getVocabularyAsset(left), imageAlt: left,
+      })),
     ],
   },
   {
@@ -103,10 +104,10 @@ export const vocabularyMissions = [
     subtitle: 'ดูภาพแล้วเรียงตัวอักษรให้ถูกต้อง',
     xpReward: 40,
     items: [
-      { id: 'ps1', image: '🚲', answer: 'bicycle', thai: 'รถจักรยาน' },
-      { id: 'ps2', image: '🏥', answer: 'hospital', thai: 'โรงพยาบาล' },
-      { id: 'ps3', image: '✈️', answer: 'airport', thai: 'สนามบิน' },
-      { id: 'ps4', image: '🏪', answer: 'market', thai: 'ตลาด' },
+      { id: 'ps1', image: getVocabularyAsset('bicycle'), imageAlt: 'bicycle', answer: 'bicycle', thai: 'รถจักรยาน' },
+      { id: 'ps2', image: getVocabularyAsset('hospital'), imageAlt: 'hospital', answer: 'hospital', thai: 'โรงพยาบาล' },
+      { id: 'ps3', image: getVocabularyAsset('airport'), imageAlt: 'airport', answer: 'airport', thai: 'สนามบิน' },
+      { id: 'ps4', image: getVocabularyAsset('market'), imageAlt: 'market', answer: 'market', thai: 'ตลาด' },
     ]
   },
   {
@@ -426,7 +427,7 @@ export const grammarMissions = [
     subtitle: 'คำใบ้ → รูปกริยาที่ถูกต้อง',
     xpReward: 30,
     techniqueCard: 'grammar',
-    // จากโค้งหักศอก Part 4: Grammar Keywords
+    // จากสูตรลัด O-NET Part 4: Grammar Keywords
     cards: [
       { id: 'gf1', front: 'yesterday / last', frontLabel: '', back: 'V ช่อง 2', backThai: 'went, ate, saw, played', hint: 'อดีต = ช่อง 2' },
       { id: 'gf2', front: 'now / at the moment', frontLabel: '', back: 'am/is/are + V-ing', backThai: 'is going, are playing', hint: 'กำลัง = Ving' },
@@ -476,8 +477,287 @@ export const grammarMissions = [
   }
 ];
 
+// ── Chapter 1 foundation quests used by the current Quest Map ───────────────
+export const aboutMissions = [
+  {
+    id: 'about_profile_flip', questId: 'about_myself', type: 'flashcard',
+    title: 'Profile Words', subtitle: 'เรียนรู้คำสำคัญสำหรับแนะนำตัว', xpReward: 30,
+    cards: [
+      { id: 'apf1', front: 'name', frontLabel: 'name', back: 'name', backThai: 'ชื่อ', hint: 'My name is ...', image: '/learning/profile/name-v1.png', imageAlt: 'นักเรียนชี้ช่องชื่อว่างบนป้ายชื่อของตน' },
+      { id: 'apf2', front: 'age', frontLabel: 'age', back: 'age', backThai: 'อายุ', hint: 'I am eleven years old.', image: '/learning/profile/age-v1.png', imageAlt: 'นักเรียนนับเทียนบนเค้กวันเกิดเพื่อบอกอายุ' },
+      { id: 'apf3', front: 'hobby', frontLabel: 'hobby', back: 'hobby', backThai: 'งานอดิเรก', hint: 'My hobby is drawing.', image: '/learning/profile/hobby-v1.png', imageAlt: 'นักเรียนกำลังวาดภาพเป็นงานอดิเรก' },
+      { id: 'apf4', front: 'favourite', frontLabel: 'favourite', back: 'favourite', backThai: 'ที่ชื่นชอบ', hint: 'My favourite subject is English.', image: '/learning/profile/favourite-v1.png', imageAlt: 'นักเรียนกอดหนังสือเล่มโปรดพร้อมสัญลักษณ์หัวใจและดาว' },
+      { id: 'apf5', front: 'live', frontLabel: 'live', back: 'live', backThai: 'อาศัยอยู่', hint: 'I live in Bangkok.', image: '/learning/profile/live-v1.png', imageAlt: 'นักเรียนชี้ไปยังบ้านที่ตนอาศัยอยู่' },
+      { id: 'apf6', front: 'student', frontLabel: 'student', back: 'student', backThai: 'นักเรียน', hint: 'I am a student.', image: '/learning/profile/student-v1.png', imageAlt: 'นักเรียนในชุดนักเรียนสะพายกระเป๋าและถือหนังสือ' },
+    ],
+  },
+  {
+    id: 'about_intro_fill', questId: 'about_myself', type: 'fill_blank',
+    title: 'Introduce Yourself', subtitle: 'เติมบทแนะนำตัวให้สมบูรณ์', xpReward: 40,
+    questions: [
+      { id: 'aif1', sentence: 'My ___ is Nida.', blank: 'My ___ is Nida.', options: ['name', 'age', 'school', 'hobby'], answer: 0, answerThai: 'ฉันชื่อนิดา', hint: 'ใช้บอกชื่อ' },
+      { id: 'aif2', sentence: 'I am eleven years ___.', blank: 'eleven years ___', options: ['old', 'live', 'name', 'class'], answer: 0, answerThai: 'ฉันอายุสิบเอ็ดปี', hint: 'years old' },
+      { id: 'aif3', sentence: 'I ___ in Chiang Mai.', blank: 'I ___ in Chiang Mai.', options: ['live', 'like', 'play', 'study'], answer: 0, answerThai: 'ฉันอาศัยอยู่เชียงใหม่', hint: 'บอกที่อยู่อาศัย' },
+      { id: 'aif4', sentence: 'My hobby is ___ books.', blank: 'My hobby is ___ books.', options: ['reading', 'read', 'reads', 'reader'], answer: 0, answerThai: 'งานอดิเรกของฉันคืออ่านหนังสือ', hint: 'is + V-ing' },
+    ],
+  },
+  {
+    id: 'about_sentence_builder', questId: 'about_myself', type: 'rearrange',
+    title: 'Profile Builder', subtitle: 'เรียงประโยคแนะนำตัวให้ถูกต้อง', xpReward: 50,
+    wordSentences: [
+      { id: 'asb1', words: ['name', 'My', 'is', 'Pim'], correct: 'My name is Pim' },
+      { id: 'asb2', words: ['years', 'I', 'am', 'old', 'twelve'], correct: 'I am twelve years old' },
+      { id: 'asb3', words: ['favourite', 'English', 'is', 'subject', 'My'], correct: 'My favourite subject is English' },
+      { id: 'asb4', words: ['football', 'after', 'I', 'school', 'play'], correct: 'I play football after school' },
+    ],
+  },
+];
+
+export const familyMissions = [
+  {
+    id: 'family_relation_flip', questId: 'family', type: 'flashcard',
+    title: 'Family Words', subtitle: 'เรียนรู้คำเรียกสมาชิกในครอบครัว', xpReward: 30,
+    cards: [
+      { id: 'frf1', front: 'parents', frontLabel: 'parents', back: 'parents', backThai: 'พ่อและแม่', hint: 'father + mother', image: '/assessment/quest-scenes/family-parents-v1.webp', imageAlt: 'พ่อและแม่ยืนอยู่กับลูกสองคนในบ้าน' },
+      { id: 'frf2', front: 'grandparents', frontLabel: 'grandparents', back: 'grandparents', backThai: 'ปู่ย่าตายาย', hint: 'parents of your parents', image: '/learning/family/grandparents-v1.png', imageAlt: 'คุณตาคุณยายหรือคุณปู่คุณย่ายืนยิ้มอยู่ด้วยกัน' },
+      { id: 'frf3', front: 'brother', frontLabel: 'brother', back: 'brother', backThai: 'พี่ชายหรือน้องชาย', hint: 'male sibling', image: '/learning/family/brother-v1.png', imageAlt: 'เด็กผู้หญิงชี้ไปยังพี่ชายหรือน้องชายของตน' },
+      { id: 'frf4', front: 'sister', frontLabel: 'sister', back: 'sister', backThai: 'พี่สาวหรือน้องสาว', hint: 'female sibling', image: '/learning/family/sister-v1.png', imageAlt: 'เด็กผู้ชายชี้ไปยังพี่สาวหรือน้องสาวของตน' },
+      { id: 'frf5', front: 'uncle', frontLabel: 'uncle', back: 'uncle', backThai: 'ลุงหรือน้าอา', hint: 'male relative', image: '/learning/family/uncle-v1.png', imageAlt: 'เด็กชี้ไปยังลุงหรือน้าอาผู้ชายที่กำลังโบกมือ' },
+      { id: 'frf6', front: 'aunt', frontLabel: 'aunt', back: 'aunt', backThai: 'ป้าหรือน้าอา', hint: 'female relative', image: '/learning/family/aunt-v1.png', imageAlt: 'เด็กชี้ไปยังป้าหรือน้าอาผู้หญิงที่กำลังโบกมือ' },
+    ],
+  },
+  {
+    id: 'family_relation_match', questId: 'family', type: 'matching',
+    title: 'Family Match', subtitle: 'จับคู่ความสัมพันธ์ในครอบครัว', xpReward: 40,
+    pairs: [
+      { id: 'frm1', left: "father's father", leftThai: 'พ่อของพ่อ', right: 'grandfather' },
+      { id: 'frm2', left: "mother's sister", leftThai: 'พี่สาวหรือน้องสาวของแม่', right: 'aunt' },
+      { id: 'frm3', left: "father's brother", leftThai: 'พี่ชายหรือน้องชายของพ่อ', right: 'uncle' },
+      { id: 'frm4', left: "uncle's child", leftThai: 'ลูกของลุง', right: 'cousin' },
+    ],
+  },
+  {
+    id: 'family_pronoun_fill', questId: 'family', type: 'fill_blank',
+    title: 'Family Pronouns', subtitle: 'เลือกคำสรรพนามให้ตรงกับสมาชิกครอบครัว', xpReward: 50,
+    questions: [
+      { id: 'fpf1', sentence: 'My mother is a nurse. ___ works at a hospital.', blank: '___ works', options: ['She', 'He', 'It', 'They'], answer: 0, answerThai: 'เธอทำงานที่โรงพยาบาล', hint: 'mother = she' },
+      { id: 'fpf2', sentence: 'Tom and Tim are brothers. ___ play football together.', blank: '___ play', options: ['They', 'He', 'She', 'It'], answer: 0, answerThai: 'พวกเขาเล่นฟุตบอลด้วยกัน', hint: 'สองคน = they' },
+      { id: 'fpf3', sentence: 'This is my father. ___ name is Somchai.', blank: '___ name', options: ['His', 'Her', 'Their', 'Its'], answer: 0, answerThai: 'ชื่อของเขาคือสมชาย', hint: 'father = his' },
+      { id: 'fpf4', sentence: 'We love ___ grandparents.', blank: '___ grandparents', options: ['our', 'his', 'her', 'its'], answer: 0, answerThai: 'พวกเรารักปู่ย่าตายายของเรา', hint: 'we = our' },
+    ],
+  },
+];
+
+export const schoolMissions = [
+  {
+    id: 'school_object_flip', questId: 'school', type: 'flashcard',
+    title: 'Classroom Words', subtitle: 'เรียนรู้สิ่งของและสถานที่ในโรงเรียน', xpReward: 30,
+    cards: [
+      { id: 'sof1', front: 'library', frontLabel: 'library', back: 'library', backThai: 'ห้องสมุด', hint: 'a place for books', image: '/learning/classroom/library-v1.png', imageAlt: 'นักเรียนอ่านหนังสือในห้องสมุดที่มีชั้นหนังสือหลายชั้น' },
+      { id: 'sof2', front: 'canteen', frontLabel: 'canteen', back: 'canteen', backThai: 'โรงอาหาร', hint: 'a place to eat lunch', image: '/learning/classroom/canteen-v1.png', imageAlt: 'นักเรียนถือถาดอาหารอยู่ในโรงอาหารของโรงเรียน' },
+      { id: 'sof3', front: 'playground', frontLabel: 'playground', back: 'playground', backThai: 'สนามเด็กเล่น', hint: 'a place to play', image: '/learning/classroom/playground-v1.png', imageAlt: 'เด็กเล่นชิงช้าและกระดานลื่นในสนามเด็กเล่น' },
+      { id: 'sof4', front: 'ruler', frontLabel: 'ruler', back: 'ruler', backThai: 'ไม้บรรทัด', hint: 'used to measure', image: '/learning/classroom/ruler-v1.png', imageAlt: 'ไม้บรรทัดสีเหลืองวางอยู่ข้างดินสอ' },
+      { id: 'sof5', front: 'eraser', frontLabel: 'eraser', back: 'eraser', backThai: 'ยางลบ', hint: 'used to remove pencil marks', image: '/learning/classroom/eraser-v1.png', imageAlt: 'ยางลบกำลังลบรอยดินสอบนกระดาษ' },
+      { id: 'sof6', front: 'notebook', frontLabel: 'notebook', back: 'notebook', backThai: 'สมุด', hint: 'used for writing notes', image: '/learning/classroom/notebook-v1.png', imageAlt: 'สมุดสันห่วงเปิดหน้ากระดาษว่างพร้อมดินสอ' },
+    ],
+  },
+  {
+    id: 'school_place_match', questId: 'school', type: 'matching',
+    title: 'School Place Match', subtitle: 'จับคู่สถานที่กับกิจกรรม', xpReward: 40,
+    pairs: [
+      { id: 'spm1', left: 'borrow a book', leftThai: 'ยืมหนังสือ', right: 'library' },
+      { id: 'spm2', left: 'eat lunch', leftThai: 'รับประทานอาหารกลางวัน', right: 'canteen' },
+      { id: 'spm3', left: 'play basketball', leftThai: 'เล่นบาสเกตบอล', right: 'gym' },
+      { id: 'spm4', left: 'study science', leftThai: 'เรียนวิทยาศาสตร์', right: 'laboratory' },
+    ],
+  },
+  {
+    id: 'school_notice_fill', questId: 'school', type: 'fill_blank',
+    title: 'School Notice', subtitle: 'อ่านสถานการณ์และเติมคำให้ถูกต้อง', xpReward: 50,
+    questions: [
+      { id: 'snf1', sentence: 'LIBRARY CLOSED ON ___.', blank: 'CLOSED ON ___', options: ['Friday', 'desk', 'book', 'quiet'], answer: 0, answerThai: 'ห้องสมุดปิดวันศุกร์', hint: 'ต้องเป็นวันในสัปดาห์' },
+      { id: 'snf2', sentence: 'Please be ___ in the library.', blank: 'be ___', options: ['quiet', 'hungry', 'late', 'fast'], answer: 0, answerThai: 'กรุณาเงียบในห้องสมุด', hint: 'library rule' },
+      { id: 'snf3', sentence: 'Students must wear their school ___.', blank: 'school ___', options: ['uniform', 'lunch', 'lesson', 'library'], answer: 0, answerThai: 'นักเรียนต้องสวมชุดนักเรียน', hint: 'สิ่งที่สวมใส่' },
+      { id: 'snf4', sentence: 'Put your books on the ___.', blank: 'on the ___', options: ['desk', 'teacher', 'class', 'subject'], answer: 0, answerThai: 'วางหนังสือบนโต๊ะ', hint: 'classroom furniture' },
+    ],
+  },
+];
+
+// ── Ten-round content pack ────────────────────────────────────────────────
+// Every Chapter 1 game is intentionally ten rounds long. These additions keep
+// the original missions and UI intact while completing the shorter data sets.
+const TEN_ROUND_ADDITIONS = {
+  vocab_match: [
+    { id: 'vm9', left: 'library', leftThai: 'ห้องสมุด', right: 'library', image: getVocabularyAsset('library'), imageAlt: 'library' },
+    { id: 'vm10', left: 'police station', leftThai: 'สถานีตำรวจ', right: 'police station', image: getVocabularyAsset('police station'), imageAlt: 'police station' },
+  ],
+  vocab_pic_spell: [
+    ['ps5', 'train', 'รถไฟ'], ['ps6', 'restaurant', 'ร้านอาหาร'], ['ps7', 'cinema', 'โรงภาพยนตร์'],
+    ['ps8', 'school', 'โรงเรียน'], ['ps9', 'ambulance', 'รถพยาบาล'], ['ps10', 'bicycle', 'รถจักรยาน'],
+  ].map(([id, answer, thai]) => ({ id, image: getVocabularyAsset(answer), imageAlt: answer, answer, thai })),
+  vocab_detective: [
+    { id: 'sd4', hints: ['It is a vehicle.', 'It flies in the sky.', 'You board it at an airport.'], answer: 'plane', thai: 'เครื่องบิน' },
+    { id: 'sd5', hints: ['It is a place.', 'You can buy food there.', 'Many sellers work here.'], answer: 'market', thai: 'ตลาด' },
+    { id: 'sd6', hints: ['It is a vehicle.', 'It has two wheels.', 'You pedal it.'], answer: 'bicycle', thai: 'รถจักรยาน' },
+    { id: 'sd7', hints: ['It is a place.', 'You watch movies there.', 'It has a big screen.'], answer: 'cinema', thai: 'โรงภาพยนตร์' },
+    { id: 'sd8', hints: ['It is a vehicle.', 'It carries many passengers.', 'It stops at bus stops.'], answer: 'bus', thai: 'รถบัส' },
+    { id: 'sd9', hints: ['It is a place.', 'You send letters there.', 'It sells stamps.'], answer: 'post office', thai: 'ไปรษณีย์' },
+    { id: 'sd10', hints: ['It is a place.', 'You keep money there.', 'It has cash machines.'], answer: 'bank', thai: 'ธนาคาร' },
+  ],
+  signs_match: [
+    { id: 'sm9', left: 'Hospital', right: '🏥', leftThai: 'โรงพยาบาล' },
+    { id: 'sm10', left: 'Pedestrian Crossing', right: '🚶', leftThai: 'ทางม้าลาย' },
+  ],
+  dir_story: [
+    { id: 'dt6', text: 'The bank is ___ the school.', question: 'ธนาคารอยู่ตรงข้ามโรงเรียน', options: ['opposite', 'between', 'behind', 'near'], answer: 0, explanation: 'opposite = ตรงข้าม' },
+    { id: 'dt7', text: 'The library is ___ the bank and the market.', question: 'ห้องสมุดอยู่ระหว่างสองสถานที่', options: ['between', 'next to', 'behind', 'on'], answer: 0, explanation: 'between = ระหว่าง' },
+    { id: 'dt8', text: 'Turn ___ at the traffic lights.', question: 'เลี้ยวซ้ายที่สัญญาณไฟ', options: ['left', 'straight', 'near', 'between'], answer: 0, explanation: 'turn left = เลี้ยวซ้าย' },
+    { id: 'dt9', text: 'The bus stop is ___ front of the school.', question: 'เติมคำบุพบท', options: ['in', 'on', 'at', 'to'], answer: 0, explanation: 'in front of = ด้านหน้า' },
+    { id: 'dt10', text: 'Walk ___ the road for two minutes.', question: 'เดินตรงไปตามถนน', options: ['along', 'between', 'opposite', 'behind'], answer: 0, explanation: 'walk along = เดินไปตาม' },
+  ],
+  market_fill: [
+    { id: 'mf6', sentence: 'The bag is ___ baht.', blank: '___ baht', options: ['ninety', 'nine', 'nineteen', 'ninth'], answer: 0, answerThai: '90 บาท', hint: '90 = ninety' },
+    { id: 'mf7', sentence: 'A: What ___ do you need? B: Medium, please.', blank: 'What ___', options: ['size', 'price', 'name', 'time'], answer: 0, answerThai: 'ต้องการขนาดอะไร', hint: 'small / medium / large' },
+    { id: 'mf8', sentence: 'Can I ___ this shirt on?', blank: '___ this shirt on', options: ['try', 'buying', 'wears', 'looks'], answer: 0, answerThai: 'ขอลองเสื้อตัวนี้ได้ไหม', hint: 'try on = ลองสวม' },
+    { id: 'mf9', sentence: 'It is too expensive. Do you have a ___ one?', blank: 'a ___ one', options: ['cheaper', 'taller', 'slower', 'younger'], answer: 0, answerThai: 'มีชิ้นที่ถูกกว่านี้ไหม', hint: 'cheap → cheaper' },
+    { id: 'mf10', sentence: 'Here is your ___.', blank: 'your ___', options: ['change', 'color', 'shop', 'size'], answer: 0, answerThai: 'นี่คือเงินทอนของคุณ', hint: 'เงินทอน = change' },
+  ],
+  market_convo: [
+    { id: 'mc5', context: '👕 คุณต้องการลองเสื้อ', speaker: 'You', speakerEmoji: '🧑', text: 'Can I try this on?', options: ['Of course. The fitting room is there.', 'It is Monday.', 'I walk to school.', 'No, I am not.'], correct: 0, explanation: 'ตอบอนุญาตและบอกตำแหน่งห้องลองเสื้อ' },
+    { id: 'mc6', context: '📏 พนักงานถามขนาด', speaker: 'Jane', speakerEmoji: '👩‍💼', text: 'What size do you need?', options: ['Medium, please.', 'It is blue.', 'Two hundred baht.', 'At the market.'], correct: 0, explanation: 'คำถาม What size ต้องตอบขนาด' },
+    { id: 'mc7', context: '🎨 พนักงานเสนออีกสี', speaker: 'Jane', speakerEmoji: '👩‍💼', text: 'Would you like the blue one?', options: ['Yes, please.', 'It is a skirt.', 'I am eleven.', 'By bus.'], correct: 0, explanation: 'Would you like...? ตอบ Yes, please.' },
+    { id: 'mc8', context: '💸 สินค้าราคาแพงเกินไป', speaker: 'You', speakerEmoji: '🧑', text: 'It is too expensive.', options: ['Do you have a cheaper one?', 'What is your name?', 'Turn left here.', 'I like football.'], correct: 0, explanation: 'ขอสินค้าที่ราคาถูกกว่าอย่างสุภาพ' },
+    { id: 'mc9', context: '💵 พนักงานรับเงิน', speaker: 'Jane', speakerEmoji: '👩‍💼', text: 'Here is your change.', options: ['Thank you.', 'Red, please.', 'Medium size.', 'I am fine.'], correct: 0, explanation: 'ได้รับเงินทอนแล้วกล่าวขอบคุณ' },
+    { id: 'mc10', context: '👋 จบบทสนทนาในร้าน', speaker: 'Jane', speakerEmoji: '👩‍💼', text: 'Have a nice day!', options: ['You too!', 'It is fifty baht.', 'I need a large.', 'This is a bank.'], correct: 0, explanation: 'ตอบคำอวยพรด้วย You too!' },
+  ],
+  convo_flip: [
+    { id: 'cf9', front: 'Excuse me.', frontLabel: '', back: 'Yes? / How can I help?', backThai: 'มีอะไรให้ช่วยไหม', hint: 'ใช้เรียกความสนใจอย่างสุภาพ' },
+    { id: 'cf10', front: 'Have a nice day!', frontLabel: '', back: 'You too!', backThai: 'เช่นกันนะ', hint: 'คำอวยพร → You too' },
+  ],
+  convo_match: [
+    { id: 'cm9', left: 'Excuse me.', right: 'Yes? How can I help?', leftThai: 'ขอโทษนะ / ขออนุญาต' },
+    { id: 'cm10', left: 'Have a nice weekend!', right: 'You too!', leftThai: 'ขอให้มีวันหยุดที่ดี' },
+  ],
+  convo_voice: [
+    { id: 'cv5', context: 'คุณต้องการขอความช่วยเหลือจากครู', text: 'can you help me please', thai: 'ช่วยฉันหน่อยได้ไหม' },
+    { id: 'cv6', context: 'คุณต้องการยืมดินสอจากเพื่อน', text: 'can I borrow your pencil', thai: 'ขอยืมดินสอได้ไหม' },
+    { id: 'cv7', context: 'เพื่อนพูดว่า "Goodbye."', text: 'see you tomorrow', thai: 'เจอกันพรุ่งนี้' },
+    { id: 'cv8', context: 'คุณต้องการเรียกพนักงานอย่างสุภาพ', text: 'excuse me', thai: 'ขอโทษนะ / ขออนุญาต' },
+    { id: 'cv9', context: 'เพื่อนอวยพรว่า "Have a nice day!"', text: 'you too', thai: 'เช่นกันนะ' },
+    { id: 'cv10', context: 'คุณพบเพื่อนใหม่เป็นครั้งแรก', text: 'nice to meet you', thai: 'ยินดีที่ได้รู้จัก' },
+  ],
+  reading_alice: [
+    { id: 'ra6', question: 'Does Alice get up early?', options: ['Yes, she does.', 'No, she does not.', 'Only on Sunday.', 'The story does not say.'], answer: 0, explanation: '"She gets up early"' },
+    { id: 'ra7', question: 'What does Alice set up every day?', options: ['Her bed', 'Her desk', 'Her bicycle', 'Her dinner'], answer: 0, explanation: '"sets up her bed every day"' },
+    { id: 'ra8', question: 'Who does Alice help after school?', options: ['Her teacher', 'Her brother', 'Her doctor', 'Her driver'], answer: 0, explanation: '"she helps her teacher"' },
+    { id: 'ra9', question: 'Who takes Alice home?', options: ['Her parents', 'Her teacher', 'Her friends', 'Her grandparents'], answer: 0, explanation: '"Her parents take her home"' },
+    { id: 'ra10', question: 'Who does Alice help after dinner?', options: ['Her parents', 'Her classmates', 'Her neighbours', 'Her cousins'], answer: 0, explanation: '"helps her parents after dinner"' },
+  ],
+  grammar_pronoun: [
+    { id: 'gp9', sentence: 'You should bring ___ notebook.', options: ['your', 'my', 'his', 'our'], answer: 0, answerThai: 'your = ของคุณ', hint: 'You → your' },
+    { id: 'gp10', sentence: 'That blue bicycle is ___.', options: ['mine', 'my', 'me', 'I'], answer: 0, answerThai: 'mine = ของฉัน', hint: 'ไม่มีคำนามตามหลัง ใช้ mine' },
+  ],
+  grammar_builder: [
+    { id: 'gb5', words: ['every', 'She', 'reads', 'night'], correct: 'She reads every night' },
+    { id: 'gb6', words: ['will', 'tomorrow', 'We', 'travel'], correct: 'We will travel tomorrow' },
+    { id: 'gb7', words: ['than', 'is', 'A', 'B', 'bigger'], correct: 'A is bigger than B' },
+    { id: 'gb8', words: ['not', 'They', 'hungry', 'are'], correct: 'They are not hungry' },
+    { id: 'gb9', words: ['your', 'What', 'name', 'is'], correct: 'What is your name' },
+    { id: 'gb10', words: ['can', 'English', 'speak', 'I'], correct: 'I can speak English' },
+  ],
+  about_profile_flip: [
+    { id: 'apf7', front: 'birthday', frontLabel: 'birthday', back: 'birthday', backThai: 'วันเกิด', hint: 'My birthday is in May.', image: '/learning/profile/birthday-v1.png', imageAlt: 'นักเรียนฉลองวันเกิดพร้อมเค้ก ลูกโป่ง และหมวกงานเลี้ยง' },
+    { id: 'apf8', front: 'address', frontLabel: 'address', back: 'address', backThai: 'ที่อยู่', hint: 'My address is ...', image: '/learning/profile/address-v1.png', imageAlt: 'นักเรียนถือซองจดหมายข้างบ้านและหมุดแผนที่เพื่อสื่อถึงที่อยู่' },
+    { id: 'apf9', front: 'subject', frontLabel: 'subject', back: 'subject', backThai: 'วิชา', hint: 'English is my favourite subject.', image: '/learning/profile/subject-v1.png', imageAlt: 'นักเรียนอยู่กับหนังสือ ลูกโลก ตัวเลข และอุปกรณ์ศิลปะซึ่งแทนวิชาเรียน' },
+    { id: 'apf10', front: 'dream job', frontLabel: 'dream job', back: 'dream job', backThai: 'อาชีพในฝัน', hint: 'I want to be a doctor.', image: '/learning/profile/dream-job-v1.png', imageAlt: 'นักเรียนฝันเห็นตนเองโตขึ้นเป็นแพทย์' },
+  ],
+  about_intro_fill: [
+    { id: 'aif5', sentence: 'I ___ at Ban Nong School.', blank: 'I ___ at Ban Nong School.', options: ['study', 'live', 'old', 'name'], answer: 0, answerThai: 'ฉันเรียนที่โรงเรียนบ้านหนอง', hint: 'study at school' },
+    { id: 'aif6', sentence: 'My favourite ___ is English.', blank: 'favourite ___', options: ['subject', 'age', 'address', 'year'], answer: 0, answerThai: 'วิชาโปรดของฉันคือภาษาอังกฤษ', hint: 'English is a subject' },
+    { id: 'aif7', sentence: 'There are four people in my ___.', blank: 'my ___', options: ['family', 'name', 'hobby', 'age'], answer: 0, answerThai: 'ครอบครัวของฉันมีสี่คน', hint: 'people in a family' },
+    { id: 'aif8', sentence: 'I want to ___ a teacher.', blank: 'to ___ a teacher', options: ['be', 'am', 'is', 'are'], answer: 0, answerThai: 'ฉันอยากเป็นครู', hint: 'want to + V1' },
+    { id: 'aif9', sentence: 'My birthday is ___ July.', blank: '___ July', options: ['in', 'on', 'at', 'from'], answer: 0, answerThai: 'วันเกิดของฉันอยู่ในเดือนกรกฎาคม', hint: 'เดือนใช้ in' },
+    { id: 'aif10', sentence: 'I like ___ badminton.', blank: 'like ___ badminton', options: ['playing', 'play', 'plays', 'played'], answer: 0, answerThai: 'ฉันชอบเล่นแบดมินตัน', hint: 'like + V-ing' },
+  ],
+  about_sentence_builder: [
+    { id: 'asb5', words: ['in', 'I', 'Udon Thani', 'live'], correct: 'I live in Udon Thani' },
+    { id: 'asb6', words: ['drawing', 'hobby', 'My', 'is'], correct: 'My hobby is drawing' },
+    { id: 'asb7', words: ['birthday', 'May', 'is', 'My', 'in'], correct: 'My birthday is in May' },
+    { id: 'asb8', words: ['student', 'grade-six', 'a', 'am', 'I'], correct: 'I am a grade-six student' },
+    { id: 'asb9', words: ['doctor', 'be', 'want', 'a', 'to', 'I'], correct: 'I want to be a doctor' },
+    { id: 'asb10', words: ['people', 'family', 'five', 'my', 'There', 'in', 'are'], correct: 'There are five people in my family' },
+  ],
+  family_relation_flip: [
+    { id: 'frf7', front: 'cousin', frontLabel: 'cousin', back: 'cousin', backThai: 'ลูกพี่ลูกน้อง', hint: "your aunt's or uncle's child", image: '/learning/family/cousin-v1.png', imageAlt: 'ลูกพี่ลูกน้องสองคนกำลังแตะมือกันอย่างสนุกสนาน' },
+    { id: 'frf8', front: 'son', frontLabel: 'son', back: 'son', backThai: 'ลูกชาย', hint: 'a male child', image: '/learning/family/son-v1.png', imageAlt: 'พ่อแนะนำลูกชายที่ยืนอยู่ข้างกัน' },
+    { id: 'frf9', front: 'daughter', frontLabel: 'daughter', back: 'daughter', backThai: 'ลูกสาว', hint: 'a female child', image: '/learning/family/daughter-v1.png', imageAlt: 'แม่แนะนำลูกสาวที่ยืนอยู่ข้างกัน' },
+    { id: 'frf10', front: 'relatives', frontLabel: 'relatives', back: 'relatives', backThai: 'ญาติ', hint: 'people in your extended family', image: '/learning/family/relatives-v1.png', imageAlt: 'กลุ่มญาติหลายวัยถ่ายภาพครอบครัวร่วมกัน' },
+  ],
+  family_relation_match: [
+    { id: 'frm5', left: "mother's mother", leftThai: 'แม่ของแม่', right: 'grandmother' },
+    { id: 'frm6', left: "aunt's daughter", leftThai: 'ลูกสาวของป้า', right: 'cousin' },
+    { id: 'frm7', left: "parents' male child", leftThai: 'ลูกผู้ชายของพ่อแม่', right: 'son' },
+    { id: 'frm8', left: "parents' female child", leftThai: 'ลูกผู้หญิงของพ่อแม่', right: 'daughter' },
+    { id: 'frm9', left: "sister's husband", leftThai: 'สามีของพี่สาวหรือน้องสาว', right: 'brother-in-law' },
+    { id: 'frm10', left: "brother's wife", leftThai: 'ภรรยาของพี่ชายหรือน้องชาย', right: 'sister-in-law' },
+  ],
+  family_pronoun_fill: [
+    { id: 'fpf5', sentence: 'My sister likes music. ___ plays the guitar.', blank: '___ plays', options: ['She', 'He', 'They', 'It'], answer: 0, answerThai: 'เธอเล่นกีตาร์', hint: 'sister = she' },
+    { id: 'fpf6', sentence: 'My uncle is a chef. ___ cooks very well.', blank: '___ cooks', options: ['He', 'She', 'They', 'We'], answer: 0, answerThai: 'เขาทำอาหารเก่ง', hint: 'uncle = he' },
+    { id: 'fpf7', sentence: 'Anna and I visit ___ aunt.', blank: '___ aunt', options: ['our', 'their', 'his', 'its'], answer: 0, answerThai: 'พวกเราไปเยี่ยมป้า', hint: 'Anna and I = we → our' },
+    { id: 'fpf8', sentence: 'The baby is playing with ___ toy.', blank: '___ toy', options: ['its', 'their', 'our', 'your'], answer: 0, answerThai: 'เด็กทารกเล่นของเล่นของตน', hint: 'baby = it → its' },
+    { id: 'fpf9', sentence: 'My cousins live nearby. ___ house is blue.', blank: '___ house', options: ['Their', 'His', 'Her', 'Its'], answer: 0, answerThai: 'บ้านของพวกเขาสีฟ้า', hint: 'cousins = they → their' },
+    { id: 'fpf10', sentence: 'You and your brother should help ___ parents.', blank: '___ parents', options: ['your', 'our', 'his', 'my'], answer: 0, answerThai: 'คุณควรช่วยพ่อแม่ของคุณ', hint: 'you → your' },
+  ],
+  school_object_flip: [
+    { id: 'sof7', front: 'laboratory', frontLabel: 'laboratory', back: 'laboratory', backThai: 'ห้องทดลอง', hint: 'a place for science experiments', image: '/learning/classroom/laboratory-v1.png', imageAlt: 'นักเรียนทดลองวิทยาศาสตร์ในห้องทดลองพร้อมอุปกรณ์นิรภัย' },
+    { id: 'sof8', front: 'gym', frontLabel: 'gym', back: 'gym', backThai: 'โรงยิม', hint: 'a place for exercise', image: '/learning/classroom/gym-v1.png', imageAlt: 'นักเรียนออกกำลังกายในโรงยิมที่มีอุปกรณ์กีฬา' },
+    { id: 'sof9', front: 'uniform', frontLabel: 'uniform', back: 'uniform', backThai: 'ชุดนักเรียน', hint: 'students wear it', image: '/learning/classroom/uniform-v1.png', imageAlt: 'ชุดนักเรียนครบชุดพร้อมกระเป๋า รองเท้า และถุงเท้า' },
+    { id: 'sof10', front: 'principal', frontLabel: 'principal', back: 'principal', backThai: 'ผู้อำนวยการโรงเรียน', hint: 'the head of a school', image: '/learning/classroom/principal-v1.png', imageAlt: 'ผู้อำนวยการโรงเรียนยืนถือแฟ้มและกล่าวต้อนรับ' },
+  ],
+  school_place_match: [
+    { id: 'spm5', left: 'use a computer', leftThai: 'ใช้คอมพิวเตอร์', right: 'computer room' },
+    { id: 'spm6', left: 'meet the principal', leftThai: 'พบผู้อำนวยการ', right: "principal's office" },
+    { id: 'spm7', left: 'play outside', leftThai: 'เล่นกลางแจ้ง', right: 'playground' },
+    { id: 'spm8', left: 'learn music', leftThai: 'เรียนดนตรี', right: 'music room' },
+    { id: 'spm9', left: 'see the school nurse', leftThai: 'พบพยาบาลโรงเรียน', right: 'first-aid room' },
+    { id: 'spm10', left: 'attend the morning assembly', leftThai: 'เข้าแถวตอนเช้า', right: 'school hall' },
+  ],
+  school_notice_fill: [
+    { id: 'snf5', sentence: 'NO FOOD OR DRINK IN THE ___.', blank: 'IN THE ___', options: ['computer room', 'sandwich', 'uniform', 'Monday'], answer: 0, answerThai: 'ห้ามอาหารและเครื่องดื่มในห้องคอมพิวเตอร์', hint: 'ต้องเป็นสถานที่' },
+    { id: 'snf6', sentence: 'The school bus leaves at ___ o’clock.', blank: 'at ___ o’clock', options: ['four', 'library', 'quiet', 'uniform'], answer: 0, answerThai: 'รถโรงเรียนออกเวลาสี่โมง', hint: 'ต้องเป็นตัวเลขบอกเวลา' },
+    { id: 'snf7', sentence: 'Please ___ your hand before speaking.', blank: '___ your hand', options: ['raise', 'eat', 'close', 'wear'], answer: 0, answerThai: 'กรุณายกมือก่อนพูด', hint: 'raise your hand' },
+    { id: 'snf8', sentence: 'Do not ___ in the hallway.', blank: 'Do not ___', options: ['run', 'read', 'study', 'write'], answer: 0, answerThai: 'ห้ามวิ่งในทางเดิน', hint: 'กฎความปลอดภัย' },
+    { id: 'snf9', sentence: 'Return library books by ___.', blank: 'by ___', options: ['Friday', 'pencil', 'lunch', 'teacher'], answer: 0, answerThai: 'คืนหนังสือภายในวันศุกร์', hint: 'กำหนดส่งเป็นวัน' },
+    { id: 'snf10', sentence: 'Keep the classroom ___.', blank: 'classroom ___', options: ['clean', 'tall', 'sweet', 'expensive'], answer: 0, answerThai: 'รักษาห้องเรียนให้สะอาด', hint: 'classroom rule' },
+  ],
+};
+
+const ROUND_COLLECTION_BY_TYPE = {
+  flashcard: 'cards', matching: 'pairs', spell: 'items', fill_blank: 'questions',
+  conversation: 'scenes', voice: 'sentences', story_tap: 'passages', rearrange: 'wordSentences',
+};
+
+function completeChapterOneMissions(missionGroups) {
+  return Object.fromEntries(Object.entries(missionGroups).map(([questId, missions]) => [questId, missions.map((sourceMission) => {
+    const mission = { ...sourceMission };
+    const collectionKey = ROUND_COLLECTION_BY_TYPE[mission.type];
+    const rounds = mission[collectionKey];
+    if (!Array.isArray(rounds)) return mission;
+    mission[collectionKey] = rounds.length >= 10
+      ? rounds.slice(0, 10)
+      : [...rounds, ...(TEN_ROUND_ADDITIONS[mission.id] || [])];
+    return mission;
+  })]));
+}
+
 // ── Export all missions grouped by questId ────────────────────
-export const CH1_MISSIONS = {
+// Vocab Drill consumes the full learning decks; Game Missions consume the
+// normalized ten-round copy.
+export const CH1_LEARNING_DECKS = {
+  about_myself: aboutMissions,
+  family: familyMissions,
+  school: schoolMissions,
   vocabulary: vocabularyMissions,
   signs: signsMissions,
   directions: directionsMissions,
@@ -486,6 +766,8 @@ export const CH1_MISSIONS = {
   reading: readingMissions,
   grammar: grammarMissions,
 };
+
+export const CH1_MISSIONS = completeChapterOneMissions(CH1_LEARNING_DECKS);
 
 export function getMissionsForQuest(questId) {
   return CH1_MISSIONS[questId] || [];
