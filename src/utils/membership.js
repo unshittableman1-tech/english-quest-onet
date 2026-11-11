@@ -99,9 +99,27 @@ export function createMembershipService(client) {
     const rows = check(await client.from('school_members')
       .select('id,school_id,user_id,role,status,school:schools(id,code,name,status)')
       .eq('user_id', user.id).eq('status', 'active'));
-    const memberships = (rows || []).filter((row) => row.user_id === user.id
+    let memberships = (rows || []).filter((row) => row.user_id === user.id
       && row.status === 'active' && ['teacher', 'school_admin'].includes(row.role)
       && row.school?.id === row.school_id && row.school.status === 'active');
+
+    if (admin?.user_id !== user.id && memberships.length === 0) {
+      // Automatically attempt to claim any pending school admin invitation matching caller email
+      try {
+        const { data: claimResult } = await client.rpc('school_admin_claim_pending_invitation');
+        if (claimResult?.ok) {
+          const freshRows = check(await client.from('school_members')
+            .select('id,school_id,user_id,role,status,school:schools(id,code,name,status)')
+            .eq('user_id', user.id).eq('status', 'active'));
+          memberships = (freshRows || []).filter((row) => row.user_id === user.id
+            && row.status === 'active' && ['teacher', 'school_admin'].includes(row.role)
+            && row.school?.id === row.school_id && row.school.status === 'active');
+        }
+      } catch (claimErr) {
+        console.warn('Membership auto-claim notice:', claimErr?.message);
+      }
+    }
+
     if (admin?.user_id !== user.id && memberships.length === 0) throw new MembershipError('no_membership');
     return { userId: user.id, email: user.email, isPlatformAdmin: admin?.user_id === user.id, memberships };
   }

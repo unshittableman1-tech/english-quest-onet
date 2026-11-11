@@ -4,7 +4,7 @@ import { useApp } from '../App';
 import { hasSupabaseConfig, supabaseConfig } from '../config/runtimeMode';
 import { getAllSchools } from '../utils/schoolStorage';
 import {
-  generateInvitationToken, platformCreateSchoolWithInvitation, platformListAccountDirectory,
+  autoProvisionAdminAccount, generateInvitationToken, platformCreateSchoolWithInvitation, platformListAccountDirectory,
   platformListPlansAndSubscriptions, platformListSchools, platformRevokeInvitation,
   platformSetSchoolStatus, setTeacherMembership, sha256Hex,
 } from '../utils/schoolAdmin';
@@ -50,8 +50,9 @@ export default function SuperAdminDashboard() {
   const blankForm = () => {
     const defaultPlan = plans.find(p => p.is_active && (p.code === 'school_growth' || p.code === 'school_starter'))
       || plans.find(p => p.is_active);
+    const randomDigits = Math.floor(1000 + Math.random() * 9000);
     return {
-      code: '',
+      code: `SCH${Math.floor(10 + Math.random() * 90)}`,
       name: '',
       province: '',
       area: '',
@@ -61,6 +62,8 @@ export default function SuperAdminDashboard() {
       startsAt: new Date().toISOString().slice(0, 10),
       endsAt: new Date(Date.now() + 365 * 86400000).toISOString().slice(0, 10),
       adminEmail: '',
+      initialPassword: `Onet@${randomDigits}`,
+      instantAccount: true,
       applicationId: null,
     };
   };
@@ -105,6 +108,7 @@ export default function SuperAdminDashboard() {
     const targetPlan = plans.find(p => p.is_active && (p.code === app.packageInterest || p.id === app.packageInterest))
       || plans.find(p => p.is_active && (p.code === 'school_growth' || p.code === 'school_starter'))
       || plans.find(p => p.is_active);
+    const randomDigits = Math.floor(1000 + Math.random() * 9000);
     setForm({
       code: candidateCode.slice(0, 6),
       name: app.schoolName || '',
@@ -116,6 +120,8 @@ export default function SuperAdminDashboard() {
       startsAt: new Date().toISOString().slice(0, 10),
       endsAt: new Date(Date.now() + durationDays * 86400000).toISOString().slice(0, 10),
       adminEmail: app.contactEmail || '',
+      initialPassword: `Onet@${randomDigits}`,
+      instantAccount: true,
       applicationId: app.id,
     });
     setStep(1);
@@ -173,10 +179,31 @@ export default function SuperAdminDashboard() {
         });
       }
 
-      setInviteResult({ schoolName: form.name, email: form.adminEmail, link: `${window.location.origin}${window.location.pathname}?invitation_token=${token}` });
+      // Pre-provision account in Supabase Auth if instant account enabled
+      if (form.instantAccount && form.initialPassword) {
+        try {
+          await autoProvisionAdminAccount(form.adminEmail, form.initialPassword);
+        } catch (provErr) {
+          console.warn('Auto-provision account notice:', provErr);
+        }
+      }
+
+      const activePlan = activePlans.find(p => p.id === form.planId);
+      const effectiveSeats = form.customSeats ? `${form.customSeats}` : `${activePlan?.max_students || 60}`;
+      const magicLink = `${window.location.origin}${window.location.pathname}?invitation_token=${token}`;
+
+      setInviteResult({
+        schoolName: form.name.trim(),
+        schoolCode: form.code.trim().toUpperCase(),
+        email: form.adminEmail.trim().toLowerCase(),
+        password: form.instantAccount ? form.initialPassword : null,
+        planName: activePlan?.name || 'School Plan',
+        seats: effectiveSeats,
+        link: magicLink,
+      });
       setWizard(false);
       await refresh();
-      showToast('✅ สร้างโรงเรียนและคำเชิญบนเซิร์ฟเวอร์สำเร็จแล้ว');
+      showToast('✅ สร้างโรงเรียนและบัญชีผู้ดูแลสำเร็จแล้ว');
     } catch (err) {
       showToast(`❌ สร้างโรงเรียนไม่สำเร็จ: ${translateError(err?.message || 'เกิดข้อผิดพลาด')}`);
     } finally {
@@ -217,7 +244,116 @@ export default function SuperAdminDashboard() {
       {tab === 'system' && <SystemStatus local={localStaging} error={error} />}
     </main>
     {wizard && <Wizard step={step} setStep={setStep} form={form} setForm={setForm} activePlans={activePlans} close={() => setWizard(false)} goNext={goNext} createSchool={createSchool} saving={saving} />}
-    {inviteResult && <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/85 p-4 backdrop-blur-md"><div className="w-full max-w-lg rounded-3xl border border-emerald-500/30 bg-slate-900 p-6"><h2 className="text-xl font-black text-emerald-300">สร้างโรงเรียนและคำเชิญสำเร็จ</h2><p className="mt-2 text-sm">{inviteResult.schoolName} · {inviteResult.email}</p><div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 text-xs leading-5 text-amber-200">สร้างคำเชิญแล้ว แต่ยังไม่มีบริการส่งอีเมลอัตโนมัติใน browser flow นี้ โปรดส่งลิงก์ผ่านช่องทางที่ปลอดภัย หากคัดลอกไม่สำเร็จ ให้เปิดรายการคำเชิญแทนการสร้างโรงเรียนซ้ำ</div><input readOnly value={inviteResult.link} className="mt-4 w-full rounded-xl border border-white/10 bg-slate-950 p-3 text-xs" /><div className="mt-4 flex gap-2"><button onClick={copyLink} className="min-h-11 flex-1 rounded-xl bg-amber-400 font-black text-slate-950">คัดลอกลิงก์</button><button onClick={() => setInviteResult(null)} className="min-h-11 rounded-xl border border-white/10 px-5 font-bold">ปิด</button></div></div></div>}
+    {inviteResult && (
+      <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/85 p-4 backdrop-blur-md animate-fade-in">
+        <div className="w-full max-w-xl rounded-3xl border border-emerald-500/40 bg-slate-900 p-6 text-white shadow-2xl space-y-4">
+          <div className="flex items-start justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center gap-2.5">
+              <span className="text-3xl">🎉</span>
+              <div>
+                <h2 className="text-lg font-black text-emerald-300">สร้างโรงเรียนและบัญชีผู้ดูแลสำเร็จ!</h2>
+                <p className="text-xs text-slate-300">{inviteResult.schoolName} ({inviteResult.schoolCode})</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setInviteResult(null)}
+              className="text-slate-400 hover:text-white text-xl p-1 rounded-lg"
+              title="ปิด"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-white/10 font-bold">
+              📦 {inviteResult.planName}
+            </span>
+            <span className="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
+              👥 โควตา {inviteResult.seats} ที่นั่ง
+            </span>
+            <span className="px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30 font-bold">
+              ✉️ {inviteResult.email}
+            </span>
+          </div>
+
+          {/* Formatted LINE Message Box */}
+          <div className="rounded-2xl border border-emerald-500/30 bg-slate-950 p-4 space-y-2">
+            <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
+              <span>💬 ข้อความสำหรับส่ง LINE ให้คุณครู (คลิกเดียวส่งต่อได้ทันที):</span>
+              <span className="text-[10px] text-slate-400 font-normal">พร้อมส่งทันที</span>
+            </div>
+            <pre className="text-xs text-slate-200 whitespace-pre-wrap font-sans leading-relaxed bg-slate-900/70 p-3 rounded-xl border border-white/5 select-all max-h-56 overflow-y-auto">
+{`🏫 ขอต้อนรับ โรงเรียน${inviteResult.schoolName} เข้าสู่ English Quest AI!
+
+✨ แพ็กเกจ: ${inviteResult.planName} (${inviteResult.seats} ที่นั่ง)
+
+คุณครูสามารถเข้าใช้งานได้ทันที 2 ช่องทางครับ:
+
+👉 วิธีที่ 1 (แนะนำ - เข้าได้ทันทีในคลิกเดียว):
+${inviteResult.link}
+(คลิกแล้วเข้าใช้งานได้ทันที ไม่ต้องตรวจอีเมล)
+
+🔑 วิธีที่ 2 (เข้าสู่ระบบด้วยรหัสผ่าน):
+🌐 เว็บไซต์: https://english-o-net-adventure.web.app
+👤 อีเมล: ${inviteResult.email}
+🔒 รหัสผ่าน: ${inviteResult.password || '(ตามที่คุณครูตั้งไว้)'}
+
+หากมีข้อสงสัยสอบถามทีมงานได้ตลอดเวลาครับ 💙`}
+            </pre>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+            <button
+              onClick={() => {
+                const msg = `🏫 ขอต้อนรับ โรงเรียน${inviteResult.schoolName} เข้าสู่ English Quest AI!
+
+✨ แพ็กเกจ: ${inviteResult.planName} (${inviteResult.seats} ที่นั่ง)
+
+คุณครูสามารถเข้าใช้งานได้ทันที 2 ช่องทางครับ:
+
+👉 วิธีที่ 1 (แนะนำ - เข้าได้ทันทีในคลิกเดียว):
+${inviteResult.link}
+(คลิกแล้วเข้าใช้งานได้ทันที ไม่ต้องตรวจอีเมล)
+
+🔑 วิธีที่ 2 (เข้าสู่ระบบด้วยรหัสผ่าน):
+🌐 เว็บไซต์: https://english-o-net-adventure.web.app
+👤 อีเมล: ${inviteResult.email}
+🔒 รหัสผ่าน: ${inviteResult.password || '(ตามที่คุณครูตั้งไว้)'}
+
+หากมีข้อสงสัยสอบถามทีมงานได้ตลอดเวลาครับ 💙`;
+                navigator.clipboard.writeText(msg);
+                showToast('📋 คัดลอกข้อความ LINE สำเร็จ! นำไปวางในแชตได้ทันที');
+              }}
+              className="min-h-12 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 font-black text-slate-950 text-xs shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95"
+            >
+              <span>📋</span>
+              <span>คัดลอกข้อความส่ง LINE ให้คุณครู</span>
+            </button>
+
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(inviteResult.link);
+                showToast('🔗 คัดลอกเฉพาะ Magic Link เรียบร้อย');
+              }}
+              className="min-h-12 py-3 px-4 rounded-xl bg-amber-400 hover:bg-amber-300 font-black text-slate-950 text-xs shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95"
+            >
+              <span>🔗</span>
+              <span>คัดลอกเฉพาะ Magic Link</span>
+            </button>
+          </div>
+
+          <div className="text-center pt-1">
+            <button
+              onClick={() => setInviteResult(null)}
+              className="text-xs text-slate-400 hover:text-white py-1 px-4 font-bold"
+            >
+              เสร็จสิ้น / ปิดหน้าต่าง
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
   </div>;
 }
 
@@ -436,7 +572,16 @@ function Wizard({ step, setStep, form, setForm, activePlans, close, goNext, crea
         <form onSubmit={goNext} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="text-xs font-bold">
-              รหัสโรงเรียน *
+              <div className="flex items-center justify-between">
+                <span>รหัสโรงเรียน *</span>
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, code: `SCH${Math.floor(10 + Math.random() * 90)}` })}
+                  className="text-[10px] text-amber-300 hover:text-amber-200 underline font-normal"
+                >
+                  🎲 สุ่มรหัส
+                </button>
+              </div>
               <input
                 required
                 value={form.code}
@@ -638,12 +783,52 @@ function Wizard({ step, setStep, form, setForm, activePlans, close, goNext, crea
                 required
                 value={form.adminEmail}
                 onChange={e => setForm({ ...form, adminEmail: e.target.value })}
-                className={`${input} min-h-12 text-white`}
+                className={`${input} min-h-12 text-white font-mono`}
                 placeholder="admin@school.ac.th"
               />
             </label>
-            <p className="mt-2 text-xs text-slate-400">สร้างโรงเรียน สมาชิก และคำเชิญแบบ atomic ผ่าน RPC ไม่มีช่อง UUID และไม่ส่งรหัสผ่าน</p>
+            <p className="mt-2 text-xs text-slate-400">ระบบจะผูกสิทธิ์ผู้ดูแลโรงเรียนเข้ากับอีเมลนี้ทันที</p>
           </div>
+
+          {/* Instant Admin Account Section */}
+          <div className="rounded-2xl border border-amber-500/20 bg-slate-950 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <label className="text-xs font-bold text-amber-300">
+                  รหัสผ่านเริ่มต้นสำหรับคุณครู (Instant Pass)
+                </label>
+                <span className="block text-[11px] text-slate-400 mt-0.5">
+                  สร้างบัญชีให้คุณครูทันที สามารถส่งรหัสผ่านนี้ใน LINE ให้ครูล็อกอินเข้าได้เลย
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, initialPassword: `Onet@${Math.floor(1000 + Math.random() * 9000)}` })}
+                className="text-[10px] text-amber-300 hover:text-amber-200 font-bold underline shrink-0"
+              >
+                🎲 สุ่มรหัสใหม่
+              </button>
+            </div>
+            <input
+              type="text"
+              value={form.initialPassword}
+              onChange={e => setForm({ ...form, initialPassword: e.target.value })}
+              className={`${input} min-h-11 font-mono text-white`}
+              placeholder="เช่น Onet@2026"
+            />
+            <label className="flex items-center gap-2 cursor-pointer pt-1">
+              <input
+                type="checkbox"
+                checked={form.instantAccount}
+                onChange={e => setForm({ ...form, instantAccount: e.target.checked })}
+                className="h-4 w-4 rounded accent-emerald-500"
+              />
+              <span className="text-xs text-slate-300 font-bold">
+                เปิดใช้งานบัญชีทันที (คุณครูนำ User/Pass ไปล็อกอินเข้าได้เลย ไม่ต้องรออีเมลยืนยัน)
+              </span>
+            </label>
+          </div>
+
           <div className="rounded-2xl bg-slate-950 p-4 text-sm">
             <b>{form.name} ({form.code})</b>
             <div className="text-slate-400 mt-1">
@@ -661,8 +846,8 @@ function Wizard({ step, setStep, form, setForm, activePlans, close, goNext, crea
           </div>
           <div className="flex gap-2">
             <button type="button" onClick={() => setStep(1)} className="min-h-11 flex-1 rounded-xl border border-white/10 font-bold">← ย้อนกลับ</button>
-            <button disabled={saving} className="min-h-11 flex-1 rounded-xl bg-amber-400 font-black text-slate-950 disabled:opacity-50">
-              {saving ? 'กำลังสร้าง…' : 'สร้างและออกคำเชิญ'}
+            <button disabled={saving} className="min-h-11 flex-1 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 font-black text-slate-950 disabled:opacity-50 shadow-lg">
+              {saving ? 'กำลังสร้าง…' : '🚀 สร้างโรงเรียนและออกบัญชีทันที'}
             </button>
           </div>
         </form>
