@@ -7,6 +7,7 @@ import {
   autoProvisionAdminAccount, generateInvitationToken, platformCreateSchoolWithInvitation, platformListAccountDirectory,
   platformListPlansAndSubscriptions, platformListSchools, platformRevokeInvitation,
   platformSetSchoolStatus, setTeacherMembership, sha256Hex,
+  platformUpdateSchool, platformDeleteSchool,
 } from '../utils/schoolAdmin';
 import { listSchoolApplications, updateSchoolApplicationStatus } from '../utils/schoolApplications';
 
@@ -47,6 +48,24 @@ export default function SuperAdminDashboard() {
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [inviteResult, setInviteResult] = useState(null);
+
+  // Edit School state
+  const [editingSchool, setEditingSchool] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    code: '',
+    province: '',
+    area: '',
+    planId: '',
+    customSeats: '',
+    subscriptionStatus: 'active',
+    endsAt: '',
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  // Delete School state
+  const [deletingSchool, setDeletingSchool] = useState(null);
+  const [savingDelete, setSavingDelete] = useState(false);
   const blankForm = () => {
     const defaultPlan = plans.find(p => p.is_active && (p.code === 'school_growth' || p.code === 'school_starter'))
       || plans.find(p => p.is_active);
@@ -222,6 +241,66 @@ export default function SuperAdminDashboard() {
   };
 
   const changeSchool = async school => { try { await platformSetSchoolStatus(school.id, school.status === 'active' ? 'suspended' : 'active'); await refresh(); showToast('✅ อัปเดตสถานะโรงเรียนแล้ว'); } catch (err) { showToast(`❌ ${err?.message || 'เซิร์ฟเวอร์ปฏิเสธคำขอ'}`); } };
+
+  const openEditSchool = school => {
+    const sub = subscriptions.find(x => x.school_id === school.id);
+    const targetPlan = plans.find(p => p.id === sub?.plan_id) || plans.find(p => p.name === school.planName) || plans[0];
+    setEditForm({
+      name: school.name || '',
+      code: school.code || '',
+      province: school.province || '',
+      area: school.area || '',
+      planId: targetPlan?.id || '',
+      customSeats: sub?.max_students_override != null ? String(sub.max_students_override) : (school.quota ? String(school.quota) : ''),
+      subscriptionStatus: school.subscriptionStatus || sub?.status || 'active',
+      endsAt: school.expiresAt ? new Date(school.expiresAt).toISOString().slice(0, 10) : (sub?.ends_at ? new Date(sub.ends_at).toISOString().slice(0, 10) : ''),
+    });
+    setEditingSchool(school);
+  };
+
+  const saveEditSchool = async e => {
+    e.preventDefault();
+    if (!editingSchool) return;
+    setSavingEdit(true);
+    try {
+      await platformUpdateSchool(editingSchool.id, {
+        schoolName: editForm.name,
+        schoolCode: editForm.code,
+        schoolProvince: editForm.province,
+        schoolArea: editForm.area,
+        planId: editForm.planId || null,
+        maxStudentsOverride: editForm.customSeats ? parseInt(editForm.customSeats, 10) : -1,
+        subscriptionStatus: editForm.subscriptionStatus,
+        subscriptionEndsAt: editForm.endsAt ? new Date(editForm.endsAt).toISOString() : null,
+      });
+      showToast('✅ บันทึกการแก้ไขโรงเรียนเรียบร้อยแล้ว');
+      setEditingSchool(null);
+      await refresh();
+    } catch (err) {
+      showToast(`❌ แก้ไขไม่สำเร็จ: ${err?.message || 'เกิดข้อผิดพลาด'}`);
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const openDeleteSchool = school => {
+    setDeletingSchool(school);
+  };
+
+  const confirmDeleteSchool = async () => {
+    if (!deletingSchool) return;
+    setSavingDelete(true);
+    try {
+      await platformDeleteSchool(deletingSchool.id);
+      showToast('🗑️ ลบโรงเรียนและข้อมูลที่เกี่ยวข้องเรียบร้อยแล้ว');
+      setDeletingSchool(null);
+      await refresh();
+    } catch (err) {
+      showToast(`❌ ลบไม่สำเร็จ: ${err?.message || 'เกิดข้อผิดพลาด'}`);
+    } finally {
+      setSavingDelete(false);
+    }
+  };
   const changeTeacher = async account => { try { await setTeacherMembership(account.schoolId, account.userId, account.status !== 'active'); await refresh(); showToast('✅ อัปเดตสถานะครูแล้ว'); } catch (err) { showToast(`❌ ${err?.message || 'เซิร์ฟเวอร์ปฏิเสธคำขอ'}`); } };
   const revoke = async invitation => { try { await platformRevokeInvitation(invitation.invitation_id || invitation.id); await refresh(); showToast('✅ ยกเลิกคำเชิญแล้ว'); } catch (err) { showToast(`❌ ${err?.message || 'เซิร์ฟเวอร์ปฏิเสธคำขอ'}`); } };
   const copyLink = async () => { await navigator.clipboard.writeText(inviteResult.link); showToast('📋 คัดลอกลิงก์แล้ว'); };
@@ -237,13 +316,15 @@ export default function SuperAdminDashboard() {
     <main className="mx-auto max-w-[1500px] space-y-5 p-4 lg:p-8">
       {loading && <div role="status" className="rounded-2xl border border-sky-500/20 bg-sky-500/10 p-4 text-sm font-bold text-sky-200">กำลังโหลดข้อมูลที่ยืนยันจากเซิร์ฟเวอร์…</div>}
       {error && <div role="alert" className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm font-bold text-rose-200">{error}</div>}
-      {tab === 'schools' && <Schools schools={visibleSchools} allSchools={schools} subscriptions={subscriptions} students={verifiedStudents} local={localStaging} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} changeSchool={changeSchool} />}
+      {tab === 'schools' && <Schools schools={visibleSchools} allSchools={schools} subscriptions={subscriptions} students={verifiedStudents} local={localStaging} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} changeSchool={changeSchool} openEditSchool={openEditSchool} openDeleteSchool={openDeleteSchool} />}
       {tab === 'applications' && <Applications applications={visibleApplications} allApplications={applications} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} onApprove={openWizardWithApp} onReject={rejectApp} />}
       {tab === 'users' && <Users accounts={visibleAccounts} invitations={invitations} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} changeTeacher={changeTeacher} revoke={revoke} />}
       {tab === 'plans' && <Plans plans={plans} subscriptions={subscriptions} schools={schools} />}
       {tab === 'system' && <SystemStatus local={localStaging} error={error} />}
     </main>
     {wizard && <Wizard step={step} setStep={setStep} form={form} setForm={setForm} activePlans={activePlans} close={() => setWizard(false)} goNext={goNext} createSchool={createSchool} saving={saving} />}
+    {editingSchool && <EditSchoolModal school={editingSchool} form={editForm} setForm={setEditForm} activePlans={activePlans} onClose={() => setEditingSchool(null)} onSave={saveEditSchool} saving={savingEdit} />}
+    {deletingSchool && <DeleteSchoolModal school={deletingSchool} onClose={() => setDeletingSchool(null)} onConfirm={confirmDeleteSchool} saving={savingDelete} />}
     {inviteResult && (
       <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/85 p-4 backdrop-blur-md animate-fade-in">
         <div className="w-full max-w-xl rounded-3xl border border-emerald-500/40 bg-slate-900 p-6 text-white shadow-2xl space-y-4">
@@ -513,9 +594,9 @@ function Applications({ applications, allApplications, search, setSearch, filter
   </>;
 }
 
-function Schools({ schools, allSchools, subscriptions, students, local, search, setSearch, filter, setFilter, changeSchool }) {
+function Schools({ schools, allSchools, subscriptions, students, local, search, setSearch, filter, setFilter, changeSchool, openEditSchool, openDeleteSchool }) {
   const stats = [['🏫', allSchools.length, 'โรงเรียนทั้งหมด', `${allSchools.filter(s => s.status === 'active').length} ใช้งานอยู่`], ['🎒', students ?? '—', 'นักเรียน Active', students == null ? 'ข้อมูลไม่พร้อม' : 'ยืนยันจากสมาชิก'], ['🧾', subscriptions.length, 'สัญญาสมาชิก', 'แยกจากสถานะโรงเรียน'], ['🛡️', local ? 'Local' : 'ไม่ยืนยัน', 'Environment', 'ไม่ใช่ Production Ready']];
-  return <><section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{stats.map(([icon, value, label, detail]) => <div key={label} className="rounded-2xl border border-white/10 bg-slate-900/80 p-5"><div className="text-2xl"><UIIcon value={icon} /></div><div className="mt-3 text-3xl font-black">{value}</div><div className="text-sm font-bold">{label}</div><div className="mt-1 text-xs text-slate-500">{detail}</div></div>)}</section><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-4"><Toolbar search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} type="schools" />{schools.length === 0 ? <Empty title="ไม่พบโรงเรียน" detail="ข้อมูลจะแสดงเมื่อเซิร์ฟเวอร์อนุญาต" /> : <div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm"><thead><tr className="border-b border-white/10 text-xs text-slate-500"><th className="p-3">โรงเรียน</th><th className="p-3">แผน / สมาชิก</th><th className="p-3">นักเรียน / ที่นั่ง</th><th className="p-3">หมดอายุ</th><th className="p-3">สถานะโรงเรียน</th><th className="p-3 text-right">จัดการ</th></tr></thead><tbody>{schools.map(s => <tr key={s.id} className="border-b border-white/5"><td className="p-3"><b>{s.name}</b><div className="font-mono text-xs text-amber-300">{s.code}</div><div className="text-xs text-slate-500">{[s.area, s.province].filter(Boolean).join(' · ') || 'ไม่ระบุพื้นที่'}</div></td><td className="p-3">{s.planName || 'ไม่พร้อมใช้งาน'}<div className="mt-1"><Badge tone={s.subscriptionStatus === 'active' ? 'green' : 'amber'}>{s.subscriptionStatus || 'ไม่พบสมาชิก'}</Badge></div></td><td className="p-3 font-bold">{Number.isFinite(s.activeStudents) ? s.activeStudents : '—'} / {Number.isFinite(s.quota) ? s.quota : '—'}</td><td className="p-3">{fmtDate(s.expiresAt)}</td><td className="p-3"><Badge tone={s.status === 'active' ? 'green' : 'red'}>{s.status}</Badge></td><td className="p-3 text-right"><button onClick={() => changeSchool(s)} className="min-h-10 rounded-xl border border-white/10 px-3 text-xs font-bold">{s.status === 'active' ? 'ระงับโรงเรียน' : 'เปิดใช้งาน'}</button> <button disabled title="ยังไม่มี Server API" className="min-h-10 cursor-not-allowed rounded-xl border border-white/10 px-3 text-xs text-slate-600">แก้ไข</button></td></tr>)}</tbody></table></div>}</section></>;
+  return <><section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{stats.map(([icon, value, label, detail]) => <div key={label} className="rounded-2xl border border-white/10 bg-slate-900/80 p-5"><div className="text-2xl"><UIIcon value={icon} /></div><div className="mt-3 text-3xl font-black">{value}</div><div className="text-sm font-bold">{label}</div><div className="mt-1 text-xs text-slate-500">{detail}</div></div>)}</section><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-4"><Toolbar search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} type="schools" />{schools.length === 0 ? <Empty title="ไม่พบโรงเรียน" detail="ข้อมูลจะแสดงเมื่อเซิร์ฟเวอร์อนุญาต" /> : <div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm"><thead><tr className="border-b border-white/10 text-xs text-slate-500"><th className="p-3">โรงเรียน</th><th className="p-3">แผน / สมาชิก</th><th className="p-3">นักเรียน / ที่นั่ง</th><th className="p-3">หมดอายุ</th><th className="p-3">สถานะโรงเรียน</th><th className="p-3 text-right">จัดการ</th></tr></thead><tbody>{schools.map(s => <tr key={s.id} className="border-b border-white/5"><td className="p-3"><b>{s.name}</b><div className="font-mono text-xs text-amber-300">{s.code}</div><div className="text-xs text-slate-500">{[s.area, s.province].filter(Boolean).join(' · ') || 'ไม่ระบุพื้นที่'}</div></td><td className="p-3">{s.planName || 'ไม่พร้อมใช้งาน'}<div className="mt-1"><Badge tone={s.subscriptionStatus === 'active' ? 'green' : 'amber'}>{s.subscriptionStatus || 'ไม่พบสมาชิก'}</Badge></div></td><td className="p-3 font-bold">{Number.isFinite(s.activeStudents) ? s.activeStudents : '—'} / {Number.isFinite(s.quota) ? s.quota : '—'}</td><td className="p-3">{fmtDate(s.expiresAt)}</td><td className="p-3"><Badge tone={s.status === 'active' ? 'green' : 'red'}>{s.status}</Badge></td><td className="p-3 text-right"><div className="flex items-center justify-end gap-1.5 flex-wrap"><button onClick={() => changeSchool(s)} className={`min-h-9 rounded-xl border px-2.5 text-xs font-bold transition-colors ${s.status === 'active' ? 'border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20' : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'}`}>{s.status === 'active' ? 'ระงับ' : 'เปิดใช้งาน'}</button><button onClick={() => openEditSchool(s)} className="min-h-9 rounded-xl border border-sky-500/30 bg-sky-500/10 px-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition-colors" title="แก้ไขข้อมูลโรงเรียนและแพ็กเกจ">✏️ แก้ไข</button><button onClick={() => openDeleteSchool(s)} className="min-h-9 rounded-xl border border-rose-500/30 bg-rose-500/10 px-2.5 text-xs font-bold text-rose-300 hover:bg-rose-500/20 transition-colors" title="ลบโรงเรียนนี้ออกจากระบบ">🗑️ ลบ</button></div></td></tr>)}</tbody></table></div>}</section></>;
 }
 
 function Toolbar({ search, setSearch, filter, setFilter, type }) {
@@ -854,4 +935,225 @@ function Wizard({ step, setStep, form, setForm, activePlans, close, goNext, crea
       )}
     </div>
   </div>;
+}
+
+function EditSchoolModal({ school, form, setForm, activePlans, onClose, onSave, saving }) {
+  const input = 'mt-1 min-h-11 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-white';
+  const schoolPlans = activePlans.filter(p =>
+    p.code?.startsWith('school_') || p.code === 'superpower' || p.features?.allow_school_provisioning === true || p.features?.target === 'school'
+  );
+  const otherPlans = activePlans.filter(p => !schoolPlans.some(sp => sp.id === p.id));
+  const selectedPlan = activePlans.find(p => p.id === form.planId);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in">
+      <div className="glass-card-dark border border-sky-500/40 w-full max-w-xl p-6 rounded-3xl shadow-2xl text-white space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="flex items-center gap-2.5">
+            <span className="text-2xl">✏️</span>
+            <div>
+              <h2 className="text-base font-black text-sky-300">แก้ไขข้อมูลโรงเรียนและสมาชิก</h2>
+              <p className="text-[11px] text-slate-400">{school.name} ({school.code})</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-slate-400 hover:text-white text-xl p-1 rounded-lg">✕</button>
+        </div>
+
+        <form onSubmit={onSave} className="space-y-4 text-xs">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="font-bold">
+              รหัสโรงเรียน *
+              <input
+                required
+                value={form.code}
+                onChange={e => setForm({ ...form, code: e.target.value.toUpperCase().replace(/[^A-Z0-9_-]/g, '') })}
+                className={`${input} font-mono`}
+              />
+            </label>
+            <label className="font-bold">
+              ชื่อโรงเรียน *
+              <input
+                required
+                value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                className={input}
+              />
+            </label>
+            <label className="font-bold">
+              จังหวัด
+              <input
+                value={form.province}
+                onChange={e => setForm({ ...form, province: e.target.value })}
+                className={input}
+                placeholder="เช่น ปัตตานี"
+              />
+            </label>
+            <label className="font-bold">
+              เขตพื้นที่
+              <input
+                value={form.area}
+                onChange={e => setForm({ ...form, area: e.target.value })}
+                className={input}
+                placeholder="เช่น สพป. เขต 2"
+              />
+            </label>
+
+            <label className="font-bold sm:col-span-2">
+              แผนแพ็กเกจ
+              <select
+                value={form.planId}
+                onChange={e => setForm({ ...form, planId: e.target.value })}
+                className={input}
+              >
+                <option value="">-- เลือกแผน --</option>
+                <optgroup label="── แพ็กเกจระดับโรงเรียน ──">
+                  {schoolPlans.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} · {p.max_students} ที่นั่ง
+                    </option>
+                  ))}
+                </optgroup>
+                {otherPlans.length > 0 && (
+                  <optgroup label="── แพ็กเกจอื่น ๆ ──">
+                    {otherPlans.map(p => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} · {p.max_students} ที่นั่ง
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+            </label>
+
+            <label className="font-bold sm:col-span-2">
+              โควตานักเรียนกำหนดเอง (Custom Seats Override)
+              <div className="mt-1 flex items-center gap-2">
+                <input
+                  type="number"
+                  min="1"
+                  max="10000"
+                  value={form.customSeats}
+                  onChange={e => setForm({ ...form, customSeats: e.target.value.replace(/[^0-9]/g, '') })}
+                  className={`${input} mt-0 font-mono`}
+                  placeholder={`เว้นว่างไว้เพื่อใช้ตามแผน (${selectedPlan?.max_students || 60} ที่นั่ง)`}
+                />
+                {form.customSeats && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, customSeats: '' })}
+                    className="min-h-11 px-3 rounded-xl border border-white/10 bg-slate-800 text-xs font-bold text-slate-300 hover:text-white shrink-0"
+                  >
+                    ล้างค่า
+                  </button>
+                )}
+              </div>
+            </label>
+
+            <label className="font-bold">
+              สถานะสมาชิก
+              <select
+                value={form.subscriptionStatus}
+                onChange={e => setForm({ ...form, subscriptionStatus: e.target.value })}
+                className={input}
+              >
+                <option value="active">Active (ใช้งานปกติ)</option>
+                <option value="trialing">Trialing (ทดลองใช้)</option>
+                <option value="past_due">Past Due (เกินกำหนดชำระ)</option>
+                <option value="suspended">Suspended (ระงับชั่วคราว)</option>
+                <option value="expired">Expired (หมดอายุ)</option>
+              </select>
+            </label>
+
+            <label className="font-bold">
+              วันหมดอายุสมาชิก
+              <input
+                type="date"
+                value={form.endsAt}
+                onChange={e => setForm({ ...form, endsAt: e.target.value })}
+                className={input}
+              />
+            </label>
+          </div>
+
+          <div className="flex gap-2 pt-3 border-t border-white/10">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={saving}
+              className="min-h-11 flex-1 rounded-xl border border-white/10 font-bold hover:bg-slate-800"
+            >
+              ยกเลิก
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="min-h-11 flex-1 rounded-xl bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-300 hover:to-sky-400 font-black text-slate-950 shadow-lg disabled:opacity-50"
+            >
+              {saving ? 'กำลังบันทึก…' : '💾 บันทึกการแก้ไข'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function DeleteSchoolModal({ school, onClose, onConfirm, saving }) {
+  const [confirmCode, setConfirmCode] = useState('');
+  const canDelete = confirmCode.trim().toUpperCase() === school.code.toUpperCase() || confirmCode.trim() === school.name.trim();
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in">
+      <div className="glass-card-dark border border-rose-500/50 w-full max-w-md p-6 rounded-3xl shadow-2xl text-white space-y-4">
+        <div className="flex items-center gap-3 border-b border-rose-500/20 pb-3">
+          <span className="text-3xl text-rose-400">⚠️</span>
+          <div>
+            <h2 className="text-base font-black text-rose-300">ยืนยันการลบโรงเรียน</h2>
+            <p className="text-[11px] text-slate-400">การดำเนินการนี้ไม่สามารถย้อนกลับได้</p>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-xs text-rose-200 leading-relaxed space-y-2">
+          <p>
+            คุณกำลังจะลบ <b>{school.name}</b> (รหัส: <code className="bg-slate-950/80 px-1.5 py-0.5 rounded font-mono text-amber-300">{school.code}</code>)
+          </p>
+          <p className="text-[11px] text-slate-300">
+            ระบบจะลบข้อมูลสมาชิก สัญญาสมัคร คำเชิญ สิทธิ์ครู/ผู้ดูแล และรายชื่อนักเรียนทั้งหมดของโรงเรียนนี้ออกจากระบบอย่างถาวร
+          </p>
+        </div>
+
+        <div className="space-y-1.5 text-xs">
+          <label className="text-slate-300 font-bold block">
+            พิมพ์รหัสโรงเรียน <span className="font-mono text-amber-300">{school.code}</span> เพื่อยืนยัน:
+          </label>
+          <input
+            type="text"
+            value={confirmCode}
+            onChange={e => setConfirmCode(e.target.value)}
+            placeholder={`พิมพ์ ${school.code} ที่นี่`}
+            className="w-full rounded-xl border border-rose-500/30 bg-slate-950 px-3.5 py-2.5 font-mono text-white text-xs outline-none focus:border-rose-400"
+          />
+        </div>
+
+        <div className="flex gap-2 pt-2 border-t border-white/10">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={saving}
+            className="min-h-11 flex-1 rounded-xl border border-white/10 font-bold hover:bg-slate-800 text-xs"
+          >
+            ยกเลิก
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={!canDelete || saving}
+            className="min-h-11 flex-1 rounded-xl bg-rose-600 hover:bg-rose-500 font-black text-white text-xs shadow-lg disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          >
+            {saving ? 'กำลังลบ…' : '🗑️ ยืนยันลบโรงเรียน'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -309,6 +309,43 @@ export async function platformSetSchoolStatus(schoolId, newStatus) {
 }
 
 /**
+ * Update school profile and subscription settings.
+ */
+export async function platformUpdateSchool(schoolId, params) {
+  const {
+    schoolName,
+    schoolCode,
+    schoolProvince = null,
+    schoolArea = null,
+    planId = null,
+    maxStudentsOverride = null,
+    subscriptionStatus = null,
+    subscriptionEndsAt = null,
+  } = params;
+
+  return callRpc('platform_admin_update_school', {
+    p_school_id: requireSchoolId(schoolId),
+    p_school_name: schoolName?.trim(),
+    p_school_code: schoolCode?.trim().toUpperCase(),
+    p_school_province: schoolProvince?.trim() || null,
+    p_school_area: schoolArea?.trim() || null,
+    p_plan_id: planId || null,
+    p_max_students_override: maxStudentsOverride !== null && maxStudentsOverride !== '' ? parseInt(maxStudentsOverride, 10) : null,
+    p_subscription_status: subscriptionStatus || null,
+    p_subscription_ends_at: subscriptionEndsAt || null,
+  });
+}
+
+/**
+ * Permanently delete school and all associated records.
+ */
+export async function platformDeleteSchool(schoolId) {
+  return callRpc('platform_admin_delete_school', {
+    p_school_id: requireSchoolId(schoolId),
+  });
+}
+
+/**
  * Onboard school and allocate subscription plan.
  */
 export async function platformCreateSchool(params) {
