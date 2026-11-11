@@ -1,777 +1,587 @@
-import UIIcon, { UIIconText } from './UIIcon';
-import { useState, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import UIIcon from './UIIcon';
 import { useApp } from '../App';
+import { hasSupabaseConfig, supabaseConfig } from '../config/runtimeMode';
+import { getAllSchools } from '../utils/schoolStorage';
 import {
-  getAllSchools, saveSchool, deleteSchool, updateSchoolStatus,
-  setActiveSchoolContext
-} from '../utils/schoolStorage';
+  generateInvitationToken, platformCreateSchoolWithInvitation, platformListAccountDirectory,
+  platformListPlansAndSubscriptions, platformListSchools, platformRevokeInvitation,
+  platformSetSchoolStatus, setTeacherMembership, sha256Hex,
+} from '../utils/schoolAdmin';
+import { listSchoolApplications, updateSchoolApplicationStatus } from '../utils/schoolApplications';
+
+const LIVE = hasSupabaseConfig;
+const ROLES = { platform_admin: 'Platform Admin', school_admin: 'School Admin', teacher: 'Teacher', student: 'Student' };
+const NAV = [
+  ['schools', '🏫', 'โรงเรียน'],
+  ['applications', '📋', 'คำขอสมัคร'],
+  ['users', '👥', 'ผู้ใช้งาน'],
+  ['plans', '🧾', 'แผนและสมาชิก'],
+  ['system', '🛡️', 'สถานะระบบ']
+];
+const fmtDate = (value) => value ? new Date(value).toLocaleDateString('th-TH') : 'ไม่พร้อมใช้งาน';
+const fmtMoney = (value, currency = 'THB') => value == null ? 'ไม่ระบุ' : new Intl.NumberFormat('th-TH', { style: 'currency', currency, maximumFractionDigits: 0 }).format(Number(value));
+
+function Badge({ children, tone = 'slate' }) {
+  const tones = { slate: 'border-slate-600/50 bg-slate-800 text-slate-300', green: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300', amber: 'border-amber-500/30 bg-amber-500/10 text-amber-300', red: 'border-rose-500/30 bg-rose-500/10 text-rose-300', blue: 'border-sky-500/30 bg-sky-500/10 text-sky-300' };
+  return <span className={`inline-flex min-h-7 items-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${tones[tone]}`}>{children}</span>;
+}
+function Empty({ title, detail }) {
+  return <div className="rounded-2xl border border-dashed border-white/15 bg-slate-950/30 px-5 py-10 text-center"><div className="text-3xl"><UIIcon value="📭" /></div><div className="mt-2 font-black">{title}</div><div className="mt-1 text-xs text-slate-400">{detail}</div></div>;
+}
 
 export default function SuperAdminDashboard() {
-  const { navigate, showToast } = useApp();
-  const [schools, setSchools] = useState(() => getAllSchools());
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [showAddEditModal, setShowAddEditModal] = useState(false);
-  const [editingSchool, setEditingSchool] = useState(null);
-  const [showShareModal, setShowShareModal] = useState(false);
-  const [shareTargetSchool, setShareTargetSchool] = useState(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-
-  // Theme
-  const [theme, setTheme] = useState(() => localStorage.getItem('teacher_theme') || 'dark');
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    localStorage.setItem('teacher_theme', next);
-  };
-
-  // Form State
-  const initialForm = {
-    code: '',
-    name: '',
-    area: '',
-    province: '',
-    contactTeacher: '',
-    email: '',
-    phone: '',
-    quota: 100,
-    status: 'active',
-    expiresAt: new Date(Date.now() + 365 * 86400000).toISOString().split('T')[0],
-    notes: ''
-  };
-  const [formData, setFormData] = useState(initialForm);
-
-  // Filtered Schools
-  const filteredSchools = useMemo(() => {
-    return schools.filter(s => {
-      const matchSearch =
-        s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (s.province && s.province.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (s.contactTeacher && s.contactTeacher.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchStatus = statusFilter === 'all' || s.status === statusFilter;
-      return matchSearch && matchStatus;
-    });
-  }, [schools, searchQuery, statusFilter]);
-
-  // Aggregate Stats
-  const totalSchools = schools.length;
-  const activeSchools = schools.filter(s => s.status === 'active').length;
-  const totalStudents = schools.reduce((sum, s) => sum + (s.activeStudents || 0), 0);
-  const totalCapacity = schools.reduce((sum, s) => sum + (s.quota || 0), 0);
-  const nationalAvg = schools.length > 0
-    ? Math.round((schools.reduce((sum, s) => sum + (s.avgScore || 0), 0) / schools.length) * 10) / 10
-    : 0;
-
-  // Actions
-  const handleOpenAdd = () => {
-    setEditingSchool(null);
-    setFormData(initialForm);
-    setShowAddEditModal(true);
-  };
-
-  const handleOpenEdit = (school) => {
-    setEditingSchool(school);
-    setFormData({
-      code: school.code,
-      name: school.name,
-      area: school.area || '',
-      province: school.province || '',
-      contactTeacher: school.contactTeacher || '',
-      email: school.email || '',
-      phone: school.phone || '',
-      quota: school.quota || 100,
-      status: school.status || 'active',
-      expiresAt: school.expiresAt || '',
-      notes: school.notes || ''
-    });
-    setShowAddEditModal(true);
-  };
-
-  const handleSaveSchool = (e) => {
-    e.preventDefault();
-    if (!formData.code.trim() || !formData.name.trim()) {
-      showToast('⚠️ กรุณากรอกรหัสโรงเรียนและชื่อโรงเรียน');
-      return;
-    }
-
-    const payload = {
-      ...(editingSchool ? editingSchool : {}),
-      ...formData,
-      code: formData.code.trim().toUpperCase(),
-      quota: Number(formData.quota) || 100
+  const { handleLogout, showToast } = useApp();
+  const [tab, setTab] = useState('schools');
+  const [schools, setSchools] = useState(() => LIVE ? [] : getAllSchools());
+  const [plans, setPlans] = useState([]);
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [accounts, setAccounts] = useState([]);
+  const [invitations, setInvitations] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [wizard, setWizard] = useState(false);
+  const [step, setStep] = useState(1);
+  const [saving, setSaving] = useState(false);
+  const [inviteResult, setInviteResult] = useState(null);
+  const blankForm = () => {
+    const defaultPlan = plans.find(p => p.is_active && (p.code === 'school_growth' || p.code === 'school_starter'))
+      || plans.find(p => p.is_active);
+    return {
+      code: '',
+      name: '',
+      province: '',
+      area: '',
+      planId: defaultPlan?.id || '',
+      subscriptionStatus: 'active',
+      startsAt: new Date().toISOString().slice(0, 10),
+      endsAt: new Date(Date.now() + 365 * 86400000).toISOString().slice(0, 10),
+      adminEmail: '',
+      applicationId: null,
     };
+  };
+  const [form, setForm] = useState(blankForm);
 
-    const updated = saveSchool(payload);
-    setSchools(updated);
-    setShowAddEditModal(false);
-    showToast(editingSchool ? '✅ บันทึกการแก้ไขเรียบร้อย' : '🎉 เพิ่มโรงเรียนใหม่สำเร็จ');
+  const refresh = useCallback(async () => {
+    setLoading(true); setError('');
+    try {
+      if (!LIVE) {
+        setSchools(getAllSchools());
+        const appRows = await listSchoolApplications();
+        setApplications(appRows || []);
+        setLoading(false);
+        return;
+      }
+      const [schoolRows, billing, appRows] = await Promise.all([
+        platformListSchools(),
+        platformListPlansAndSubscriptions(),
+        listSchoolApplications()
+      ]);
+      setSchools(schoolRows); setPlans(billing.plans); setSubscriptions(billing.subscriptions);
+      setApplications(appRows || []);
+      const directory = await platformListAccountDirectory(schoolRows);
+      setAccounts(directory.accounts); setInvitations(directory.invitations);
+    } catch (err) { setError(err?.message || 'ไม่สามารถโหลดข้อมูลที่ยืนยันจากเซิร์ฟเวอร์ได้'); }
+    finally { setLoading(false); }
+  }, []);
+  useEffect(() => { refresh(); }, [refresh]);
+
+  const localStaging = typeof window !== 'undefined' && ['127.0.0.1', 'localhost', '::1'].includes(window.location.hostname) && supabaseConfig.url === 'http://127.0.0.1:54321';
+  const activePlans = plans.filter(p => p.is_active);
+  const visibleSchools = useMemo(() => schools.filter(s => (!search || [s.code, s.name, s.province, s.area].some(v => String(v || '').toLowerCase().includes(search.toLowerCase()))) && (filter === 'all' || s.status === filter)), [schools, search, filter]);
+  const visibleAccounts = useMemo(() => accounts.filter(a => (!search || [a.displayName, a.email, a.secondaryId, a.schoolName].some(v => String(v || '').toLowerCase().includes(search.toLowerCase()))) && (filter === 'all' || a.role === filter)), [accounts, search, filter]);
+  const visibleApplications = useMemo(() => applications.filter(app => (!search || [app.referenceCode, app.schoolName, app.province, app.contactName, app.contactEmail].some(v => String(v || '').toLowerCase().includes(search.toLowerCase()))) && (filter === 'all' || app.status === filter)), [applications, search, filter]);
+  const verifiedStudents = schools.every(s => Number.isFinite(s.activeStudents)) ? schools.reduce((n, s) => n + s.activeStudents, 0) : null;
+
+  const openWizard = () => { setForm(blankForm()); setStep(1); setWizard(true); };
+
+  const openWizardWithApp = (app) => {
+    const candidateCode = (app.province?.slice(0, 3) || 'SCH').toUpperCase().replace(/[^A-Z]/g, 'SCH') + String(Math.floor(10 + Math.random() * 89));
+    const durationDays = app.billingCycle === 'semester' ? 152 : 365;
+    const targetPlan = plans.find(p => p.is_active && (p.code === app.packageInterest || p.id === app.packageInterest))
+      || plans.find(p => p.is_active && (p.code === 'school_growth' || p.code === 'school_starter'))
+      || plans.find(p => p.is_active);
+    setForm({
+      code: candidateCode.slice(0, 6),
+      name: app.schoolName || '',
+      province: app.province || '',
+      area: app.district || '',
+      planId: targetPlan?.id || '',
+      subscriptionStatus: app.packageInterest === 'trial' ? 'trialing' : 'active',
+      startsAt: new Date().toISOString().slice(0, 10),
+      endsAt: new Date(Date.now() + durationDays * 86400000).toISOString().slice(0, 10),
+      adminEmail: app.contactEmail || '',
+      applicationId: app.id,
+    });
+    setStep(1);
+    setWizard(true);
   };
 
-  const handleDelete = (id) => {
-    const updated = deleteSchool(id);
-    setSchools(updated);
-    setConfirmDeleteId(null);
-    showToast('🗑️ ลบโรงเรียนออกจากระบบแล้ว');
+  const goNext = e => {
+    e.preventDefault();
+    const cleanCode = form.code.trim().toUpperCase();
+    if (!cleanCode || !form.name.trim() || !form.planId || !form.startsAt || !form.endsAt) {
+      return showToast('⚠️ กรุณากรอกข้อมูลโรงเรียน แผน และช่วงสมาชิกให้ครบ');
+    }
+    if (!/^[A-Z0-9][A-Z0-9_-]{2,31}$/.test(cleanCode)) {
+      return showToast('⚠️ รหัสโรงเรียนต้องเป็นตัวอักษรภาษาอังกฤษหรือตัวเลข 3-32 ตัวอักษร (เช่น BNS02)');
+    }
+    if (new Date(form.endsAt) <= new Date(form.startsAt)) {
+      return showToast('⚠️ วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น');
+    }
+    setStep(2);
   };
 
-  const handleToggleStatus = (id, currentStatus) => {
-    const nextStatus = currentStatus === 'active' ? 'suspended' : 'active';
-    const updated = updateSchoolStatus(id, nextStatus);
-    setSchools(updated);
-    showToast(nextStatus === 'active' ? '🟢 เปิดใช้งานโรงเรียนแล้ว' : '⏸️ ระงับการใช้งานโรงเรียนแล้ว');
+  const translateError = (msg = '') => {
+    if (msg.includes('invalid_school_onboarding')) return 'รหัสโรงเรียนหรือชื่อโรงเรียนไม่ถูกต้อง (รหัสต้องเป็น A-Z หรือ 0-9 ความยาว 3-32 ตัวอักษร)';
+    if (msg.includes('school_code_already_exists')) return 'รหัสโรงเรียนนี้มีอยู่ในระบบแล้ว โปรดใช้รหัสอื่น';
+    if (msg.includes('invalid_school_subscription')) return 'ช่วงเวลาสมาชิกไม่ถูกต้อง วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น';
+    if (msg.includes('plan_unavailable')) return 'แผนสมาชิกที่เลือกไม่พร้อมใช้งาน';
+    if (msg.includes('invalid_admin_email')) return 'รูปแบบอีเมล School Admin ไม่ถูกต้อง';
+    if (msg.includes('platform_admin_forbidden')) return 'สิทธิ์ไม่เพียงพอ ต้องเข้าสู่ระบบด้วยบัญชี Platform Admin';
+    return msg;
   };
 
-  const handleImpersonate = (school) => {
-    setActiveSchoolContext(school);
-    showToast(`🏫 สลับเข้าสู่มุมมอง: ${school.name}`);
-    navigate('teacher');
+  const createSchool = async e => {
+    e.preventDefault();
+    if (!form.adminEmail.includes('@')) return showToast('⚠️ กรุณาระบุอีเมลผู้ดูแลโรงเรียนที่ถูกต้อง');
+    setSaving(true);
+    try {
+      const token = generateInvitationToken();
+      await platformCreateSchoolWithInvitation({
+        schoolCode: form.code.trim().toUpperCase(),
+        schoolName: form.name.trim(),
+        schoolProvince: form.province?.trim() || null,
+        schoolArea: form.area?.trim() || null,
+        planId: form.planId,
+        subscriptionStatus: form.subscriptionStatus,
+        startsAt: new Date(form.startsAt).toISOString(),
+        endsAt: new Date(form.endsAt).toISOString(),
+        adminEmail: form.adminEmail.trim().toLowerCase(),
+        tokenHash: await sha256Hex(token),
+      });
+
+      if (form.applicationId) {
+        await updateSchoolApplicationStatus(form.applicationId, 'approved', {
+          provisionedSchoolCode: form.code.trim().toUpperCase(),
+        });
+      }
+
+      setInviteResult({ schoolName: form.name, email: form.adminEmail, link: `${window.location.origin}${window.location.pathname}?invitation_token=${token}` });
+      setWizard(false);
+      await refresh();
+      showToast('✅ สร้างโรงเรียนและคำเชิญบนเซิร์ฟเวอร์สำเร็จแล้ว');
+    } catch (err) {
+      showToast(`❌ สร้างโรงเรียนไม่สำเร็จ: ${translateError(err?.message || 'เกิดข้อผิดพลาด')}`);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleOpenShare = (school) => {
-    setShareTargetSchool(school);
-    setShowShareModal(true);
+  const rejectApp = async (appId) => {
+    try {
+      await updateSchoolApplicationStatus(appId, 'rejected');
+      await refresh();
+      showToast('อัปเดตสถานะคำขอเป็นปฏิเสธแล้ว');
+    } catch (err) {
+      showToast(`❌ ${err?.message}`);
+    }
   };
 
-  const getPortalUrl = (code) => {
-    const base = window.location.origin + window.location.pathname;
-    return `${base}?school=${code}`;
-  };
+  const changeSchool = async school => { try { await platformSetSchoolStatus(school.id, school.status === 'active' ? 'suspended' : 'active'); await refresh(); showToast('✅ อัปเดตสถานะโรงเรียนแล้ว'); } catch (err) { showToast(`❌ ${err?.message || 'เซิร์ฟเวอร์ปฏิเสธคำขอ'}`); } };
+  const changeTeacher = async account => { try { await setTeacherMembership(account.schoolId, account.userId, account.status !== 'active'); await refresh(); showToast('✅ อัปเดตสถานะครูแล้ว'); } catch (err) { showToast(`❌ ${err?.message || 'เซิร์ฟเวอร์ปฏิเสธคำขอ'}`); } };
+  const revoke = async invitation => { try { await platformRevokeInvitation(invitation.invitation_id || invitation.id); await refresh(); showToast('✅ ยกเลิกคำเชิญแล้ว'); } catch (err) { showToast(`❌ ${err?.message || 'เซิร์ฟเวอร์ปฏิเสธคำขอ'}`); } };
+  const copyLink = async () => { await navigator.clipboard.writeText(inviteResult.link); showToast('📋 คัดลอกลิงก์แล้ว'); };
 
-  const handleCopyLink = (code) => {
-    const url = getPortalUrl(code);
-    navigator.clipboard.writeText(url);
-    showToast('📋 คัดลอกลิงก์ส่งให้โรงเรียนแล้ว!');
-  };
+  return <div className="super-admin-shell min-h-screen bg-[#020617] text-slate-100">
+    <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/95 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-[1500px] flex-col gap-3 px-4 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+        <div className="flex items-center gap-3"><div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-xl"><UIIcon value="👑" /></div><div><div className="flex flex-wrap items-center gap-2"><h1 className="text-lg font-black">Super Admin Hub</h1><Badge tone="amber">PLATFORM OWNER</Badge></div><p className="text-xs text-slate-400">ศูนย์บริหารโรงเรียน คำขอสมัคร ผู้ใช้งาน และสมาชิก</p></div></div>
+        <div className="flex flex-wrap items-center gap-2"><Badge tone={localStaging ? 'blue' : 'red'}>{localStaging ? 'Local Staging' : 'Environment ไม่ยืนยัน'}</Badge><button onClick={openWizard} disabled={!LIVE || activePlans.length === 0} className="min-h-11 rounded-xl bg-amber-400 px-4 text-sm font-black text-slate-950 disabled:opacity-40">+ เพิ่มโรงเรียนใหม่</button><button onClick={handleLogout} className="min-h-11 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 text-sm font-bold text-rose-300">ออกจากระบบ</button></div>
+      </div>
+      <nav className="mx-auto flex max-w-[1500px] gap-2 overflow-x-auto px-4 pb-3 lg:px-8" aria-label="เมนูผู้ดูแลแพลตฟอร์ม">{NAV.map(([id, icon, label]) => <button key={id} onClick={() => { setTab(id); setSearch(''); setFilter('all'); }} className={`min-h-11 shrink-0 rounded-xl px-4 text-sm font-bold ${tab === id ? 'bg-amber-400 text-slate-950' : 'border border-white/10 bg-slate-900 text-slate-300'}`}><UIIcon value={icon} /> {label}</button>)}</nav>
+    </header>
+    <main className="mx-auto max-w-[1500px] space-y-5 p-4 lg:p-8">
+      {loading && <div role="status" className="rounded-2xl border border-sky-500/20 bg-sky-500/10 p-4 text-sm font-bold text-sky-200">กำลังโหลดข้อมูลที่ยืนยันจากเซิร์ฟเวอร์…</div>}
+      {error && <div role="alert" className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm font-bold text-rose-200">{error}</div>}
+      {tab === 'schools' && <Schools schools={visibleSchools} allSchools={schools} subscriptions={subscriptions} students={verifiedStudents} local={localStaging} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} changeSchool={changeSchool} />}
+      {tab === 'applications' && <Applications applications={visibleApplications} allApplications={applications} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} onApprove={openWizardWithApp} onReject={rejectApp} />}
+      {tab === 'users' && <Users accounts={visibleAccounts} invitations={invitations} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} changeTeacher={changeTeacher} revoke={revoke} />}
+      {tab === 'plans' && <Plans plans={plans} subscriptions={subscriptions} schools={schools} />}
+      {tab === 'system' && <SystemStatus local={localStaging} error={error} />}
+    </main>
+    {wizard && <Wizard step={step} setStep={setStep} form={form} setForm={setForm} activePlans={activePlans} close={() => setWizard(false)} goNext={goNext} createSchool={createSchool} saving={saving} />}
+    {inviteResult && <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/85 p-4 backdrop-blur-md"><div className="w-full max-w-lg rounded-3xl border border-emerald-500/30 bg-slate-900 p-6"><h2 className="text-xl font-black text-emerald-300">สร้างโรงเรียนและคำเชิญสำเร็จ</h2><p className="mt-2 text-sm">{inviteResult.schoolName} · {inviteResult.email}</p><div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 text-xs leading-5 text-amber-200">สร้างคำเชิญแล้ว แต่ยังไม่มีบริการส่งอีเมลอัตโนมัติใน browser flow นี้ โปรดส่งลิงก์ผ่านช่องทางที่ปลอดภัย หากคัดลอกไม่สำเร็จ ให้เปิดรายการคำเชิญแทนการสร้างโรงเรียนซ้ำ</div><input readOnly value={inviteResult.link} className="mt-4 w-full rounded-xl border border-white/10 bg-slate-950 p-3 text-xs" /><div className="mt-4 flex gap-2"><button onClick={copyLink} className="min-h-11 flex-1 rounded-xl bg-amber-400 font-black text-slate-950">คัดลอกลิงก์</button><button onClick={() => setInviteResult(null)} className="min-h-11 rounded-xl border border-white/10 px-5 font-bold">ปิด</button></div></div></div>}
+  </div>;
+}
 
-  return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-slate-950 text-slate-100 teacher-dark' : 'bg-slate-100 text-slate-800 teacher-light'} transition-colors duration-300 flex flex-col`}>
+function Applications({ applications, allApplications, search, setSearch, filter, setFilter, onApprove, onReject }) {
+  const pendingCount = allApplications.filter(a => a.status === 'pending_review').length;
+  const approvedCount = allApplications.filter(a => a.status === 'approved').length;
+  const rejectedCount = allApplications.filter(a => a.status === 'rejected').length;
 
-      {/* ── Top Navbar ────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 flex items-center justify-center text-xl shadow-lg shadow-amber-500/25">
-            <UIIcon value={"👑"} />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="font-black text-white text-base sm:text-lg leading-tight">Super Admin Hub</h1>
-              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
-                Platform Master
-              </span>
-            </div>
-            <p className="text-xs text-slate-400">ระบบควบคุม & บริหารจัดการโรงเรียนทั่วประเทศ</p>
-          </div>
+  const stats = [
+    ['📋', allApplications.length, 'คำขอทั้งหมด', 'ยื่นผ่านเว็บไซต์/LINE'],
+    ['⏳', pendingCount, 'รอตรวจสอบ', 'รอ Super Admin อนุมัติ'],
+    ['✅', approvedCount, 'อนุมัติแล้ว', 'สร้างเป็นโรงเรียนแล้ว'],
+    ['❌', rejectedCount, 'ปฏิเสธแล้ว', 'ไม่ผ่านเกณฑ์'],
+  ];
+
+  return <>
+    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {stats.map(([icon, value, label, detail]) => (
+        <div key={label} className="rounded-2xl border border-white/10 bg-slate-900/80 p-5">
+          <div className="text-2xl"><UIIcon value={icon} /></div>
+          <div className="mt-3 text-3xl font-black">{value}</div>
+          <div className="text-sm font-bold">{label}</div>
+          <div className="mt-1 text-xs text-slate-500">{detail}</div>
         </div>
+      ))}
+    </section>
 
-        <div className="flex items-center gap-2">
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className={`px-3 py-1.5 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-all ${
-              theme === 'dark'
-                ? 'bg-slate-800/90 text-amber-300 border-amber-500/30 hover:bg-slate-800'
-                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
-            }`}
-            title="เปลี่ยนธีม"
-          >
-            <span><UIIconText value={theme === 'dark' ? '🌙' : '☀️'} /></span>
-            <span className="hidden sm:inline">{theme === 'dark' ? 'โหมดมืด' : 'โหมดขาว'}</span>
-          </button>
-
-          {/* Back to Teacher Dashboard */}
-          <button
-            onClick={() => navigate('teacher')}
-            className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition-all"
-          >
-            <span><UIIcon value={"👩‍🏫"} /></span>
-            <span className="hidden sm:inline">กลับ Teacher Hub</span>
-          </button>
-
-          {/* Add School Button */}
-          <button
-            onClick={handleOpenAdd}
-            className="px-4 py-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-amber-500/20 active:scale-95 transition-all"
-          >
-            <span><UIIcon value={"➕"} /></span>
-            <span>เพิ่มโรงเรียนใหม่</span>
-          </button>
+    <section className="rounded-3xl border border-white/10 bg-slate-900/75 p-5">
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between mb-4">
+        <div>
+          <h2 className="text-xl font-black">คำขอสมัครแพ็กเกจโรงเรียน</h2>
+          <p className="text-xs text-slate-400 mt-0.5">
+            เมื่อกด "อนุมัติและสร้างโรงเรียน" ระบบจะดึงข้อมูลเข้าสู่ตัวช่วยสร้างโรงเรียนอัตโนมัติในคลิกเดียว
+          </p>
         </div>
-      </header>
+      </div>
 
-      {/* ── Main Content Area ─────────────────────────────────────── */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+      <div className="mb-4 flex flex-col gap-3 md:flex-row md:justify-between">
+        <input
+          aria-label="ค้นหาคำขอ"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="ค้นหาชื่อโรงเรียน, รหัสอ้างอิง, ผู้ติดต่อ, อีเมล…"
+          className="min-h-11 rounded-xl border border-white/10 bg-slate-950 px-4 text-sm md:w-96"
+        />
+        <select
+          aria-label="กรองสถานะ"
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          className="min-h-11 rounded-xl border border-white/10 bg-slate-950 px-3 text-sm"
+        >
+          <option value="all">สถานะทั้งหมด</option>
+          <option value="pending_review">รอตรวจสอบ</option>
+          <option value="approved">อนุมัติแล้ว</option>
+          <option value="rejected">ปฏิเสธ</option>
+        </select>
+      </div>
 
-        {/* ── Executive Top Stat Cards ────────────────────────────── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="glass-card-dark p-4 border border-sky-500/20 rounded-2xl relative overflow-hidden group hover:border-sky-500/40 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-2xl"><UIIcon value={"🏫"} /></span>
-              <span className="text-xs font-bold text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-full border border-sky-500/20">
-                {activeSchools} ใช้งานอยู่
-              </span>
-            </div>
-            <div className="text-3xl font-black text-white">{totalSchools}</div>
-            <div className="text-xs text-slate-400 mt-1">โรงเรียนทั้งหมดในระบบ</div>
-          </div>
-
-          <div className="glass-card-dark p-4 border border-violet-500/20 rounded-2xl relative overflow-hidden group hover:border-violet-500/40 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-2xl"><UIIcon value={"🎒"} /></span>
-              <span className="text-xs font-bold text-violet-400 bg-violet-500/10 px-2 py-0.5 rounded-full border border-violet-500/20">
-                โควตารวม {totalCapacity}
-              </span>
-            </div>
-            <div className="text-3xl font-black text-white">{totalStudents.toLocaleString()}</div>
-            <div className="text-xs text-slate-400 mt-1">นักเรียนที่กำลังใช้งาน (Active)</div>
-          </div>
-
-          <div className="glass-card-dark p-4 border border-emerald-500/20 rounded-2xl relative overflow-hidden group hover:border-emerald-500/40 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-2xl"><UIIcon value={"📈"} /></span>
-              <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                เป้าหมาย &gt;60%
-              </span>
-            </div>
-            <div className="text-3xl font-black text-emerald-400">{nationalAvg}%</div>
-            <div className="text-xs text-slate-400 mt-1">คะแนนเฉลี่ย O-NET รวมประเทศ</div>
-          </div>
-
-          <div className="glass-card-dark p-4 border border-amber-500/20 rounded-2xl relative overflow-hidden group hover:border-amber-500/40 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-2xl"><UIIcon value={"⚡"} /></span>
-              <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                SaaS Ready
-              </span>
-            </div>
-            <div className="text-3xl font-black text-amber-400">Multi-School</div>
-            <div className="text-xs text-slate-400 mt-1">สถานะระบบ Cloud Database</div>
-          </div>
-        </div>
-
-        {/* ── Search & Filter Controls Bar ────────────────────────── */}
-        <div className="glass-card-dark p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-3">
-          <div className="relative w-full md:w-96">
-            <input
-              type="text"
-              placeholder="🔍 ค้นหาชื่อโรงเรียน, รหัส, จังหวัด, ครูผู้รับผิดชอบ..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-950/80 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition-colors"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs"
-              >
-                <UIIcon value={"✕"} />
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2 w-full md:w-auto justify-end overflow-x-auto">
-            <span className="text-xs text-slate-400 font-medium shrink-0">สถานะ:</span>
-            {[
-              { id: 'all', label: 'ทั้งหมด' },
-              { id: 'active', label: '🟢 ใช้งานอยู่' },
-              { id: 'trial', label: '🟡 ทดลองใช้' },
-              { id: 'suspended', label: '🔴 ระงับ' }
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setStatusFilter(tab.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
-                  statusFilter === tab.id
-                    ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/20'
-                    : 'bg-slate-900/60 text-slate-400 hover:text-white border border-white/5'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Schools List Table ──────────────────────────────────── */}
-        <div className="glass-card-dark rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-white/10 text-slate-400 text-xs font-bold uppercase tracking-wider bg-slate-950/70">
-                  <th className="py-3.5 px-4">รหัส / โรงเรียน</th>
-                  <th className="py-3.5 px-4">สังกัด / จังหวัด</th>
-                  <th className="py-3.5 px-4">ผู้ประสานงาน</th>
-                  <th className="py-3.5 px-4 text-center">นักเรียน / โควตา</th>
-                  <th className="py-3.5 px-4 text-center">O-NET เฉลี่ย</th>
-                  <th className="py-3.5 px-4 text-center">สถานะ</th>
-                  <th className="py-3.5 px-4 text-center">หมดอายุ</th>
-                  <th className="py-3.5 px-4 text-right">เครื่องมือจัดการ</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5 text-xs">
-                {filteredSchools.length === 0 ? (
-                  <tr>
-                    <td colSpan="8" className="py-12 text-center text-slate-500">
-                      <div className="text-3xl mb-2"><UIIcon value={"🏫"} /></div>
-                      <p className="font-bold">ไม่พบข้อมูลโรงเรียนตามเงื่อนไข</p>
+      {applications.length === 0 ? (
+        <Empty title="ไม่พบคำขอสมัคร" detail="เมื่อโรงเรียนยื่นคำขอจากหน้าแรก รายการจะปรากฏที่นี่" />
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[1000px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-white/10 text-xs text-slate-500">
+                <th className="p-3">รหัส / โรงเรียน</th>
+                <th className="p-3">ผู้ประสานงาน</th>
+                <th className="p-3">แพ็กเกจ / ความต้องการ</th>
+                <th className="p-3">วันที่ยื่น</th>
+                <th className="p-3">สถานะ</th>
+                <th className="p-3 text-right">ดำเนินการ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {applications.map(app => (
+                <tr key={app.id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                  <td className="p-3">
+                    <span className="font-mono text-xs font-bold text-amber-300">{app.referenceCode}</span>
+                    <div className="font-bold text-white text-sm">{app.schoolName}</div>
+                    {app.schoolNameEnglish && <div className="text-xs text-slate-400">{app.schoolNameEnglish}</div>}
+                    <div className="text-xs text-slate-500 mt-0.5">
+                      {[app.district, app.province].filter(Boolean).join(' · ')}
+                    </div>
+                  </td>
+                  <td className="p-3">
+                    <div className="font-bold text-slate-200">{app.contactName}</div>
+                    <div className="text-xs font-mono text-sky-400">{app.contactEmail}</div>
+                    <div className="text-xs text-slate-400">{app.contactPhone}</div>
+                  </td>
+                  <td className="p-3">
+                    <div className="font-bold text-amber-300">{app.packageName || app.packageInterest}</div>
+                    <div className="text-xs text-sky-300 mt-0.5 font-medium">
+                      {app.cycleLabel || (app.billingCycle === 'yearly' ? 'รายปี (12 เดือน)' : 'รายเทอม (5 เดือน)')}
+                      {app.approxPrice != null && ` · ฿${Number(app.approxPrice).toLocaleString()}`}
+                    </div>
+                    <div className="text-xs text-slate-400 mt-0.5">
+                      นักเรียน {app.expectedStudents || '—'} คน · ครู {app.expectedTeachers || '—'} คน
+                    </div>
+                    {app.needQuotation && (
+                      <div className="mt-1 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-sky-500/10 text-sky-300 border border-sky-500/20">
+                        📄 ขอใบเสนอราคา
+                      </div>
+                    )}
+                    {app.notes && <div className="text-xs text-slate-500 italic mt-0.5">"{app.notes}"</div>}
+                  </td>
+                  <td className="p-3 text-xs text-slate-400">
+                    {fmtDate(app.createdAt)}
+                  </td>
+                  <td className="p-3">
+                    {app.status === 'pending_review' && <Badge tone="amber">รอตรวจสอบ</Badge>}
+                    {app.status === 'approved' && (
+                      <div>
+                        <Badge tone="green">อนุมัติแล้ว</Badge>
+                        {app.provisionedSchoolCode && (
+                          <div className="text-[11px] font-mono text-emerald-400 mt-1 font-bold">
+                            รหัส: {app.provisionedSchoolCode}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {app.status === 'rejected' && <Badge tone="red">ปฏิเสธแล้ว</Badge>}
+                  </td>
+                  <td className="p-3 text-right">
+                    {app.status === 'pending_review' ? (
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => onApprove(app)}
+                          className="min-h-10 rounded-xl bg-amber-400 px-3 text-xs font-black text-slate-950 hover:bg-amber-300 transition-colors shadow-md shadow-amber-400/20"
+                        >
+                          ⚡ อนุมัติและสร้างโรงเรียน
+                        </button>
+                        <button
+                          onClick={() => onReject(app.id)}
+                          className="min-h-10 rounded-xl border border-rose-500/30 px-3 text-xs font-bold text-rose-300 hover:bg-rose-500/10 transition-colors"
+                        >
+                          ปฏิเสธ
+                        </button>
+                      </div>
+                    ) : app.status === 'approved' ? (
+                      <span className="text-xs text-emerald-400 font-bold">พร้อมใช้งาน</span>
+                    ) : (
                       <button
-                        onClick={handleOpenAdd}
-                        className="mt-3 text-xs text-amber-400 hover:underline font-bold"
+                        onClick={() => onApprove(app)}
+                        className="min-h-9 rounded-xl border border-white/10 px-3 text-xs text-slate-400 hover:text-white"
                       >
-                        + คลิกที่นี่เพื่อเพิ่มโรงเรียนใหม่
+                        พิจารณาใหม่
                       </button>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredSchools.map((school) => {
-                    const usagePercent = school.quota > 0
-                      ? Math.min(100, Math.round((school.activeStudents / school.quota) * 100))
-                      : 0;
-                    return (
-                      <tr
-                        key={school.id}
-                        className="hover:bg-white/[0.04] transition-colors group"
-                      >
-                        {/* School Code & Name */}
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center gap-2.5">
-                            <span className="font-mono font-black text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg text-[11px]">
-                              {school.code}
-                            </span>
-                            <div>
-                              <div className="font-bold text-white text-sm leading-tight flex items-center gap-1.5">
-                                {school.name}
-                              </div>
-                              {school.notes && (
-                                <div className="text-[10px] text-slate-400 truncate max-w-xs mt-0.5">
-                                  {school.notes}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </td>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  </>;
+}
 
-                        {/* Area & Province */}
-                        <td className="py-3.5 px-4 text-slate-300">
-                          <div>{school.area || '-'}</div>
-                          <div className="text-[10px] text-slate-400 font-medium">{school.province}</div>
-                        </td>
+function Schools({ schools, allSchools, subscriptions, students, local, search, setSearch, filter, setFilter, changeSchool }) {
+  const stats = [['🏫', allSchools.length, 'โรงเรียนทั้งหมด', `${allSchools.filter(s => s.status === 'active').length} ใช้งานอยู่`], ['🎒', students ?? '—', 'นักเรียน Active', students == null ? 'ข้อมูลไม่พร้อม' : 'ยืนยันจากสมาชิก'], ['🧾', subscriptions.length, 'สัญญาสมาชิก', 'แยกจากสถานะโรงเรียน'], ['🛡️', local ? 'Local' : 'ไม่ยืนยัน', 'Environment', 'ไม่ใช่ Production Ready']];
+  return <><section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{stats.map(([icon, value, label, detail]) => <div key={label} className="rounded-2xl border border-white/10 bg-slate-900/80 p-5"><div className="text-2xl"><UIIcon value={icon} /></div><div className="mt-3 text-3xl font-black">{value}</div><div className="text-sm font-bold">{label}</div><div className="mt-1 text-xs text-slate-500">{detail}</div></div>)}</section><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-4"><Toolbar search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} type="schools" />{schools.length === 0 ? <Empty title="ไม่พบโรงเรียน" detail="ข้อมูลจะแสดงเมื่อเซิร์ฟเวอร์อนุญาต" /> : <div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm"><thead><tr className="border-b border-white/10 text-xs text-slate-500"><th className="p-3">โรงเรียน</th><th className="p-3">แผน / สมาชิก</th><th className="p-3">นักเรียน / ที่นั่ง</th><th className="p-3">หมดอายุ</th><th className="p-3">สถานะโรงเรียน</th><th className="p-3 text-right">จัดการ</th></tr></thead><tbody>{schools.map(s => <tr key={s.id} className="border-b border-white/5"><td className="p-3"><b>{s.name}</b><div className="font-mono text-xs text-amber-300">{s.code}</div><div className="text-xs text-slate-500">{[s.area, s.province].filter(Boolean).join(' · ') || 'ไม่ระบุพื้นที่'}</div></td><td className="p-3">{s.planName || 'ไม่พร้อมใช้งาน'}<div className="mt-1"><Badge tone={s.subscriptionStatus === 'active' ? 'green' : 'amber'}>{s.subscriptionStatus || 'ไม่พบสมาชิก'}</Badge></div></td><td className="p-3 font-bold">{Number.isFinite(s.activeStudents) ? s.activeStudents : '—'} / {Number.isFinite(s.quota) ? s.quota : '—'}</td><td className="p-3">{fmtDate(s.expiresAt)}</td><td className="p-3"><Badge tone={s.status === 'active' ? 'green' : 'red'}>{s.status}</Badge></td><td className="p-3 text-right"><button onClick={() => changeSchool(s)} className="min-h-10 rounded-xl border border-white/10 px-3 text-xs font-bold">{s.status === 'active' ? 'ระงับโรงเรียน' : 'เปิดใช้งาน'}</button> <button disabled title="ยังไม่มี Server API" className="min-h-10 cursor-not-allowed rounded-xl border border-white/10 px-3 text-xs text-slate-600">แก้ไข</button></td></tr>)}</tbody></table></div>}</section></>;
+}
 
-                        {/* Contact Person */}
-                        <td className="py-3.5 px-4">
-                          <div className="font-medium text-slate-200">{school.contactTeacher || '-'}</div>
-                          <div className="text-[10px] text-slate-400 font-mono">{school.phone || school.email || '-'}</div>
-                        </td>
+function Toolbar({ search, setSearch, filter, setFilter, type }) {
+  return <div className="mb-4 flex flex-col gap-3 md:flex-row md:justify-between"><input aria-label="ค้นหา" value={search} onChange={e => setSearch(e.target.value)} placeholder="ค้นหา…" className="min-h-11 rounded-xl border border-white/10 bg-slate-950 px-4 text-sm md:w-96" /><select aria-label="กรอง" value={filter} onChange={e => setFilter(e.target.value)} className="min-h-11 rounded-xl border border-white/10 bg-slate-950 px-3 text-sm"><option value="all">ทั้งหมด</option>{type === 'schools' ? <><option value="active">ใช้งานอยู่</option><option value="suspended">ระงับ</option><option value="archived">เก็บถาวร</option></> : Object.entries(ROLES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>;
+}
 
-                        {/* Student Count / Quota */}
-                        <td className="py-3.5 px-4 text-center">
-                          <div className="font-bold text-slate-200">
-                            {school.activeStudents} <span className="text-slate-500 font-normal">/ {school.quota}</span>
-                          </div>
-                          <div className="w-20 h-1.5 bg-slate-800 rounded-full mx-auto mt-1 overflow-hidden border border-white/5">
-                            <div
-                              className={`h-full rounded-full ${
-                                usagePercent >= 90 ? 'bg-rose-500' : usagePercent >= 70 ? 'bg-amber-400' : 'bg-emerald-400'
-                              }`}
-                              style={{ width: `${usagePercent}%` }}
-                            />
-                          </div>
-                        </td>
+function Users({ accounts, invitations, search, setSearch, filter, setFilter, changeTeacher, revoke }) {
+  return <><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-5"><h2 className="text-xl font-black">User Management</h2><p className="mt-1 text-xs text-slate-400">แสดงเฉพาะขอบเขตที่ API อนุญาต ไม่แสดงรหัสผ่าน PIN verifier หรือ service credentials</p></section><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-4"><Toolbar search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} type="users" />{accounts.length === 0 ? <Empty title="ไม่พบบัญชี" detail="ระบบไม่อ่าน auth.users โดยตรงจากเบราว์เซอร์" /> : <div className="overflow-x-auto"><table className="w-full min-w-[900px] text-left text-sm"><thead><tr className="border-b border-white/10 text-xs text-slate-500"><th className="p-3">บัญชี</th><th className="p-3">บทบาท</th><th className="p-3">ขอบเขต</th><th className="p-3">สถานะ</th><th className="p-3 text-right">การดำเนินการ</th></tr></thead><tbody>{accounts.map(a => <tr key={a.key} className="border-b border-white/5"><td className="p-3"><b>{a.displayName}</b>{a.secondaryId && <div className="font-mono text-xs text-slate-500">Student ID: {a.secondaryId}</div>}</td><td className="p-3"><Badge tone="blue">{ROLES[a.role] || a.role}</Badge></td><td className="p-3">{a.schoolName}</td><td className="p-3"><Badge tone={String(a.status).toLowerCase() === 'active' ? 'green' : 'amber'}>{a.status}</Badge></td><td className="p-3 text-right">{a.role === 'teacher' && <button onClick={() => changeTeacher(a)} className="min-h-10 rounded-xl border border-white/10 px-3 text-xs font-bold">{a.status === 'active' ? 'ระงับ' : 'เปิดใช้งาน'}</button>} <button disabled title="ยังไม่มี browser-safe credential reset API" className="min-h-10 cursor-not-allowed rounded-xl border border-white/10 px-3 text-xs text-slate-600">รีเซ็ตรหัสผ่าน</button></td></tr>)}</tbody></table></div>}</section><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-5"><h3 className="font-black">คำเชิญ School Admin</h3><p className="mb-4 text-xs text-slate-400">สร้างและยกเลิกผ่าน RPC ที่ตรวจสิทธิ์ฝั่งเซิร์ฟเวอร์</p>{invitations.length === 0 ? <Empty title="ไม่มีคำเชิญ" detail="สร้างพร้อมโรงเรียนใหม่จาก wizard" /> : <div className="grid gap-3 lg:grid-cols-2">{invitations.map(i => <div key={i.invitation_id || i.id} className="rounded-2xl border border-white/10 bg-slate-950/60 p-4"><b>{i.admin_email || i.email}</b><div className="text-xs text-slate-500">{i.status} · หมดอายุ {fmtDate(i.expires_at)}</div>{i.status === 'pending' && <button onClick={() => revoke(i)} className="mt-3 min-h-10 rounded-xl border border-rose-500/30 px-3 text-xs font-bold text-rose-300">ยกเลิกคำเชิญ</button>}</div>)}</div>}</section></>;
+}
 
-                        {/* O-NET Average */}
-                        <td className="py-3.5 px-4 text-center">
-                          <span className={`font-black text-sm ${
-                            school.avgScore >= 70 ? 'text-emerald-400' : school.avgScore >= 50 ? 'text-amber-400' : 'text-slate-400'
-                          }`}>
-                            {school.avgScore > 0 ? `${school.avgScore}%` : '-'}
-                          </span>
-                        </td>
+function Plans({ plans, subscriptions, schools }) {
+  return <><section className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-5"><h2 className="text-xl font-black">Plans & Subscriptions</h2><p className="mt-1 text-sm text-slate-300">ข้อมูลจริงจากเซิร์ฟเวอร์ การสร้างหรือแก้ไขถูกปิดเพราะยังไม่มี Server API ที่ปลอดภัย</p><button disabled className="mt-4 min-h-11 cursor-not-allowed rounded-xl border border-white/10 px-4 text-slate-600">สร้างหรือแก้ไขแผน — ยังไม่พร้อมใช้งาน</button></section><section className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">{plans.map(p => <article key={p.id} className="rounded-3xl border border-white/10 bg-slate-900/75 p-5"><div className="flex justify-between"><div><h3 className="text-lg font-black">{p.name}</h3><div className="font-mono text-xs text-amber-300">{p.code}</div></div><Badge tone={p.is_active ? 'green' : 'slate'}>{p.is_active ? 'Active' : 'Inactive'}</Badge></div><p className="mt-3 text-xs text-slate-400">{p.description || 'ไม่มีคำอธิบาย'}</p><div className="mt-4 grid grid-cols-3 gap-2 text-xs"><div className="rounded-xl bg-slate-950 p-2.5">รายเดือน<br /><b>{fmtMoney(p.price_monthly, p.currency)}</b></div><div className="rounded-xl bg-slate-950 p-2.5">รายเทอม<br /><b>{p.features?.price_semester ? fmtMoney(p.features.price_semester, p.currency) : '—'}</b></div><div className="rounded-xl bg-slate-950 p-2.5">รายปี<br /><b>{fmtMoney(p.price_yearly, p.currency)}</b></div></div><div className="mt-4 space-y-2 text-sm"><div>นักเรียน <b>{p.max_students}</b> <span className="text-emerald-400">บังคับใช้</span></div><div>ครู <b>{p.max_teachers}</b> <span className="text-amber-400">ยังไม่บังคับใช้</span></div><div>ห้องเรียน <b>{p.max_classes}</b> <span className="text-amber-400">ยังไม่บังคับใช้</span></div></div></article>)}</section><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-4"><h3 className="mb-4 font-black">สมาชิกโรงเรียน</h3>{subscriptions.length === 0 ? <Empty title="ไม่พบสมาชิก" detail="ไม่มีค่าทดแทนหรือข้อมูลสมมติ" /> : <div className="overflow-x-auto"><table className="w-full min-w-[850px] text-left text-sm"><thead><tr className="border-b border-white/10 text-xs text-slate-500"><th className="p-3">โรงเรียน</th><th className="p-3">แผน</th><th className="p-3">สถานะสมาชิก</th><th className="p-3">ช่วงสัญญา</th><th className="p-3">โควตา</th></tr></thead><tbody>{subscriptions.map(s => { const school = schools.find(x => x.id === s.school_id); const plan = plans.find(x => x.id === s.plan_id); return <tr key={s.id} className="border-b border-white/5"><td className="p-3 font-bold">{school?.name || s.school_id}</td><td className="p-3">{plan?.name || 'ไม่พร้อมใช้งาน'}</td><td className="p-3"><Badge tone={s.status === 'active' ? 'green' : 'amber'}>{s.status}</Badge></td><td className="p-3 text-xs">{fmtDate(s.starts_at)} – {fmtDate(s.ends_at)}</td><td className="p-3 text-xs">นักเรียน {s.max_students_override ?? plan?.max_students ?? '—'} · ครู {s.max_teachers_override ?? plan?.max_teachers ?? '—'} · ห้อง {s.max_classes_override ?? plan?.max_classes ?? '—'}<div className="text-amber-300">ครู/ห้องยังไม่บังคับใช้</div></td></tr>; })}</tbody></table></div>}</section></>;
+}
 
-                        {/* Status */}
-                        <td className="py-3.5 px-4 text-center">
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
-                            school.status === 'active'
-                              ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                              : school.status === 'trial'
-                              ? 'bg-amber-500/10 text-amber-300 border-amber-500/30'
-                              : 'bg-rose-500/10 text-rose-300 border-rose-500/30'
-                          }`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${
-                              school.status === 'active' ? 'bg-emerald-400' : school.status === 'trial' ? 'bg-amber-400' : 'bg-rose-400'
-                            }`} />
-                            {school.status === 'active' ? 'ใช้งานอยู่' : school.status === 'trial' ? 'ทดลองใช้' : 'ระงับ'}
-                          </span>
-                        </td>
+function SystemStatus({ local, error }) {
+  const items = [['Environment', local ? 'Local Staging' : 'ไม่ยืนยัน', local ? 'green' : 'red', `Supabase: ${supabaseConfig.url || 'ไม่ได้กำหนด'}`], ['Database & RLS', error ? 'ตรวจสอบไม่ผ่าน' : 'เชื่อมต่อและอ่านได้', error ? 'red' : 'green', 'สิทธิ์ข้อมูลยึด RLS/RPC ฝั่งเซิร์ฟเวอร์'], ['Owner MFA', 'ยังไม่บังคับใช้', 'amber', 'เป็น blocker ก่อน production'], ['Student Seat Quota', 'บังคับใช้แล้ว', 'green', 'ตรวจที่ RPC สำหรับที่นั่งนักเรียน'], ['Teacher/Class Quota', 'ยังไม่บังคับใช้', 'amber', 'ยังไม่มี server validation'], ['Plan Mutations', 'ยังไม่มี Browser API', 'amber', 'หน้าแผนจึงเป็น read-only']];
+  return <><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-6"><h2 className="text-xl font-black">System Status</h2><p className="text-sm text-slate-400">แสดงเฉพาะสิ่งที่ตรวจสอบได้ ไม่สรุป Production Ready จากการเชื่อมต่อฐานข้อมูล</p></section><section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{items.map(([title, status, tone, detail]) => <article key={title} className="rounded-3xl border border-white/10 bg-slate-900/75 p-5"><div className="flex justify-between gap-3"><b>{title}</b><Badge tone={tone}>{status}</Badge></div><p className="mt-4 text-xs text-slate-400">{detail}</p></article>)}</section><section className="rounded-3xl border border-rose-500/20 bg-rose-500/5 p-5"><h3 className="font-black text-rose-200">Operational blockers ก่อน Production</h3><ul className="mt-3 list-disc space-y-2 pl-5 text-sm"><li>ยังไม่บังคับ MFA สำหรับ Platform Admin</li><li>ยังไม่มี server validation สำหรับโควตาครูและห้องเรียน</li><li>ยังไม่มี API สำหรับแก้แผน สมาชิก และรีเซ็ตรหัสบัญชีอื่น</li><li>สถานะหน้านี้ไม่ใช่การรับรอง production readiness</li></ul></section></>;
+}
 
-                        {/* Expiry */}
-                        <td className="py-3.5 px-4 text-center text-slate-400 font-mono text-[11px]">
-                          {school.expiresAt || 'ไม่มีกำหนด'}
-                        </td>
+function Wizard({ step, setStep, form, setForm, activePlans, close, goNext, createSchool, saving }) {
+  const input = 'mt-1 min-h-11 w-full rounded-xl border border-white/10 bg-slate-950 px-3';
+  const schoolPlans = activePlans.filter(p =>
+    p.code?.startsWith('school_') || p.code === 'superpower' || p.features?.allow_school_provisioning === true || p.features?.target === 'school'
+  );
+  const otherPlans = activePlans.filter(p => !schoolPlans.some(sp => sp.id === p.id));
+  const selectedPlan = activePlans.find(p => p.id === form.planId);
 
-                        {/* Actions */}
-                        <td className="py-3.5 px-4 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
-                            {/* Impersonate / Enter School View */}
-                            <button
-                              onClick={() => handleImpersonate(school)}
-                              className="p-1.5 bg-sky-500/10 hover:bg-sky-500/25 text-sky-300 rounded-lg border border-sky-500/20 transition-all text-xs"
-                              title="สลับเข้าดูหน้าจอโรงเรียนนี้ (Impersonate)"
-                            >
-                              <UIIcon value={"👁️"} />
-                            </button>
+  const setQuickDuration = (months) => {
+    const start = form.startsAt ? new Date(form.startsAt) : new Date();
+    const end = new Date(start);
+    end.setMonth(end.getMonth() + months);
+    setForm(prev => ({ ...prev, endsAt: end.toISOString().slice(0, 10) }));
+  };
 
-                            {/* Share / Copy Portal URL */}
-                            <button
-                              onClick={() => handleOpenShare(school)}
-                              className="p-1.5 bg-amber-500/10 hover:bg-amber-500/25 text-amber-300 rounded-lg border border-amber-500/20 transition-all text-xs"
-                              title="แชร์ลิงก์ Portal ประจำโรงเรียน"
-                            >
-                              <UIIcon value={"🔗"} />
-                            </button>
-
-                            {/* Edit */}
-                            <button
-                              onClick={() => handleOpenEdit(school)}
-                              className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-white/10 transition-all text-xs"
-                              title="แก้ไขข้อมูลโรงเรียน"
-                            >
-                              <UIIcon value={"✏️"} />
-                            </button>
-
-                            {/* Toggle Suspend/Active */}
-                            <button
-                              onClick={() => handleToggleStatus(school.id, school.status)}
-                              className={`p-1.5 rounded-lg border transition-all text-xs ${
-                                school.status === 'active'
-                                  ? 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border-rose-500/20'
-                                  : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border-emerald-500/20'
-                              }`}
-                              title={school.status === 'active' ? 'ระงับโรงเรียนนี้' : 'เปิดใช้งานโรงเรียนนี้'}
-                            >
-                              <UIIconText value={school.status === 'active' ? '⏸️' : '▶️'} />
-                            </button>
-
-                            {/* Delete */}
-                            <button
-                              onClick={() => setConfirmDeleteId(school.id)}
-                              className="p-1.5 bg-rose-500/10 hover:bg-rose-500/30 text-rose-400 rounded-lg border border-rose-500/20 transition-all text-xs"
-                              title="ลบโรงเรียน"
-                            >
-                              <UIIcon value={"🗑️"} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
+  return <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-slate-950/85 p-4 backdrop-blur-md">
+    <div className="w-full max-w-2xl rounded-3xl border border-amber-500/30 bg-slate-900 p-5">
+      <div className="mb-5 flex justify-between">
+        <div>
+          <div className="text-xs font-bold text-amber-300">ขั้นตอน {step} จาก 2</div>
+          <h2 className="text-xl font-black">{step === 1 ? 'ข้อมูลโรงเรียนและสมาชิก' : 'เชิญ School Admin'}</h2>
+        </div>
+        <button onClick={close} aria-label="ปิด" className="min-h-11 min-w-11 rounded-xl border border-white/10">✕</button>
+      </div>
+      {step === 1 ? (
+        <form onSubmit={goNext} className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="text-xs font-bold">
+              รหัสโรงเรียน *
+              <input
+                required
+                value={form.code}
+                onChange={e => setForm({ ...form, code: e.target.value.toUpperCase().replace(/[^A-Z0-9_-]/g, '') })}
+                className={`${input} font-mono`}
+                placeholder="เช่น BNS02 (3–32 ตัวอักษร)"
+              />
+              <span className="text-[10px] text-slate-500 font-normal mt-0.5 block">ภาษาอังกฤษ/ตัวเลข/ขีดล่าง/ขีดกลาง 3-32 ตัว</span>
+            </label>
+            <label className="text-xs font-bold">
+              ชื่อโรงเรียน *
+              <input
+                required
+                value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                className={input}
+                placeholder="เช่น โรงเรียนบ้านน้ำใส"
+              />
+            </label>
+            <label className="text-xs font-bold">
+              จังหวัด
+              <input
+                value={form.province}
+                onChange={e => setForm({ ...form, province: e.target.value })}
+                className={input}
+                placeholder="เช่น เชียงใหม่"
+              />
+            </label>
+            <label className="text-xs font-bold">
+              เขตพื้นที่
+              <input
+                value={form.area}
+                onChange={e => setForm({ ...form, area: e.target.value })}
+                className={input}
+                placeholder="เช่น สพป. เขต 1"
+              />
+            </label>
+            <label className="text-xs font-bold sm:col-span-2">
+              แผนแพ็กเกจ *
+              <select required value={form.planId} onChange={e => setForm({ ...form, planId: e.target.value })} className={input}>
+                <option value="">-- เลือกแผนแพ็กเกจที่จะขาย --</option>
+                <optgroup label="── แพ็กเกจระดับโรงเรียน ──">
+                  {schoolPlans.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} · {p.max_students} ที่นั่ง {p.price_yearly ? `(฿${Number(p.price_yearly).toLocaleString('th-TH')}/ปี)` : ''}
+                    </option>
+                  ))}
+                </optgroup>
+                {otherPlans.length > 0 && (
+                  <optgroup label="── แพ็กเกจอื่นๆ ──">
+                    {otherPlans.map(p => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} · {p.max_students} ที่นั่ง {p.price_yearly ? `(฿${Number(p.price_yearly).toLocaleString('th-TH')}/ปี)` : ''}
+                      </option>
+                    ))}
+                  </optgroup>
                 )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* ── Quick School Onboarding Steps Guide ──────────────────── */}
-        <div className="glass-card-dark p-5 rounded-3xl border border-white/10 space-y-4">
-          <div className="flex items-center gap-2.5">
-            <span className="text-xl"><UIIcon value={"💡"} /></span>
-            <div>
-              <h3 className="font-black text-white text-sm">ขั้นตอนการเปิดใช้งานระบบสำหรับโรงเรียนใหม่ (Quick Onboarding Guide)</h3>
-              <p className="text-[11px] text-slate-400">คำแนะนำสำหรับ Super Admin ในการกระจายระบบไปยังโรงเรียนต่างๆ</p>
+              </select>
+              {selectedPlan && (
+                <div className="mt-2 rounded-xl border border-amber-400/20 bg-amber-400/5 p-3 text-xs">
+                  <div className="flex items-center justify-between font-bold text-amber-300">
+                    <span>{selectedPlan.name} ({selectedPlan.code})</span>
+                    <span className="rounded-md bg-amber-400/20 px-2 py-0.5 text-amber-200">
+                      โควตา {selectedPlan.max_students} ที่นั่ง
+                    </span>
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-slate-400">
+                    <span>ครู: {selectedPlan.max_teachers ? `${selectedPlan.max_teachers} ท่าน` : 'ไม่จำกัด'}</span>
+                    <span>ห้องเรียน: {selectedPlan.max_classes ? `${selectedPlan.max_classes} ห้อง` : 'ไม่จำกัด'}</span>
+                    {selectedPlan.features?.price_semester && (
+                      <span className="text-emerald-400 font-semibold">รายเทอม: ฿{Number(selectedPlan.features.price_semester).toLocaleString('th-TH')}</span>
+                    )}
+                    {selectedPlan.price_yearly && (
+                      <span className="text-amber-300 font-semibold">รายปี: ฿{Number(selectedPlan.price_yearly).toLocaleString('th-TH')}</span>
+                    )}
+                  </div>
+                  {selectedPlan.description && (
+                    <div className="mt-1 text-[11px] text-slate-400">{selectedPlan.description}</div>
+                  )}
+                </div>
+              )}
+            </label>
+            <label className="text-xs font-bold">
+              สถานะสมาชิก *
+              <select value={form.subscriptionStatus} onChange={e => setForm({ ...form, subscriptionStatus: e.target.value })} className={input}>
+                <option value="active">Active (ใช้งานปกติ)</option>
+                <option value="trialing">Trialing (ทดลองใช้)</option>
+              </select>
+            </label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold">
+                วันเริ่ม *
+                <input type="date" required value={form.startsAt} onChange={e => setForm({ ...form, startsAt: e.target.value })} className={input} />
+              </label>
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1 text-xs">
-            <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-white/5 space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-300 font-black flex items-center justify-center text-xs">1</span>
-                <span className="font-bold text-white">สร้างบัญชีโรงเรียน</span>
-              </div>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                กดปุ่ม <strong>+ เพิ่มโรงเรียนใหม่</strong> กำหนดรหัส รร. (เช่น BNS01) และโควตานักเรียน
-              </p>
-            </div>
-
-            <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-white/5 space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-300 font-black flex items-center justify-center text-xs">2</span>
-                <span className="font-bold text-white">ส่งมอบลิงก์ Portal</span>
-              </div>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                กดปุ่ม <strong><UIIcon value={"🔗"} /> คัดลอกลิงก์</strong> ส่งให้ครูประจำโรงเรียนนำไปแปะในกลุ่ม Line หรือ Facebook
-              </p>
-            </div>
-
-            <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-white/5 space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-300 font-black flex items-center justify-center text-xs">3</span>
-                <span className="font-bold text-white">ครูนำเข้านักเรียน</span>
-              </div>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                ครูเข้าสู่ระบบเพื่อนำเข้ารายชื่อเด็กผ่านไฟล์ Excel/Sheets ข้อมูลจะผูกกับ รร. นั้นอัตโนมัติ
-              </p>
-            </div>
-
-            <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-white/5 space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-violet-500/20 text-violet-300 font-black flex items-center justify-center text-xs">4</span>
-                <span className="font-bold text-white">ติดตาม & สวมสิทธิ์</span>
-              </div>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                Super Admin กดปุ่ม <strong><UIIcon value={"👁️"} /></strong> เพื่อสลับเข้าไปดูผลการเรียนของโรงเรียนนั้นๆ ได้ทุกเมื่อ
-              </p>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      {/* ── Add / Edit School Modal ───────────────────────────────── */}
-      {showAddEditModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-          <div className="glass-card-dark border border-amber-500/30 w-full max-w-lg p-6 rounded-3xl shadow-2xl text-white space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h2 className="text-lg font-black text-white flex items-center gap-2">
-                <span><UIIconText value={editingSchool ? '✏️ แก้ไขข้อมูลโรงเรียน' : '➕ เพิ่มโรงเรียนใหม่เข้าระบบ'} /></span>
-              </h2>
-              <button
-                onClick={() => setShowAddEditModal(false)}
-                className="text-slate-400 hover:text-white text-xl"
-              >
-                <UIIcon value={"✕"} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveSchool} className="space-y-3.5 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-bold mb-1">
-                    รหัสโรงเรียน (School Code) <span className="text-amber-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="เช่น BNS01, WNT02"
-                    value={formData.code}
-                    onChange={e => setFormData({ ...formData, code: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white font-mono uppercase focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-bold mb-1">
-                    สถานะการใช้งาน
-                  </label>
-                  <select
-                    value={formData.status}
-                    onChange={e => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white focus:border-amber-400 focus:outline-none"
-                  >
-                    <option value="active"><UIIcon value={"🟢"} /> Active (เปิดใช้งาน)</option>
-                    <option value="trial"><UIIcon value={"🟡"} /> Trial (ทดลองใช้งาน)</option>
-                    <option value="suspended"><UIIcon value={"🔴"} /> Suspended (ระงับชั่วคราว)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-bold mb-1">
-                  ชื่อโรงเรียน <span className="text-amber-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="เช่น โรงเรียนบ้านนาสาร"
-                  value={formData.name}
-                  onChange={e => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white focus:border-amber-400 focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-bold mb-1">เขตพื้นที่การศึกษา (สพป./สพม.)</label>
-                  <input
-                    type="text"
-                    placeholder="เช่น สพป.สุราษฎร์ธานี เขต 3"
-                    value={formData.area}
-                    onChange={e => setFormData({ ...formData, area: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-bold mb-1">จังหวัด</label>
-                  <input
-                    type="text"
-                    placeholder="เช่น สุราษฎร์ธานี"
-                    value={formData.province}
-                    onChange={e => setFormData({ ...formData, province: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-bold mb-1">ครูผู้รับผิดชอบ / ประสานงาน</label>
-                  <input
-                    type="text"
-                    placeholder="เช่น ครูสมชาย ใจดี"
-                    value={formData.contactTeacher}
-                    onChange={e => setFormData({ ...formData, contactTeacher: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-bold mb-1">เบอร์โทรติดต่อ</label>
-                  <input
-                    type="text"
-                    placeholder="เช่น 081-234-5678"
-                    value={formData.phone}
-                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-slate-300 font-bold mb-1">โควตานักเรียนสูงสุด (คน)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    placeholder="เช่น 100"
-                    value={formData.quota}
-                    onChange={e => setFormData({ ...formData, quota: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-slate-300 font-bold mb-1">วันหมดอายุสิทธิ์ (License Expiry)</label>
-                  <input
-                    type="date"
-                    value={formData.expiresAt}
-                    onChange={e => setFormData({ ...formData, expiresAt: e.target.value })}
-                    className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white focus:border-amber-400 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-bold mb-1">บันทึกเพิ่มเติม</label>
-                <textarea
-                  rows="2"
-                  placeholder="หมายเหตุเพิ่มเติมเกี่ยวกับโรงเรียนนี้..."
-                  value={formData.notes}
-                  onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white focus:border-amber-400 focus:outline-none resize-none"
-                />
-              </div>
-
-              <div className="flex gap-2 pt-3">
+            <div className="space-y-1 sm:col-span-2">
+              <label className="text-xs font-bold">
+                วันสิ้นสุด *
+                <input type="date" required value={form.endsAt} onChange={e => setForm({ ...form, endsAt: e.target.value })} className={input} />
+              </label>
+              <div className="flex gap-2 pt-1">
                 <button
                   type="button"
-                  onClick={() => setShowAddEditModal(false)}
-                  className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-colors"
+                  onClick={() => setQuickDuration(5)}
+                  className="rounded-lg border border-white/10 bg-slate-950 px-2.5 py-1 text-[11px] text-slate-300 hover:border-amber-400 hover:text-white"
                 >
-                  ยกเลิก
+                  ⏱️ กำหนด 1 ภาคเรียน (5 เดือน)
                 </button>
                 <button
-                  type="submit"
-                  className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-95"
+                  type="button"
+                  onClick={() => setQuickDuration(12)}
+                  className="rounded-lg border border-white/10 bg-slate-950 px-2.5 py-1 text-[11px] text-slate-300 hover:border-amber-400 hover:text-white"
                 >
-                  {editingSchool ? 'บันทึกการแก้ไข' : 'ยืนยันเพิ่มโรงเรียน'}
+                  💎 กำหนด 1 ปีการศึกษา (12 เดือน)
                 </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* ── Share / Copy Portal URL Modal ─────────────────────────── */}
-      {showShareModal && shareTargetSchool && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-          <div className="glass-card-dark border border-amber-500/30 w-full max-w-md p-6 rounded-3xl shadow-2xl text-white space-y-4">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h2 className="text-base font-black text-white flex items-center gap-2">
-                <span><UIIcon value={"🔗"} /> ลิงก์ Portal ประจำโรงเรียน</span>
-              </h2>
-              <button
-                onClick={() => setShowShareModal(false)}
-                className="text-slate-400 hover:text-white text-xl"
-              >
-                <UIIcon value={"✕"} />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div className="p-3 bg-slate-950/70 rounded-xl border border-white/10 space-y-1">
-                <div className="font-bold text-amber-300">{shareTargetSchool.name}</div>
-                <div className="text-[11px] text-slate-400 font-mono">รหัสโรงเรียน: {shareTargetSchool.code}</div>
-              </div>
-
-              <div>
-                <label className="block text-slate-300 font-bold mb-1">ลิงก์ทางเข้าสำหรับนักเรียนและครู:</label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    readOnly
-                    value={getPortalUrl(shareTargetSchool.code)}
-                    className="flex-1 bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-white font-mono text-[11px] select-all"
-                  />
-                  <button
-                    onClick={() => handleCopyLink(shareTargetSchool.code)}
-                    className="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl transition-all shrink-0 active:scale-95"
-                  >
-                    คัดลอก
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl space-y-1.5 text-emerald-300 text-[11px]">
-                <div className="font-bold flex items-center gap-1">
-                  <span><UIIcon value={"💡"} /> คำแนะนำการส่งต่อ:</span>
-                </div>
-                <p className="text-slate-300 leading-relaxed">
-                  คุณครูสามารถส่งลิงก์นี้ลงกลุ่ม Line หรือ Facebook ของโรงเรียน เพื่อให้นักเรียนและครูคลิกเข้าใช้งานได้ทันที ระบบจะล็อกรหัสโรงเรียนนี้ให้อัตโนมัติครับ
-                </p>
-              </div>
-
-              <button
-                onClick={() => setShowShareModal(false)}
-                className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl transition-colors mt-2"
-              >
-                ปิดหน้าต่าง
-              </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ── Confirm Delete Modal ──────────────────────────────────── */}
-      {confirmDeleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-          <div className="glass-card-dark border border-rose-500/40 w-full max-w-sm p-6 rounded-3xl shadow-2xl text-white space-y-4 text-center">
-            <div className="text-4xl"><UIIcon value={"⚠️"} /></div>
-            <h2 className="text-lg font-black text-white">ยืนยันการลบโรงเรียน?</h2>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              การลบจะนำโรงเรียนนี้ออกจากระบบ Super Admin คุณแน่ใจหรือไม่ที่จะดำเนินการต่อ?
-            </p>
-            <div className="flex gap-2 pt-2">
-              <button
-                onClick={() => setConfirmDeleteId(null)}
-                className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-colors text-xs"
-              >
-                ยกเลิก
-              </button>
-              <button
-                onClick={() => handleDelete(confirmDeleteId)}
-                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl transition-colors text-xs"
-              >
-                ยืนยันลบ
-              </button>
-            </div>
+          <div className="flex justify-end pt-2">
+            <button className="min-h-11 rounded-xl bg-amber-400 px-5 font-black text-slate-950">ถัดไป: เชิญผู้ดูแล →</button>
           </div>
-        </div>
+        </form>
+      ) : (
+        <form onSubmit={createSchool} className="space-y-5">
+          <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+            <label className="text-sm font-bold text-emerald-200">
+              อีเมล School Admin *
+              <input
+                type="email"
+                required
+                value={form.adminEmail}
+                onChange={e => setForm({ ...form, adminEmail: e.target.value })}
+                className={`${input} min-h-12 text-white`}
+                placeholder="admin@school.ac.th"
+              />
+            </label>
+            <p className="mt-2 text-xs text-slate-400">สร้างโรงเรียน สมาชิก และคำเชิญแบบ atomic ผ่าน RPC ไม่มีช่อง UUID และไม่ส่งรหัสผ่าน</p>
+          </div>
+          <div className="rounded-2xl bg-slate-950 p-4 text-sm">
+            <b>{form.name} ({form.code})</b>
+            <div className="text-slate-400">
+              {activePlans.find(p => p.id === form.planId)?.name} · {fmtDate(form.startsAt)} – {fmtDate(form.endsAt)}
+            </div>
+            {form.applicationId && (
+              <div className="mt-2 text-xs text-amber-300">
+                🔗 ผูกกับคำขอสมัครหมายเลข: {form.applicationId} (จะเปลี่ยนสถานะเป็นอนุมัติแล้วทันที)
+              </div>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setStep(1)} className="min-h-11 flex-1 rounded-xl border border-white/10 font-bold">← ย้อนกลับ</button>
+            <button disabled={saving} className="min-h-11 flex-1 rounded-xl bg-amber-400 font-black text-slate-950 disabled:opacity-50">
+              {saving ? 'กำลังสร้าง…' : 'สร้างและออกคำเชิญ'}
+            </button>
+          </div>
+        </form>
       )}
-
     </div>
-  );
+  </div>;
 }
