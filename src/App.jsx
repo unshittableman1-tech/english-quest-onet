@@ -1,35 +1,37 @@
-import { useState, useEffect, createContext, useContext, useCallback, useRef } from 'react';
+import { useState, useEffect, createContext, useContext, useCallback, useRef, lazy, Suspense } from 'react';
 import confetti from 'canvas-confetti';
 import LandingPage from './components/LandingPage';
 import StudentLoginPage from './components/StudentLoginPage';
 import TeacherLoginPage from './components/TeacherLoginPage';
-import PreTestPage from './components/PreTestPage';
 import QuestMap from './components/QuestMap';
-import Chapter3LearningPage from './components/Chapter3LearningPage';
-import MiniLesson from './components/MiniLesson';
-import QuizPage from './components/QuizPage';
-import BadgePage from './components/BadgePage';
-import StudentReport from './components/StudentReport';
 import AvatarSessionSync from './components/AvatarSessionSync';
-import TeacherDashboard from './components/TeacherDashboard';
-import FinalBoss from './components/FinalBoss';
-import ReviewMistakePage from './components/ReviewMistakePage';
-import RankingPage from './components/RankingPage';
 import Navigation from './components/Navigation';
 import XPToast from './components/XPToast';
-import OnetArena from './components/OnetArena';
-import OfficialOnetPage from './components/OfficialOnetPage';
-import HeadsUpCharades from './components/HeadsUpCharades';
-import ExamMode from './components/ExamMode';
-import ExamReport from './components/ExamReport';
-import MissionSelect from './components/MissionSelect';
-import GameMissionRouter from './components/games/GameMissionRouter';
-import TechniqueHub from './components/TechniqueHub';
-import VocabDrillHub from './components/VocabDrillHub';
-import RealOnetSimulator from './components/RealOnetSimulator';
-import FinalExamReport from './components/FinalExamReport';
-import SuperAdminDashboard from './components/SuperAdminDashboard';
-import SchoolAdminDashboard from './components/SchoolAdminDashboard';
+
+// Lazy-loaded components for optimal initial payload & classroom concurrency
+const PreTestPage = lazy(() => import('./components/PreTestPage'));
+const Chapter3LearningPage = lazy(() => import('./components/Chapter3LearningPage'));
+const MiniLesson = lazy(() => import('./components/MiniLesson'));
+const QuizPage = lazy(() => import('./components/QuizPage'));
+const BadgePage = lazy(() => import('./components/BadgePage'));
+const StudentReport = lazy(() => import('./components/StudentReport'));
+const TeacherDashboard = lazy(() => import('./components/TeacherDashboard'));
+const FinalBoss = lazy(() => import('./components/FinalBoss'));
+const ReviewMistakePage = lazy(() => import('./components/ReviewMistakePage'));
+const RankingPage = lazy(() => import('./components/RankingPage'));
+const OnetArena = lazy(() => import('./components/OnetArena'));
+const OfficialOnetPage = lazy(() => import('./components/OfficialOnetPage'));
+const HeadsUpCharades = lazy(() => import('./components/HeadsUpCharades'));
+const ExamMode = lazy(() => import('./components/ExamMode'));
+const ExamReport = lazy(() => import('./components/ExamReport'));
+const MissionSelect = lazy(() => import('./components/MissionSelect'));
+const GameMissionRouter = lazy(() => import('./components/games/GameMissionRouter'));
+const TechniqueHub = lazy(() => import('./components/TechniqueHub'));
+const VocabDrillHub = lazy(() => import('./components/VocabDrillHub'));
+const RealOnetSimulator = lazy(() => import('./components/RealOnetSimulator'));
+const FinalExamReport = lazy(() => import('./components/FinalExamReport'));
+const SuperAdminDashboard = lazy(() => import('./components/SuperAdminDashboard'));
+const SchoolAdminDashboard = lazy(() => import('./components/SchoolAdminDashboard'));
 import AcceptInvitationModal from './components/AcceptInvitationModal';
 import OwnerActivationPage from './components/OwnerActivationPage';
 import {
@@ -58,7 +60,7 @@ import { fetchServerStudentProfile } from './utils/studentProgressApi';
 import { createDemoStudent } from './data/demoFixtures';
 import { buildGameMissionRewardProgress } from './utils/gameMissionRewards';
 import { buildDemoQuestProgress } from './utils/demoQuestProgress';
-import DemoAdventureHub from './components/demo/DemoAdventureHub';
+const DemoAdventureHub = lazy(() => import('./components/demo/DemoAdventureHub'));
 import { isDemoPath, DEMO_CONFIG } from './config/demoConfig';
 import { getGuestDemoSession, isGuestDemoSession, clearGuestDemoSession, addDemoXPToSession, saveGuestDemoSession } from './utils/demoSession';
 import { restoreStudentSession } from './utils/studentAuth';
@@ -75,6 +77,18 @@ export const useApp = () => useContext(AppContext);
 
 // Pages that show bottom nav
 const SHOW_NAV_PAGES = ['map', 'vocab-drill', 'badge', 'report', 'review', 'ranking'];
+
+
+function PageLoadingFallback() {
+  return (
+    <div className="flex items-center justify-center min-h-[50vh]" role="status" aria-live="polite">
+      <div className="text-center p-6">
+        <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+        <p className="text-sm font-bold text-slate-700">กำลังเตรียมความพร้อม...</p>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const ownerActivationRequested = typeof window !== 'undefined'
@@ -772,6 +786,7 @@ export default function App() {
 
       {/* Main content */}
       <div id="app-content" tabIndex={-1} className={`relative z-10 app-page-content ${showNav ? 'has-bottom-navigation' : ''} ${page === 'ranking' ? 'is-ranking-page' : ''}`}>
+        <Suspense fallback={<PageLoadingFallback />}>
         {/* Public pages */}
         {page === 'landing'        && <LandingPage />}
         {page === 'student-login'  && <StudentLoginPage />}
@@ -873,7 +888,7 @@ export default function App() {
           ? (student?.role === 'super_admin' ? <SchoolAdminDashboard onBackToTeacher={() => setPage('teacher')} /> : <TeacherDashboard initialTab="student_management" />) : <TeacherLoginPage />)}
         {page === 'super-admin' && (canAccessPage(student, 'super-admin')
           ? <SuperAdminDashboard /> : <TeacherLoginPage />)}
-      </div>
+              </Suspense></div>
 
       {/* Bottom Navigation */}
       {showNav && <Navigation />}
