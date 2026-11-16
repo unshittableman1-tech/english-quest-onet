@@ -227,11 +227,13 @@ function LegacyQuizPage({ questId }) {
       isMainCorrect,
       isReasonCorrect,
       question: q,
+      learningMode: !isExamMode && !questId.includes('boss') ? 'practice' : null,
+      learningQuestId: questId,
       questionGuide,
       timeSpent // pass to handleNext
     });
     setShowFeedback(true);
-  }, [selected, showFeedback, wrongAttempts, q, questionGuide, questionStartTime, addXP, student, saveMistake, currentStep, mainSelected, showToast, twoStepSessionStats, firstResponseScoring, currentIdx]);
+  }, [selected, showFeedback, wrongAttempts, q, questionGuide, questionStartTime, addXP, student, saveMistake, currentStep, mainSelected, showToast, twoStepSessionStats, firstResponseScoring, currentIdx, isExamMode, questId]);
 
   const handleNext = useCallback((retrying = false) => {
     if (nextLock.current) return;

@@ -56,10 +56,32 @@ export default function PricingSection({ onApplySchool, onSelectPlan }) {
           รอบสิทธิ์การใช้งาน: <span className="font-semibold text-amber-400">{activeCycle.periodDesc}</span>
           {cycle === 'monthly' && ' (แพ็กเกจระดับโรงเรียนเปิดเฉพาะรอบรายเทอมและรายปีตามรอบงบประมาณ)'}
         </div>
+        {/* 15-Day Free School Pass Banner */}
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-amber-500/10 border border-amber-400/40 text-left max-w-2xl mx-auto shadow-lg">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">🎁</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-black text-amber-300">15-Day Free School Pass</span>
+                <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">ทดลองฟรี 100%</span>
+              </div>
+              <p className="text-xs text-slate-300 mt-0.5">
+                เปิดสิทธิ์นักเรียน 30–50 คน และครู 1 ท่าน ใช้งานเต็มรูปแบบ 15 วัน พร้อมรับรายงานสรุปผล Pre-test เสนอ ผอ.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => handlePlanClick({ id: 'school_starter' })}
+            className="whitespace-nowrap px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-md transition-all cursor-pointer shrink-0"
+          >
+            ขอสิทธิ์ทดลองฟรี →
+          </button>
+        </div>
       </div>
 
       {/* Cards Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 items-stretch">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 items-stretch">
         {PRICING_PLANS.map((plan) => {
           const price = plan.prices[cycle];
           const isAvailableInCycle = price !== null;

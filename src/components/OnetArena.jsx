@@ -67,7 +67,7 @@ export default function OnetArena({ student, onBack, onStartExam, onStartFinalEx
   }, [refreshing, student]);
 
   if (syncing || !stats) return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="onex-arena-entry min-h-screen flex items-center justify-center">
       <div className="text-center space-y-3">
         <div className="w-10 h-10 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto" />
         <p className="text-amber-700 text-sm font-bold">กำลังโหลดคะแนน...</p>

@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { playCorrectSound, playWrongSound } from '../../utils/audio';
 import { useSpeech } from '../../utils/useSpeech';
 
-export default function AudioDetectiveGame({ cards, title, onBack, onComplete, onEvidence }) {
+export default function AudioDetectiveGame({ cards, title, onBack, onComplete, onEvidence, onPracticed, choiceCards = cards }) {
   const { speak, speaking } = useSpeech();
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -27,7 +27,7 @@ export default function AudioDetectiveGame({ cards, title, onBack, onComplete, o
     setSelectedChoiceId(null);
 
     // Create 4 choices
-    const others = cards.filter(c => c.id !== card.id);
+    const others = choiceCards.filter(c => c.id !== card.id);
     const shuffledOthers = [...others].sort(() => Math.random() - 0.5).slice(0, 3);
     const all = [card, ...shuffledOthers].sort(() => Math.random() - 0.5);
     setChoices(all);
@@ -50,6 +50,7 @@ export default function AudioDetectiveGame({ cards, title, onBack, onComplete, o
     setRevealed(true);
 
     const isCorrect = choice.id === currentCard.id;
+    onPracticed?.(currentCard);
     onEvidence?.({ card: currentCard, mode: 'audio', correct: isCorrect, assisted: false, observationId: String(qIndex) });
 
     if (isCorrect) {
@@ -60,7 +61,7 @@ export default function AudioDetectiveGame({ cards, title, onBack, onComplete, o
 
       if (newStreak === 10) {
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-        if (onComplete) onComplete(10);
+        // Completion follows coverage, not a ten-answer winning streak.
       }
     } else {
       playWrongSound();
@@ -68,7 +69,8 @@ export default function AudioDetectiveGame({ cards, title, onBack, onComplete, o
     }
 
     setTimeout(() => {
-      setQIndex(prev => prev + 1);
+      if (qIndex + 1 >= Math.min(10, cards.length)) onComplete?.(10);
+      else setQIndex(prev => prev + 1);
     }, 1800);
   };
 
@@ -83,7 +85,7 @@ export default function AudioDetectiveGame({ cards, title, onBack, onComplete, o
         </button>
         <div className="text-center">
           <span className="text-amber-400 font-black text-sm"><UIIcon value={"🔊"} /> นักสืบหูทองคำ: {title}</span>
-          <p className="text-[10px] text-slate-400">ฟังเสียงฝรั่งแล้วเลือกความหมายที่ถูกต้อง</p>
+          <p className="text-[10px] text-slate-400">ข้อ {qIndex + 1}/{Math.min(10, cards.length)} · ฟังแล้วเลือกความหมายที่ถูกต้อง</p>
         </div>
         <div className="text-right">
           <span className="text-xs font-bold text-amber-300 bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">

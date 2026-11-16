@@ -73,6 +73,8 @@ export default function ReviewMistakePage() {
       reasonSelectedIdx: q.type === 'two_step' ? idx : null,
       isMainCorrect, isReasonCorrect,
       question: q,
+      learningMode: !q.quest?.includes('boss') ? 'practice' : null,
+      learningQuestId: q.quest,
     });
     setShowFeedback(true);
   }, [selected, showFeedback, q, wrongAttempts, student, processReviewAnswer, addXP, checkBadges, currentStep, mainSelected]);

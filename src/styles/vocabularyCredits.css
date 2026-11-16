@@ -1,0 +1,65 @@
+.credit-lab { max-width: 1060px; margin: 24px auto; padding: 20px 20px 110px; color: #17395c; background: #f3faff; border: 1px solid #b3d4e7; border-radius: 24px; }
+.credit-lab * { box-sizing: border-box; }
+.credit-lab button,.credit-lab select { min-height: 44px; padding: 10px 14px; border: 1px solid #9abed7; border-radius: 12px; background: #fff; color: #17395c; font: inherit; }
+.credit-lab button { cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.credit-lab button:not(.credit-secondary):not(.credit-word) { background: #fff1bd; border-color: #d6b25e; }
+.credit-lab button:disabled { opacity: .55; cursor: default; }
+.credit-lab :is(button,select,summary):focus-visible { outline: 3px solid #0271a5; outline-offset: 3px; }
+.credit-lab h1 { font-size: clamp(24px,4vw,34px); margin: 4px 0; }
+.credit-lab h2 { font-size: 22px; margin: 0 0 12px; }
+.credit-lab h3 { font-size: 20px; margin: 0 0 8px; }
+.credit-lab p { line-height: 1.7; margin: 8px 0 14px; }
+.credit-header,.credit-rolebar,.credit-wallet,.credit-policy-control { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.credit-header { margin: 24px 0; }
+.credit-header h1,.credit-wallet>div,.credit-panel>h2 { display: flex; align-items: center; gap: 10px; }
+.credit-eyebrow { font-size: 12px; letter-spacing: .1em; font-weight: 800; color: #8a5812; }
+.credit-pilot-notice { background: #fff3c8; padding: 12px 16px; border-radius: 12px; color: #654915; }
+.credit-rolebar label,.credit-policy-control label { display: grid; gap: 8px; }
+.credit-rolebar select { width: 100%; max-width: 100%; }
+.credit-status { min-height: 26px; color: #205e4e; }
+.credit-wallet { background: linear-gradient(110deg,#e4f2ff,#eee3ff); border: 1px solid #b5b4da; border-radius: 18px; padding: 18px 22px; }
+.credit-wallet strong { font-size: 30px; }
+.credit-wallet p { margin: 0; }
+.credit-panel { margin-top: 20px; padding: 22px; background: white; border: 1px solid #c2d7e6; border-radius: 18px; }
+.credit-word-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+.credit-word-grid article { min-width: 0; padding: 16px; background: #f7fbff; border: 1px solid #bfd7ea; border-radius: 14px; }
+.credit-word-grid article>button { width: 100%; margin: 5px 0; }
+.credit-word-grid small { display: block; line-height: 1.6; margin-top: 8px; }
+.credit-check { border-color: #d0aa4c; background: #fffdf4; scroll-margin: 24px; }
+.credit-options { display: grid; gap: 12px; }
+.credit-options button { text-align: left; justify-content: flex-start; }
+.credit-result { font-weight: 700; }
+.credit-reading { background: #f5fffa; }
+.credit-sentence { font-size: clamp(20px,3vw,26px); }
+.credit-lab button.credit-word { display: inline; border-radius: 5px; border: 0; border-bottom: 2px dashed #006ca0; background: #e4f4ff; padding: 2px 5px; font-size: inherit; }
+.credit-note { font-size: 14px; color: #48637a; }
+.credit-error { border: 1px solid #e5a1a1; background: #fff2f2; color: #9b2525; padding: 12px; border-radius: 10px; }
+.credit-teacher-row { border: 1px solid #c2d7e6; border-radius: 14px; padding: 18px; margin: 16px 0; }
+.credit-teacher-row details { margin-top: 16px; }
+.credit-lab summary { cursor: pointer; padding: 8px 0; }
+.credit-lab ul { padding-left: 22px; line-height: 1.8; }
+.credit-dialog { width: min(480px,calc(100vw - 32px)); max-height: calc(100dvh - 48px); overflow-y: auto; border: 2px solid #d8b14f; border-radius: 18px; padding: 24px; color: #17395c; background: #fffdf5; }
+.credit-dialog::backdrop { background: #10243eb3; }
+.credit-dialog button { margin: 6px 8px 0 0; }
+.credit-meaning { font-size: 24px; font-weight: 700; }
+.credit-set-progress { border: 1px solid #b9d9d0; background: #f3fff9; padding: 18px; margin: 16px 0; border-radius: 14px; }
+.credit-set-progress ol { list-style: none; padding: 0; }
+.credit-set-progress li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #d2e6df; flex-wrap: wrap; }
+.credit-set-progress li[data-completed="true"]>span { color: #116647; font-weight: 700; }
+.credit-game-fieldset { border: 0; min-width: 0; padding: 0; margin: 0; }
+.credit-game-banner { padding: 12px 18px; background: #fff0b9; color: #17395c; font-weight: 700; }
+.credit-training-game { padding-bottom: 100px; }
+.credit-inline-wallet { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; padding: 12px 16px; border: 1px solid #c4b4db; background: #f1eaff; color: #17395c; border-radius: 12px; margin: 16px 0; }
+.credit-gloss-word { display: inline; font: inherit; font-weight: 700; color: #075985; background: #e0f2fe; border: 0; border-bottom: 2px dashed #0284c7; border-radius: 4px; padding: 0 2px; cursor: pointer; }
+.credit-gloss-word.credit-gloss-missing { color: inherit; font-weight: inherit; background: transparent; border-bottom-color: #94a3b8; }
+.credit-gloss-word:focus-visible { outline: 3px solid #ca8a04; outline-offset: 2px; }
+.credit-lab .credit-gloss-text button.credit-gloss-word { display: inline; min-height: 0; padding: 0 2px; border: 0; border-bottom: 2px dashed #0284c7; border-radius: 4px; background: #e0f2fe; color: #075985; font: inherit; font-weight: 700; }
+.credit-lab .credit-gloss-text button.credit-gloss-word.credit-gloss-missing { color: inherit; font-weight: inherit; background: transparent; border-bottom-color: #94a3b8; }
+.credit-dialog button { min-height: 44px; padding: 10px 14px; border: 1px solid #d6b25e; border-radius: 12px; background: #fff1bd; color: #17395c; font: inherit; cursor: pointer; }
+.credit-dialog .credit-secondary { background: #fff; border-color: #9abed7; }
+.credit-dialog p { line-height: 1.7; margin: 14px 0; }
+.credit-panel select { max-width: 100%; display: block; margin-top: 8px; }
+.quiz-credit-choice { display: flex; gap: 12px; align-items: flex-start; }
+.quiz-credit-choice>button { min-width: 44px; min-height: 44px; flex-shrink: 0; border: 1px solid #94bed7; border-radius: 8px; color: #17395c; background: #fff; font-weight: 700; }
+@media(max-width:640px) { .credit-lab { margin: 8px; padding: 14px 12px 100px; } .credit-word-grid { grid-template-columns: 1fr; } .credit-panel { padding: 16px; } .credit-rolebar label { min-width: 0; width: 100%; } .credit-policy-control { align-items: stretch; flex-direction: column; } }
+@media(prefers-reduced-motion:reduce) { .credit-lab *, .credit-lab *::before, .credit-lab *::after { animation: none!important; transition: none!important; scroll-behavior: auto!important; } }

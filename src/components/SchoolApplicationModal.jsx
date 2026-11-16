@@ -13,6 +13,7 @@ export default function SchoolApplicationModal({
   const [selectedPlanId, setSelectedPlanId] = useState('student_hero');
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [needQuotation, setNeedQuotation] = useState(false);
+  const [isTrialPass, setIsTrialPass] = useState(false);
 
   const [form, setForm] = useState({
     schoolName: '',
@@ -35,22 +36,34 @@ export default function SchoolApplicationModal({
   useEffect(() => {
     if (!isOpen) return;
 
-    if (initialPlanId === 'teacher_pro') {
+    if (initialCycle === 'trial' || initialPlanId === 'trial') {
+      setCategory('school');
+      setSelectedPlanId('school_starter');
+      setBillingCycle('semester');
+      setIsTrialPass(true);
+      setForm(prev => ({ ...prev, expectedStudents: 45, expectedTeachers: 1 }));
+      setNeedQuotation(false);
+    } else if (initialPlanId === 'teacher_pro') {
       setCategory('teacher');
       setSelectedPlanId('teacher_pro');
       setBillingCycle(initialCycle || 'semester');
+      setIsTrialPass(false);
       setForm(prev => ({ ...prev, expectedStudents: 40, expectedTeachers: 1 }));
     } else if (initialPlanId && (initialPlanId.startsWith('school_') || initialPlanId === 'superpower')) {
       setCategory('school');
       setSelectedPlanId(initialPlanId);
-      setBillingCycle(initialCycle && initialCycle !== 'monthly' ? initialCycle : 'semester');
-      setForm(prev => ({ ...prev, expectedStudents: 150, expectedTeachers: 5 }));
+      setBillingCycle(initialCycle && initialCycle !== 'monthly' && initialCycle !== 'trial' ? initialCycle : 'semester');
+      setIsTrialPass(false);
+      const defaultStudents = initialPlanId === 'school_micro' ? 20 : (initialPlanId === 'school_starter' ? 50 : 150);
+      const defaultTeachers = initialPlanId === 'school_micro' ? 1 : (initialPlanId === 'school_starter' ? 3 : 5);
+      setForm(prev => ({ ...prev, expectedStudents: defaultStudents, expectedTeachers: defaultTeachers }));
       setNeedQuotation(true);
     } else {
       // Default: Student Hero
       setCategory('student');
       setSelectedPlanId('student_hero');
       setBillingCycle(initialCycle || 'monthly');
+      setIsTrialPass(false);
       setForm(prev => ({ ...prev, expectedStudents: 1, expectedTeachers: 0 }));
       setNeedQuotation(false);
     }
@@ -69,10 +82,11 @@ export default function SchoolApplicationModal({
     perStudentRate = currentPlan.perStudentFee?.[billingCycle] ?? (billingCycle === 'monthly' ? 10 : billingCycle === 'yearly' ? 40 : 25);
     perStudentTotal = studentCount * perStudentRate;
   }
-  const price = basePrice + perStudentTotal;
+  const price = isTrialPass ? 0 : (basePrice + perStudentTotal);
 
   const handleCategoryChange = (newCat) => {
     setCategory(newCat);
+    setIsTrialPass(false);
     if (newCat === 'student') {
       setSelectedPlanId('student_hero');
       setForm(prev => ({ ...prev, expectedStudents: 1, expectedTeachers: 0 }));
@@ -100,16 +114,20 @@ export default function SchoolApplicationModal({
 
     setSaving(true);
     try {
-      const cycleText = billingCycle === 'monthly' ? 'รายเดือน (30 วัน)' : billingCycle === 'semester' ? 'รายเทอม (5 เดือน)' : 'รายปี (12 เดือน)';
+      const cycleText = isTrialPass
+        ? 'ทดลองใช้ฟรี 15 วัน (Trial Pass)'
+        : (billingCycle === 'monthly' ? 'รายเดือน (30 วัน)' : billingCycle === 'semester' ? 'รายเทอม (5 เดือน)' : 'รายปี (12 เดือน)');
       const result = await submitSchoolApplication({
         ...form,
         applicantType: category,
-        packageInterest: currentPlan.id,
-        packageName: currentPlan.name,
-        billingCycle: billingCycle,
+        packageInterest: isTrialPass ? 'trial' : currentPlan.id,
+        packageName: isTrialPass ? '15-Day Free School Pass' : currentPlan.name,
+        billingCycle: isTrialPass ? 'trial' : billingCycle,
         cycleLabel: cycleText,
-        approxPrice: price,
-        needQuotation: needQuotation,
+        approxPrice: isTrialPass ? 0 : price,
+        isTrial: isTrialPass,
+        trialDays: isTrialPass ? 15 : null,
+        needQuotation: isTrialPass ? false : needQuotation,
       });
       setSuccessResult(result);
     } catch (err) {
@@ -304,9 +322,43 @@ export default function SchoolApplicationModal({
                   </div>
                 </div>
 
+                {/* 15-Day Free School Pass Option */}
+                {category === 'school' && (
+                  <div className={`rounded-2xl border p-3.5 flex items-start gap-3 transition-all ${
+                    isTrialPass
+                      ? 'border-amber-400 bg-amber-400/15 shadow-md shadow-amber-500/10'
+                      : 'border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50'
+                  }`}>
+                    <input
+                      type="checkbox"
+                      id="trial-pass-checkbox"
+                      checked={isTrialPass}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setIsTrialPass(checked);
+                        if (checked) {
+                          setForm(prev => ({ ...prev, expectedStudents: 45, expectedTeachers: 1 }));
+                        }
+                      }}
+                      className="mt-1 h-4 w-4 rounded accent-amber-400 cursor-pointer"
+                    />
+                    <label htmlFor="trial-pass-checkbox" className="cursor-pointer text-xs flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-black text-amber-300">🎁 ขอรับสิทธิ์ 15-Day Free School Pass (ทดลองฟรี 15 วัน)</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          ฿0 ฟรีไม่มีข้อผูกมัด
+                        </span>
+                      </div>
+                      <span className="text-slate-300 block mt-1 leading-relaxed">
+                        เปิดสิทธิ์นักเรียน 30–50 คน และครู 1 ท่าน ใช้งานระบบเต็มรูปแบบ 15 วัน พร้อมสร้างรายงานวิเคราะห์จุดอ่อน O-NET เสนอ ผอ.
+                      </span>
+                    </label>
+                  </div>
+                )}
+
                 {/* Cards rendering based on category */}
                 {category === 'school' ? (
-                  <div className="grid gap-2 sm:grid-cols-3">
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                     {PRICING_PLANS.filter(p => p.schoolApplicable).map(plan => {
                       const planPrice = plan.prices[billingCycle];
                       const isSelected = selectedPlanId === plan.id;
@@ -588,7 +640,7 @@ export default function SchoolApplicationModal({
                   disabled={saving}
                   className="min-h-12 flex-[2] rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-sm shadow-lg shadow-amber-400/20 transition-all disabled:opacity-50"
                 >
-                  {saving ? 'กำลังส่งข้อมูล…' : category === 'school' ? 'ยื่นขอรับแพ็กเกจ & ใบเสนอราคา →' : `ยืนยันสมัคร ${currentPlan.name} (${formatPrice(price)}) →`}
+                  {saving ? 'กำลังส่งข้อมูล…' : isTrialPass ? '🚀 ยืนยันขอรับสิทธิ์ 15-Day Free School Pass (ฟรี 100%) →' : category === 'school' ? 'ยื่นขอรับแพ็กเกจ & ใบเสนอราคา →' : `ยืนยันสมัคร ${currentPlan.name} (${formatPrice(price)}) →`}
                 </button>
               </div>
             </form>

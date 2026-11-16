@@ -79,6 +79,32 @@ export const PRICING_PLANS = [
     schoolApplicable: false,
   },
   {
+    id: 'school_micro',
+    name: 'School Micro',
+    badge: 'โรงเรียนขนาดเล็ก (10–25 คน) 💡',
+    icon: '🌱',
+    target: 'โรงเรียนขนาดเล็ก / กะทัดรัด (1–25 คน)',
+    description: 'แพ็กเกจประหยัดพิเศษสำหรับโรงเรียนขนาดเล็ก หรือโรงเรียนขยายโอกาสที่มีนักเรียน ป.6 จำนวน 10–25 คน',
+    prices: {
+      monthly: null,
+      semester: 1190,
+      yearly: 1890,
+    },
+    quota: 'นักเรียน 25 ที่นั่ง · ครู 1 ท่าน',
+    features: [
+      'สิทธิ์ใช้งานครบทุกบทเรียนสำหรับนักเรียน 1–25 คน',
+      'ดูแลโดยครูผู้สอน 1 ท่าน',
+      'ระบบรหัสนักเรียนและรหัส PIN 6 หลัก ปลอดภัยสูง',
+      'Pre-test & Post-test วิเคราะห์จุดอ่อนตามตัวชี้วัด สพฐ.',
+      'รายงานสรุปผล O-NET สำหรับเสนอผู้บริหาร (Executive PDF)',
+      'ออกใบเสนอราคาและเอกสารเบิกจ่ายงบเรียนฟรีได้'
+    ],
+    ctaText: 'ขอใบเสนอราคา / สมัครแพ็กเกจ',
+    popular: false,
+    type: 'school',
+    schoolApplicable: true,
+  },
+  {
     id: 'school_starter',
     name: 'School Starter',
     badge: 'เริ่มต้นระดับโรงเรียน',

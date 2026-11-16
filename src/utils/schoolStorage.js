@@ -111,6 +111,8 @@ export function saveSchool(schoolData) {
       email: schoolData.email || '',
       phone: schoolData.phone || '',
       quota: Number(schoolData.quota) || 100,
+      agreedPrice: schoolData.agreedPrice != null ? Number(schoolData.agreedPrice) : null,
+      customSeats: schoolData.customSeats != null ? Number(schoolData.customSeats) : null,
       activeStudents: Number(schoolData.activeStudents) || 0,
       avgScore: Number(schoolData.avgScore) || 0,
       status: schoolData.status || 'active',

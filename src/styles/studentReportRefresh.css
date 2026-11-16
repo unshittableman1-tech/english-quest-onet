@@ -1,0 +1,1764 @@
+/* ========================================================================= */
+/* STUDENT LEARNING REPORT — PREMIUM RPG DASHBOARD REDESIGN                   */
+/* ========================================================================= */
+
+.student-report-page {
+  --ink: #123d63;
+  --muted: #4a6d88;
+  --primary-blue: #1b68a6;
+  --royal-blue: #123d67;
+  --gold-accent: #f4b942;
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(215, 236, 248, 0.95);
+  --card-shadow: 0 10px 28px rgba(18, 62, 103, 0.08);
+
+  min-height: 100vh;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding: 24px 16px 80px;
+  color: var(--ink);
+  color-scheme: light;
+  background: linear-gradient(180deg, #d7eef9 0%, #edf6fc 450px, #f5fafe 1000px);
+  position: relative;
+}
+
+.student-report-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/hero-bg.jpg');
+  background-size: cover;
+  background-position: center top;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.student-report-shell {
+  position: relative;
+  z-index: 1;
+  width: min(1200px, 100%);
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* ── Section A: Header ───────────────────────────────────────────────────── */
+.student-report-page .report-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 22px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--card-shadow);
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.report-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.report-title-icon {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1e7dc1, #0d5389);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(25, 123, 192, 0.28);
+  flex-shrink: 0;
+}
+
+.report-header h1 {
+  margin: 0;
+  font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.report-header p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.report-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.report-semester-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #edf6fd;
+  border: 1px solid #cce4f5;
+  color: #1e527d;
+  font-size: 0.825rem;
+  font-weight: 700;
+}
+
+.report-map-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  min-height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffc83b, #f59e0b);
+  border: 1px solid #e5a019;
+  color: #553300;
+  font-weight: 800;
+  font-size: 0.875rem;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.report-map-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
+}
+
+/* ── Section B: Hero Student Profile ─────────────────────────────────────── */
+.student-report-page .report-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) minmax(260px, 0.85fr);
+  align-items: center;
+  gap: 20px 24px;
+  padding: 24px 28px;
+  border-radius: 22px;
+  background: linear-gradient(115deg, #113c66 0%, #155584 55%, #1a6d9e 100%);
+  box-shadow: 0 14px 34px rgba(18, 62, 103, 0.22);
+  color: #fff;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.report-hero-character {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.report-character-img {
+  max-height: 100px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.3));
+}
+
+.student-report-page .report-avatar {
+  border: 3px solid #ffdc73;
+  border-radius: 16px;
+  padding: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.student-report-page .report-identity {
+  min-width: 0;
+}
+
+.student-report-page .report-identity h2 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  font-weight: 800;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.report-student-class {
+  margin: 4px 0 0;
+  color: #cde6f5;
+  font-size: 0.9rem;
+}
+
+.report-identity-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.report-level-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #ffdb76;
+  color: #553700;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.report-level-title {
+  color: #e5f2fa;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.student-report-page .report-identity-awards {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 12px;
+  color: #ffedba;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.student-report-page .report-identity-awards span,
+.student-report-page .report-identity-awards button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  min-height: 36px;
+}
+
+.student-report-page .report-identity-awards button:hover {
+  text-decoration: underline;
+}
+
+.report-hero-xp {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6px 0 6px 26px;
+  border-left: 1px solid rgba(255, 255, 255, 0.22);
+  min-width: 0;
+}
+
+.report-xp-label {
+  color: #c9e4f5;
+  font-size: 0.825rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.report-xp-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 10px;
+  color: #fff;
+  font-size: clamp(1.8rem, 2.5vw, 2.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.report-xp-star-icon {
+  color: #facc15;
+  fill: #facc15;
+  flex-shrink: 0;
+}
+
+.report-xp-value small {
+  font-size: 1rem;
+  color: #ffde7a;
+  font-weight: 700;
+}
+
+.report-xp-progress {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.report-xp-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+  transition: width 0.4s ease;
+}
+
+.report-xp-hint {
+  margin: 8px 0 0;
+  color: #d8edf8;
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+/* ── Generic Section Card ────────────────────────────────────────────────── */
+.student-report-page .report-section {
+  padding: 24px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--card-shadow);
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.report-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.report-section-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.report-heading-icon {
+  color: #0284c7;
+  flex-shrink: 0;
+}
+
+.report-section-heading h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.report-section-heading h2 small {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* ── Section C: Overview 4-Metric Grid ───────────────────────────────────── */
+.student-report-page .report-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.overview-metric-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 18px 20px;
+  border-radius: 16px;
+  border: 1px solid #d4e8f6;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(18, 62, 103, 0.04);
+  min-height: 160px;
+  box-sizing: border-box;
+  min-width: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.overview-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(18, 62, 103, 0.08);
+}
+
+.overview-metric-card.metric-time {
+  background: linear-gradient(145deg, #f1f8fe, #e5f2fc);
+  border-color: #c4e1f5;
+}
+
+.overview-metric-card.metric-test {
+  background: linear-gradient(145deg, #f7f3ff, #ede7fc);
+  border-color: #dcd0f7;
+}
+
+.overview-metric-card.metric-vocab {
+  background: linear-gradient(145deg, #f0faf5, #e3f5ec);
+  border-color: #c1e8d4;
+}
+
+.overview-metric-card.metric-rank {
+  background: linear-gradient(145deg, #fff9ee, #fff3dc);
+  border-color: #f7e0b5;
+}
+
+.metric-icon-wrap {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.metric-title {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.metric-value {
+  margin: 4px 0 2px;
+  font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.metric-sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.metric-action-btn {
+  margin-top: auto;
+  padding-top: 10px;
+  background: none;
+  border: 0;
+  color: #0369a1;
+  font-size: 0.825rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 40px;
+}
+
+.metric-action-btn:hover {
+  color: #075985;
+}
+
+/* ── Section C Next Step Banner ──────────────────────────────────────────── */
+.report-next-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: 1px solid #ffd880;
+  background: linear-gradient(135deg, #fff8e6, #fff3d4);
+  box-sizing: border-box;
+}
+
+.report-next-step strong {
+  display: block;
+  color: #855300;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.report-next-step p {
+  margin: 4px 0 0;
+  color: #4b360b;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.report-next-step button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 10px 18px;
+  min-height: 44px;
+  border-radius: 10px;
+  background: #ffc43d;
+  border: 1px solid #e0a31b;
+  color: #553200;
+  font-weight: 800;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.report-next-step button:hover {
+  transform: translateY(-1px);
+  background: #ffd35e;
+}
+
+/* ── Middle Grid Layout ─────────────────────────────────────────────────── */
+.report-middle-grid,
+.report-lower-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.report-column-left,
+.report-column-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* ── Radar Chart Section ─────────────────────────────────────────────────── */
+.report-radar-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.report-radar-svg-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.report-radar-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.report-radar-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.report-radar-badge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  border: 1px solid #d0e4f5;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 4px 12px rgba(18, 62, 103, 0.08);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  pointer-events: auto;
+  box-sizing: border-box;
+  max-width: 48%;
+}
+
+.report-radar-badge-icon {
+  display: grid;
+  place-items: center;
+  color: #0284c7;
+}
+
+.report-radar-badge-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.report-radar-badge-text .badge-name {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.report-radar-badge-text .badge-eng {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.report-radar-badge-text .badge-pct {
+  font-weight: 800;
+  color: #6366f1;
+}
+
+.report-radar-badge.is-unmeasured .badge-pct {
+  color: #64748b;
+  font-size: 0.725rem;
+}
+
+/* Position radar badges cleanly inside container boundaries */
+.report-radar-badge.axis-0 { top: 0; left: 50%; transform: translateX(-50%); }
+.report-radar-badge.axis-1 { top: 18%; right: 2%; }
+.report-radar-badge.axis-2 { bottom: 18%; right: 2%; }
+.report-radar-badge.axis-3 { bottom: 0; left: 50%; transform: translateX(-50%); }
+.report-radar-badge.axis-4 { bottom: 18%; left: 2%; }
+.report-radar-badge.axis-5 { top: 18%; left: 2%; }
+
+.report-radar-caption {
+  margin-top: 18px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.report-radar-caption .dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.report-radar-caption .dot.measured { background: #7c3aed; }
+.report-radar-caption .dot.unmeasured { background: #94a3b8; }
+
+/* ── Preserved Skill Evidence Profile Compliance ─────────────────────────── */
+.student-report-page .skill-evidence-profile {
+  color: rgb(26, 58, 92) !important;
+}
+
+/* ── Test Results Card ───────────────────────────────────────────────────── */
+.report-exam-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #f0f7fc;
+  border: 1px solid #d4e7f5;
+  color: #1e527d;
+  font-size: 0.825rem;
+  font-weight: 700;
+}
+
+.report-test-score-card {
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid #dbe6f3;
+  background: #f8fbff;
+  margin-bottom: 18px;
+  box-sizing: border-box;
+}
+
+.report-score-legend {
+  display: flex;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.report-score-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.legend-dot.dot-earned { background: #7c3aed; }
+.legend-dot.dot-prev { background: #94a3b8; }
+
+.report-test-score-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.report-test-score-bar {
+  flex: 1;
+  height: 28px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.report-test-score-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7c3aed, #a855f7);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+}
+
+.report-test-score-label {
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.report-test-score-total {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #7c3aed;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.student-report-page .report-exams h3 {
+  margin: 18px 0 8px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.report-exam-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.student-report-page .report-exam-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #dbe6f0;
+  background: #fff;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+}
+
+.student-report-page .report-exam-row strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.student-report-page .report-exam-row p {
+  margin: 2px 0 0;
+  font-size: 0.775rem;
+  color: var(--muted);
+}
+
+.student-report-page .report-exam-row b {
+  color: #7c3aed;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.report-comparison-note {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fff7df;
+  border: 1px solid #eed69b;
+  color: #754f0c;
+  font-size: 0.785rem;
+  line-height: 1.5;
+}
+
+/* ── Achievements Showcase ───────────────────────────────────────────────── */
+.report-badge-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.showcase-badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px 6px;
+  border-radius: 14px;
+  border: 1px solid #e2ecf5;
+  background: #fff;
+  box-sizing: border-box;
+  min-width: 0;
+  transition: transform 0.15s ease;
+}
+
+.showcase-badge-item:hover {
+  transform: translateY(-2px);
+}
+
+.showcase-badge-item.is-locked {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  opacity: 0.75;
+}
+
+.showcase-badge-art {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 8px;
+}
+
+.badge-lock-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #94a3b8;
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.showcase-badge-name {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.showcase-badge-desc {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.report-achievements-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  background: none;
+  border: 0;
+  color: #0284c7;
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 44px;
+}
+
+/* ── Quest Details & Chapters ────────────────────────────────────────────── */
+.student-report-page .report-chapters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.student-report-page .report-chapter {
+  border: 1px solid #c6dfe8;
+  border-radius: 14px;
+  background: #f8fcff;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.student-report-page .report-chapter > button {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto 24px;
+  align-items: center;
+  gap: 12px;
+  min-height: 74px;
+  padding: 14px 18px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.student-report-page .report-chapter > button:hover {
+  background: #eaf7fb;
+}
+
+.report-chapter-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  background: #197bc0;
+  flex-shrink: 0;
+}
+
+.student-report-page .report-chapter:nth-child(2) .report-chapter-number { background: #14836c; }
+.student-report-page .report-chapter:nth-child(3) .report-chapter-number { background: #7356a3; }
+.student-report-page .report-chapter:nth-child(4) .report-chapter-number { background: #b65e41; }
+.student-report-page .report-chapter:nth-child(5) .report-chapter-number { background: #996a0c; }
+
+.student-report-page .report-chapter > button > span:nth-child(2) strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.student-report-page .report-chapter > button > span:nth-child(2) small {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.report-chapter-count {
+  font-size: 0.875rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #123d63;
+  background: #e2edf6;
+  font-variant-numeric: tabular-nums;
+}
+
+.report-chapter-count.is-complete {
+  color: #0d6e4b;
+  background: #d4f3e5;
+}
+
+.student-report-page .report-quest-list {
+  padding: 8px 18px 16px;
+  border-top: 1px solid #e1eef6;
+  background: #fbfdff;
+}
+
+.student-report-page .report-quest-list > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed #e1edf5;
+  font-size: 0.875rem;
+}
+
+.student-report-page .report-quest-list > div:last-child {
+  border-bottom: 0;
+}
+
+.report-quest-status {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #64748b;
+  background: #e2e8f0;
+}
+
+.student-report-page .report-quest-list > div.is-passed .report-quest-status {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.student-report-page .report-quest-list > div > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+
+.student-report-page .report-quest-list > div > span:nth-child(2) strong {
+  display: block;
+  color: var(--ink);
+}
+
+.student-report-page .report-quest-list > div > span:nth-child(2) small {
+  display: block;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.student-report-page .report-quest-list > div > b {
+  font-weight: 800;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Engagement Card ─────────────────────────────────────────────────────── */
+.report-engagement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.engagement-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid #dce9f4;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.engagement-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.engagement-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.engagement-label-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.engagement-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  overflow: hidden;
+}
+
+.engagement-bar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.engagement-value {
+  margin-left: auto;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.engagement-stars {
+  margin-left: auto;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Section I: Recommended Learning Path ────────────────────────────────── */
+.report-path-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.path-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 22px;
+  border-radius: 18px;
+  border: 1px solid #d3e7f5;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(18, 62, 103, 0.04);
+  box-sizing: border-box;
+  min-width: 0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.path-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(18, 62, 103, 0.08);
+}
+
+.path-card.path-vocab {
+  background: linear-gradient(135deg, #f0f7ff 0%, #e2effc 100%);
+  border-color: #c4dff5;
+}
+
+.path-card.path-reading {
+  background: linear-gradient(135deg, #f5f2ff 0%, #ebe4fc 100%);
+  border-color: #d8ccf5;
+}
+
+.path-card.path-grammar {
+  background: linear-gradient(135deg, #f0fbf6 0%, #def5eb 100%);
+  border-color: #bce8d3;
+}
+
+.path-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.path-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.path-card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.path-card-body p {
+  margin: 0 0 14px;
+  font-size: 0.825rem;
+  color: var(--muted);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.path-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.825rem;
+  font-weight: 800;
+  border: 0;
+  cursor: pointer;
+  min-height: 38px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.path-action-btn:hover {
+  transform: translateX(2px);
+  opacity: 0.95;
+}
+
+.btn-vocab { background: #0284c7; color: #fff; }
+.btn-reading { background: #6366f1; color: #fff; }
+.btn-grammar { background: #059669; color: #fff; }
+
+.path-card-art {
+  font-size: 2.8rem;
+  margin-left: 12px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12));
+}
+
+/* ── Section J & K: Teacher's Note & Next Goal ───────────────────────────── */
+.report-summary-goal-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+  gap: 20px;
+}
+
+.student-report-page .report-teacher-note {
+  background: linear-gradient(135deg, #fffdf8 0%, #fff9ec 100%);
+  border: 1.5px solid #fde68a;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.08);
+}
+
+.student-report-page .report-teacher-note > .report-section-heading {
+  background: transparent;
+  padding: 0;
+  margin-bottom: 16px;
+}
+
+.student-report-page .report-teacher-note > .report-section-heading h2 {
+  color: #78350f;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.student-report-page .report-teacher-note > .report-section-heading small {
+  color: #92400e;
+  font-weight: 600;
+}
+
+.teacher-note-content {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+
+.teacher-avatar-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  border: 3px solid #7dd3fc;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.teacher-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.teacher-avatar-fallback {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.teacher-feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.feedback-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.885rem;
+  line-height: 1.45;
+}
+
+.feedback-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.feedback-badge.badge-good {
+  background: #10b981;
+  color: #fff;
+}
+
+.feedback-badge.badge-warn {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.feedback-badge.badge-goal {
+  background: #8b5cf6;
+  color: #fff;
+}
+
+.feedback-item p {
+  margin: 0;
+  color: #1e293b;
+  overflow-wrap: anywhere;
+}
+
+.feedback-item strong {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+/* Next Goal */
+.student-report-page .report-next-goal {
+  background: linear-gradient(135deg, #f8f6ff 0%, #ede8ff 100%);
+  border: 1.5px solid #ddd6fe;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.student-report-page .report-next-goal > .report-section-heading {
+  background: linear-gradient(110deg, #6366f1, #8b5cf6);
+  border-radius: 12px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.student-report-page .report-next-goal > .report-section-heading h2,
+.student-report-page .report-next-goal > .report-section-heading svg {
+  color: #fff;
+}
+
+.next-goal-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(221, 214, 254, 0.85);
+  box-sizing: border-box;
+}
+
+.goal-target-icon-wrap {
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 12px rgba(225, 29, 72, 0.28));
+}
+
+.goal-target-svg-art {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.goal-target-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.goal-target-number {
+  display: block;
+  font-size: clamp(2rem, 2.5vw, 2.4rem);
+  font-weight: 900;
+  color: #1e1b4b;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.goal-target-desc {
+  margin: 4px 0 0;
+  font-size: 0.885rem;
+  font-weight: 700;
+  color: #374151;
+  line-height: 1.35;
+}
+
+.goal-target-sub {
+  display: block;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+/* ── Preserved Records Grid ─────────────────────────────────────────────── */
+.report-records-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.student-report-page .report-records-card {
+  min-width: 0;
+}
+
+.student-report-page .report-records-card h3 {
+  margin: 16px 0 5px;
+  color: #244f6b;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.student-report-page .report-records-card p,
+.student-report-page .report-records-card li {
+  color: #365a70;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.student-report-page .report-records-card ul {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.report-records-explanation {
+  margin: 8px 0;
+  color: #365a70;
+  font-size: 0.875rem;
+}
+
+.report-records-explanation summary {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  color: #075d80;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.report-records-link {
+  min-height: 44px;
+  color: #075d80;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.student-report-page .report-activity-card { background: #f4fbff; }
+.student-report-page .report-vocabulary-card { background: #f2fbf5; }
+
+/* ========================================================================= */
+/* RESPONSIVE DESIGN (1280px, 1024px, 768px, 390px, 320px)                  */
+/* ========================================================================= */
+
+@media (max-width: 1024px) {
+  .student-report-page .report-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-path-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-middle-grid,
+  .report-lower-grid,
+  .report-summary-goal-grid,
+  .report-records-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .student-report-page {
+    padding: 16px 12px 90px;
+  }
+
+  .student-report-page .report-hero {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    padding: 20px;
+  }
+
+  .report-hero-character {
+    display: none;
+  }
+
+  .report-hero-xp {
+    grid-column: 1 / -1;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 16px 0 0;
+    margin-top: 4px;
+  }
+
+  .report-badge-showcase-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .student-report-page {
+    padding: 12px 8px 90px;
+  }
+
+  .student-report-page .report-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-badge-showcase-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .report-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .report-header-right {
+    justify-content: space-between;
+  }
+
+  .report-radar-badge {
+    padding: 2px 4px;
+    font-size: 0.68rem;
+  }
+}
+
+/* Report refinement: keep evidence full-width and preserve natural card height. */
+.student-report-shell { width: min(1280px, 100%); }
+.report-header h1 { font-size: clamp(1.5rem, 2vw, 1.875rem); }
+.report-middle-grid, .report-lower-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.report-evidence-overview { color: #355a76; line-height: 1.65; }
+.report-evidence-overview > p { margin: 0 0 16px; }
+.report-evidence-counts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.report-evidence-counts > div { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 16px; border-radius: 14px; background: #edf7fd; }
+.report-evidence-counts svg { color: #1675a5; }
+.report-evidence-counts strong { color: #163f66; font-size: 1.5rem; }
+.report-evidence-counts small, .report-evidence-counts span { font-size: .875rem; }
+.report-evidence-activity { display: flex; align-items: flex-start; gap: 8px; margin-top: 16px !important; font-size: .875rem; }
+.report-evidence-activity svg { flex: none; margin-top: 3px; }
+.student-report-page .skill-evidence-grid { align-items: start; }
+.student-report-page .skill-evidence-card { height: auto; }
+.student-report-page :is(button, summary):focus-visible { outline: 3px solid #0878ad; outline-offset: 3px; }
+@media (min-width: 1100px) { .student-report-page .skill-evidence-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 1024px) { .report-middle-grid, .report-lower-grid { grid-template-columns: 1fr 1fr; } .report-path-cards-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 768px) { .report-middle-grid, .report-lower-grid { grid-template-columns: 1fr; } .report-path-cards-grid { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .student-report-page .report-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .report-evidence-counts { grid-template-columns: 1fr 1fr; } }
+@media (prefers-reduced-motion: reduce) { .student-report-page *, .student-report-page *::before, .student-report-page *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
+
+.report-test-score-fill { padding: 0; }
+
+.student-report-page .report-hero { grid-template-columns: auto minmax(0, 1fr) minmax(240px, .7fr); }
+.student-report-page .report-identity { grid-column: auto; grid-row: auto; }
+.student-report-page .report-identity h2, .student-report-page .report-chapter button strong, .student-report-page .report-chapter button small { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
+.report-middle-grid > .report-column-left, .report-middle-grid > .report-column-right { display: contents; }
+.report-middle-grid .report-achievements { grid-column: 1 / -1; }
+@media (max-width: 768px) {
+  .student-report-page .report-hero { grid-template-columns: auto minmax(0, 1fr); }
+  .student-report-page .report-hero-xp { grid-column: 1 / -1; }
+  .report-middle-grid .report-achievements { grid-column: auto; }
+  .student-report-page .report-map-button { width: auto; padding: 8px 14px; font-size: .875rem; }
+}
+
+.student-report-page .report-avatar { grid-row: auto; }
+
+/* Blue and violet chapter ribbons echo the supplied adventure dashboard. */
+.student-report-page {
+  background: linear-gradient(180deg, #77c7f1 0, #c4e8f9 38%, #d7f0f8 70%, #e8f8ed 100%);
+}
+.student-report-page::before { opacity: .3; }
+.student-report-page .report-section {
+  background: linear-gradient(155deg, rgba(255,255,255,.97), rgba(230,245,255,.96));
+  box-shadow: 0 8px 24px rgba(22, 90, 160, .18);
+}
+.student-report-page :is(.report-skill-radar-section, .report-exams, .report-achievements, .report-quest-details, .report-activity-summary, .report-learning-path) > .report-section-heading {
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: linear-gradient(110deg, #5747b6 0%, #2868b9 57%, #137fb6 100%);
+  color: #fff;
+}
+.student-report-page :is(.report-skill-radar-section, .report-exams, .report-achievements, .report-quest-details, .report-activity-summary, .report-learning-path) > .report-section-heading :is(h2, h2 small, svg, span) {
+  color: #fff;
+}
+.student-report-page .report-hero {
+  background: linear-gradient(115deg, #102e62 0%, #105591 58%, #227db4 100%);
+  box-shadow: 0 10px 26px rgba(8, 59, 113, .3);
+}
+.student-report-page .report-overview-grid > div:nth-child(1) { background: linear-gradient(135deg, #eef9ff, #c9e9ff); }
+.student-report-page .report-overview-grid > div:nth-child(2) { background: linear-gradient(135deg, #f6f0ff, #ddd4ff); }
+.student-report-page .report-overview-grid > div:nth-child(3) { background: linear-gradient(135deg, #eefdf5, #caeee1); }
+.student-report-page .report-overview-grid > div:nth-child(4) { background: linear-gradient(135deg, #fff9e9, #f7e5b8); }
+.student-report-page .report-test-score-fill { background: linear-gradient(90deg, #6033c3, #9b61ec); }
+@media (max-width: 600px) {
+  .student-report-page :is(.report-skill-radar-section, .report-exams, .report-achievements, .report-quest-details, .report-activity-summary, .report-learning-path) > .report-section-heading { align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+}
+
+/* Report V3: use the full available route width and keep evidence one click away. */
+.student-report-page { width: 100%; max-width: none; padding-inline: clamp(12px, 4vw, 48px); }
+.student-report-page .student-report-shell { width: min(1280px, 100%); max-width: none; }
+.student-report-page .report-section { font-size: 1rem; line-height: 1.55; }
+.student-report-page .report-section-heading h2 { font-size: clamp(1.125rem, 1.4vw, 1.25rem); }
+.report-skill-details { border-radius: 18px; background: rgba(248,252,255,.96); box-shadow: 0 8px 24px #125aa01f; }
+.report-skill-details > summary { display: flex; align-items: center; min-height: 56px; padding: 12px 20px; color: #124f79; font-weight: 800; cursor: pointer; }
+.report-skill-details > summary::before { content: '+'; margin-right: 10px; font-size: 1.25rem; }
+.report-skill-details[open] > summary::before { content: '−'; }
+.report-skill-details > .skill-evidence-profile { box-shadow: none; }
+.report-path-context { margin: 8px 0 14px; color: #345c79; font-size: .9rem; }
+.student-report-page .report-path-recommendation { background: linear-gradient(120deg, #effaff, #f5f2ff 55%, #e8f9ee); }
+.student-report-page .path-card { box-shadow: 0 5px 16px #17588c1a; }
+.student-report-page .report-hero { background: linear-gradient(110deg, #102b60, #155c9b 70%, #2585bb); }
+.student-report-page .report-chapter { background: linear-gradient(110deg, #f7fcff, #e7f4ff); }
+.student-report-page .report-achievements { background: linear-gradient(145deg, #fff, #e5f3ff); }
+@media (max-width: 768px) { .student-report-page { padding-inline: 12px; } }
+
+
+/* ========================================================================= */
+/* PREMIUM REDESIGN ENHANCEMENTS — RPG THEME & ACCENT TOKENS                 */
+/* ========================================================================= */
+
+.report-hero-trophy-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffde7a;
+  opacity: 0.85;
+  filter: drop-shadow(0 4px 14px rgba(245, 158, 11, 0.45));
+  margin-left: auto;
+}
+
+@media (max-width: 900px) {
+  .report-hero-trophy-art {
+    display: none;
+  }
+}
+
+.metric-sub-green {
+  color: #10b981;
+  font-weight: 700;
+}
+
+.report-chapter-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.report-chapter-meta strong {
+  font-size: 0.95rem;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.report-chapter-meta small {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.report-chapter-progress-bar {
+  width: 100%;
+  max-width: 180px;
+  height: 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.report-chapter-progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  transition: width 0.3s ease;
+}
+
+.report-chapter-pct {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #3b82f6;
+  font-variant-numeric: tabular-nums;
+  margin-left: 8px;
+}
+
+.student-report-page .report-chapter:nth-child(1) .report-chapter-number { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.student-report-page .report-chapter:nth-child(2) .report-chapter-number { background: linear-gradient(135deg, #10b981, #047857); }
+.student-report-page .report-chapter:nth-child(3) .report-chapter-number { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+.student-report-page .report-chapter:nth-child(4) .report-chapter-number { background: linear-gradient(135deg, #f97316, #c2410c); }
+.student-report-page .report-chapter:nth-child(5) .report-chapter-number { background: linear-gradient(135deg, #eab308, #a16207); }
+
+.student-report-page .report-teacher-note {
+  background: linear-gradient(135deg, #fffcf5 0%, #fff8eb 100%);
+  border-color: #fde68a;
+}
+
+.teacher-avatar-emoji {
+  font-size: 2.2rem;
+}
+
+.report-radar-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.report-radar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 0;
+  position: relative;
+  overflow: visible;
+}
+
+.report-radar-svg-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 340 / 320;
+}
+
+.report-radar-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.report-radar-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.report-radar-badge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid #e0e7ff;
+  box-shadow: 0 4px 12px rgba(18, 62, 103, 0.08);
+  font-size: 0.76rem;
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+.report-radar-badge-icon {
+  display: grid;
+  place-items: center;
+  color: #7c3aed;
+}
+
+.report-radar-badge-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.report-radar-badge-text .badge-name {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.report-radar-badge-text .badge-eng {
+  font-size: 0.65rem;
+  color: #64748b;
+}
+
+.report-radar-badge-text .badge-pct {
+  font-weight: 800;
+  color: #7c3aed;
+  font-size: 0.78rem;
+}
+
+.report-radar-badge.axis-0 { top: -2%; left: 50%; transform: translateX(-50%); }
+.report-radar-badge.axis-1 { top: 20%; right: -2%; }
+.report-radar-badge.axis-2 { bottom: 18%; right: -2%; }
+.report-radar-badge.axis-3 { bottom: -2%; left: 50%; transform: translateX(-50%); }
+.report-radar-badge.axis-4 { bottom: 18%; left: -2%; }
+.report-radar-badge.axis-5 { top: 20%; left: -2%; }

@@ -1,0 +1,31 @@
+.avatar-dynamic-effect { position:absolute; inset:0; pointer-events:none; overflow:hidden; z-index:3; }
+.dynamic-halo { position:absolute; inset:16% 8% 3%; border-radius:50%; box-shadow:inset 0 0 20px var(--dynamic-color),0 0 12px var(--dynamic-color); opacity:.28; }
+.dynamic-particle { position:absolute; left:calc(5% + var(--i) * 13%); bottom:8%; width:8px; height:8px; background:var(--dynamic-color); border-radius:50%; box-shadow:0 0 8px var(--dynamic-color); opacity:.85; }
+.dynamic-particle:nth-child(3n) { bottom:20%; }.dynamic-particle:nth-child(3n+1) { bottom:32%; }
+.dynamic-starlight,.dynamic-crystals { --dynamic-color:#66c9ff; }
+.dynamic-sunrise,.dynamic-lanterns { --dynamic-color:#ffd166; }
+.dynamic-firefly,.dynamic-leaves { --dynamic-color:#86dc99; }
+.dynamic-bubbles,.dynamic-snow { --dynamic-color:#b4eaff; }
+.dynamic-petals { --dynamic-color:#ffbad0; }
+.dynamic-rainbow { --dynamic-color:#ffe389; }
+.dynamic-moon,.dynamic-magic { --dynamic-color:#d5b6ff; }
+.dynamic-comet { --dynamic-color:#ffd99b; }
+.dynamic-music { --dynamic-color:#f6b8ed; }
+.dynamic-aurora { --dynamic-color:#76ebd2; }
+.dynamic-starlight .dynamic-particle,.dynamic-sunrise .dynamic-particle,.dynamic-snow .dynamic-particle,.dynamic-rainbow .dynamic-particle,.dynamic-comet .dynamic-particle { width:12px; height:12px; border-radius:0; clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%); }
+.dynamic-crystals .dynamic-particle { width:9px; height:13px; border-radius:0; transform:rotate(45deg); }
+.dynamic-bubbles .dynamic-particle { background:transparent; border:2px solid var(--dynamic-color); width:12px; height:12px; }
+.dynamic-petals .dynamic-particle,.dynamic-leaves .dynamic-particle { width:10px; height:15px; border-radius:100% 0 100% 0; }
+.dynamic-magic .dynamic-halo,.dynamic-moon .dynamic-halo { border:2px solid var(--dynamic-color); box-shadow:0 0 10px var(--dynamic-color); }
+.dynamic-rainbow .dynamic-particle:nth-child(3n) { background:#f3a9ce; }.dynamic-rainbow .dynamic-particle:nth-child(3n+1) { background:#9cddff; }
+.avatar-dynamic-effect.is-animated .dynamic-particle { animation:dynamic-rise 4s ease-in-out infinite; animation-delay:calc(var(--i) * -.45s); }
+.avatar-dynamic-effect.is-animated .dynamic-halo { animation:dynamic-breathe 4s ease-in-out infinite; }
+.dynamic-snow.is-animated .dynamic-particle,.dynamic-petals.is-animated .dynamic-particle { animation-name:dynamic-fall; animation-duration:5s; }
+.dynamic-comet.is-animated .dynamic-particle { animation-name:dynamic-sweep; animation-duration:3s; }
+.dynamic-magic.is-animated .dynamic-halo { animation:dynamic-orbit 8s linear infinite; }
+@keyframes dynamic-rise { 0%{transform:translateY(0);opacity:0} 25%{opacity:.9} 100%{transform:translateY(-110px) rotate(60deg);opacity:0} }
+@keyframes dynamic-fall { 0%{transform:translateY(-100px) rotate(0);opacity:0} 25%{opacity:.9} 100%{transform:translateY(25px) rotate(100deg);opacity:0} }
+@keyframes dynamic-sweep { 0%{transform:translate(-30px,-40px);opacity:0} 35%{opacity:1} 100%{transform:translate(40px,40px);opacity:0} }
+@keyframes dynamic-breathe { 50%{opacity:.55;transform:scale(1.04)} }
+@keyframes dynamic-orbit { to{transform:rotate(360deg)} }
+@media(prefers-reduced-motion:reduce) { .avatar-dynamic-effect .dynamic-particle,.avatar-dynamic-effect .dynamic-halo { animation:none!important; } }

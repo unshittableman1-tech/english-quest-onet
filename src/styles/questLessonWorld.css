@@ -1,0 +1,381 @@
+.eq-lesson-world {
+  --atlas-ink: #163a3d;
+  --atlas-forest: #123b3f;
+  --atlas-gold: #e3b659;
+  --atlas-paper: #fbf8ed;
+  --atlas-mist: #dcefe8;
+  --atlas-panorama: url('/assets/lesson-world/atlas-overlook.webp');
+}
+
+.eq-quest-page.eq-lesson-world .eq-shell-bg {
+  background: linear-gradient(180deg, #badbd2a8, #e6f2e3ed 85%), var(--atlas-panorama) 75% center / cover no-repeat;
+}
+.eq-quest-page.eq-lesson-world::after {
+  background: linear-gradient(90deg, #d6efe32e, #e9f6ed94 46%, #d6efe32e);
+}
+
+.eq-quest-page.eq-lesson-world .eq-header,
+.eq-quest-page.eq-lesson-world .eq-shell-content { width: min(1360px, calc(100% - 32px)); }
+.eq-lesson-world .qm-shell { width: 100%; }
+.eq-quest-page.eq-lesson-world .eq-shell-content { padding-top: 12px; }
+.eq-quest-page.eq-lesson-world .qm-player { padding-block: 8px; }
+
+.eq-quest-page.eq-lesson-world .qm-adventure-banner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 25rem) minmax(0, 15rem);
+  align-content: center;
+  justify-content: start;
+  gap: 9px 18px;
+  margin-top: 12px;
+  min-height: 156px;
+  padding: 15px clamp(16px, 3vw, 36px);
+  border-color: var(--atlas-gold);
+  border-radius: 24px 24px 10px 10px;
+  background: linear-gradient(90deg, #0a2935 2%, #0a2935e8 22%, #0a29355e 61%, transparent 90%), var(--atlas-panorama) 60% center / cover no-repeat, var(--atlas-forest);
+  box-shadow: 0 5px 0 #14393e;
+}
+.eq-lesson-world .qm-adventure-banner::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 0 44%;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 64% 35%, #fff0a747, transparent 61%);
+  animation: atlas-sunrise 1.6s ease-out 2 alternate both;
+}
+.eq-quest-page.eq-lesson-world .qm-adventure-banner .qm-page-heading { grid-row: 1 / 3; }
+.eq-lesson-world .qm-adventure-banner .qm-page-heading { justify-content: flex-start; gap: clamp(8px, 1.5vw, 18px); }
+.qm-hero-compass { flex: none; width: clamp(42px, 5vw, 62px); height: auto; object-fit: contain; }
+.eq-lesson-world .qm-adventure-banner .qm-page-heading h1 {
+  margin: 0;
+  font-size: clamp(30px, 3.35vw, 48px);
+  line-height: 1.15;
+  color: #fff;
+}
+.eq-lesson-world .qm-adventure-banner .qm-eyebrow { color: #ffe19b; font-size: 14px; }
+.eq-lesson-world .qm-banner-progress { color: #e5f4ef; max-width: 18rem; font-size: 14px; }
+.eq-lesson-world .qm-adventure-banner .qm-continue { font-size: 15px; }
+.eq-lesson-world .qm-banner-progress strong { color: #ffe19b; }
+.eq-lesson-world .quest-workspace .qm-banner-progress progress { border-color: #a9bfbb; background: #082f3e; }
+.eq-lesson-world .quest-workspace .qm-banner-progress progress::-webkit-progress-bar { background: #082f3e; }
+.eq-quest-page.eq-lesson-world .qm-adventure-banner .qm-next {
+  grid-column: 2;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.eq-lesson-world .qm-next h2 { color: #fff; }
+.eq-lesson-world .qm-adventure-banner .qm-continue:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+
+.eq-quest-page.eq-lesson-world .qm-toolbar { margin-top: 12px; }
+.eq-quest-page.eq-lesson-world .qm-view-tabs button { min-height: 52px; padding-block: 5px; }
+.eq-lesson-world .qm-view-emblem { flex-basis: 36px; height: 36px; }
+
+.qm-chapter-picker {
+  display: grid;
+  grid-template-columns: minmax(230px, 27%) minmax(0, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+.qm-featured-chapter {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  border: 1px solid var(--atlas-gold);
+  border-radius: 18px 8px 8px 18px;
+  background: var(--atlas-forest);
+  color: #fff;
+}
+.qm-featured-chapter img, .qm-featured-chapter::after {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+.qm-featured-chapter img {
+  object-fit: cover;
+  object-position: center 42%;
+}
+.qm-featured-chapter::after {
+  content: '';
+  background: linear-gradient(0deg, #0a2935 7%, #0a2935ed 37%, #0a29353b 80%, transparent);
+}
+.qm-featured-copy {
+  display: grid;
+  gap: 3px;
+  padding: 14px 16px;
+}
+.qm-featured-copy strong { font-size: clamp(18px, 2vw, 25px); line-height: 1.3; }
+.qm-featured-kicker, .qm-featured-progress { display: flex; align-items: center; flex-wrap: wrap; gap: 5px 9px; font-size: 12px; }
+.qm-featured-kicker { color: #ffe19b; font-weight: 800; }
+.qm-featured-kicker > span { border: 1px solid #e3b659aa; padding: 0 7px; border-radius: 5px; }
+.qm-featured-world { color: #e5f4ef; font-size: 13px; }
+.qm-featured-progress { margin-top: 5px; }
+.eq-lesson-world .quest-workspace .qm-featured-progress progress {
+  width: 100%;
+  height: 6px;
+  background: #b4cbc34d;
+}
+.eq-lesson-world .quest-workspace .qm-featured-progress progress::-webkit-progress-bar { background: #b4cbc34d; }
+.eq-lesson-world .quest-workspace .qm-featured-progress progress::-webkit-progress-value { background: #ffc845; }
+.eq-lesson-world .quest-workspace .qm-featured-progress progress::-moz-progress-bar { background: #ffc845; }
+
+.qm-chapter-carousel {
+  min-width: 0;
+  padding: 4px 10px 7px;
+  border: 1px solid #a4bdb2;
+  border-radius: 8px 18px 18px 8px;
+  background: #f4f8f0f5;
+}
+.qm-carousel-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 4px; }
+.qm-carousel-toolbar h2 { color: var(--atlas-ink); font-size: 16px; margin: 0; }
+.qm-carousel-arrows { display: flex; gap: 4px; }
+.qm-carousel-arrows button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid #a4bdb2;
+  border-radius: 8px;
+  background: var(--atlas-paper);
+  color: var(--atlas-forest);
+}
+.qm-carousel-arrows button[aria-disabled=true] { background: #e5eee7; color: #617771; cursor: default; }
+.qm-carousel-track {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(152px, 27%, 258px);
+  gap: 14px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 4px;
+  scrollbar-color: #9a742e #e0eae1;
+  scrollbar-width: thin;
+  padding: 5px 4px 7px;
+}
+.qm-carousel-track button {
+  display: grid;
+  grid-template-rows: 91px auto 1fr auto;
+  min-height: 185px;
+  gap: 5px;
+  overflow: hidden;
+  padding: 0 0 10px;
+  text-align: start;
+  scroll-snap-align: start;
+  border: 1px solid #a4bdb2;
+  border-radius: 9px;
+  background: var(--atlas-paper);
+  color: var(--atlas-ink);
+}
+.qm-carousel-track img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 43%; }
+.qm-carousel-track button > :not(img) { margin-inline: 11px; }
+.qm-carousel-track strong { font-size: 16px; line-height: 1.35; }
+.qm-carousel-chapter-meta, .qm-carousel-track small { display: flex; align-items: center; gap: 5px; font-size: 13px; }
+.qm-carousel-chapter-meta { justify-content: space-between; font-weight: 800; }
+.qm-carousel-track button[data-locked=true] img { filter: saturate(.7); }
+.qm-carousel-track button:hover { border-color: #9a742e; }
+.qm-carousel-track button[aria-selected=true] { border-color: #9a742e; background: #fff0c3; box-shadow: inset 0 -3px #ba8f45; }
+.qm-carousel-track button:focus-visible, .qm-carousel-arrows button:focus-visible {
+  outline: 3px solid var(--atlas-ink);
+  outline-offset: 1px;
+}
+
+.eq-quest-page.eq-lesson-world .qm-chapter-panel {
+  margin-top: 10px;
+  padding: clamp(5px, 1vw, 12px);
+  background: #f4f8f0f5;
+  border-color: #a4bdb2;
+  box-shadow: 0 5px 0 #173f4433;
+}
+.eq-lesson-world .qm-smart-banner { background: #eef8ef; border-color: #98baaa; box-shadow: none; }
+.qm-smart-banner-art { flex: none; object-fit: contain; }
+.eq-quest-page.eq-lesson-world .qm-adventure-map { box-shadow: 0 5px 0 #78613433; }
+.eq-quest-page.eq-lesson-world .qm-adventure-map > header {
+  min-height: 76px;
+  padding-block: 9px;
+  background: linear-gradient(110deg, #e3f3eb, var(--atlas-paper) 72%);
+}
+.eq-lesson-world .qm-adventure-map > header h3 { font-size: clamp(18px, 2vw, 26px); }
+.eq-lesson-world .qm-map-header-actions .qm-filter { gap: 5px; white-space: nowrap; }
+.qm-selected-stage {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  padding: 6px 14px;
+  background: #eef6ef;
+  color: #214c47;
+  border-top: 1px solid #b4cec1;
+}
+.qm-selected-stage button,
+.qm-stage-dialog-bar button {
+  min-height: 44px;
+  min-width: 44px;
+  padding-inline: 10px;
+  border-radius: 9px;
+  color: #145e58;
+  background: #fff;
+  border: 1px solid #a4c6ba;
+}
+.qm-stage-dialog {
+  position: fixed;
+  inset: 0 14px 0 auto;
+  width: min(480px, calc(100vw - 28px));
+  max-width: none;
+  height: min(820px, calc(100dvh - 28px));
+  max-height: none;
+  margin: auto 0;
+  padding: 0;
+  border: 1px solid #a3bfb3;
+  border-radius: 18px;
+  color: #163a3d;
+  background: #fffdf5;
+  box-shadow: 0 12px 50px #122d4166;
+  overflow: hidden;
+}
+.qm-stage-dialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr); }
+.qm-stage-dialog::backdrop { background: #102c3c72; }
+html:has(.qm-stage-dialog[open]) { overflow: hidden; }
+.qm-stage-dialog-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px 8px 18px;
+  background: #e5f2eb;
+  border-bottom: 1px solid #c2d7cb;
+  font-weight: 800;
+}
+.qm-stage-dialog-bar button { display: grid; place-items: center; }
+.eq-lesson-world .qm-stage-dialog .qm-mission-panel {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0;
+  padding: 0;
+  border: 0;
+}
+.qm-stage-dialog .qm-mission-body {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.qm-stage-dialog .qm-mission-intro { grid-template-columns: 72px minmax(0, 1fr); gap: 12px; }
+.qm-stage-dialog .qm-mission-title h4 { font-size: clamp(20px, 3vw, 26px); line-height: 1.25; }
+.qm-stage-dialog .qm-mission-art > span { width: 33px; height: 33px; font-size: 16px; top: -7px; left: -6px; }
+.qm-stage-dialog .qm-mission-action {
+  order: 0;
+  padding: 10px 16px 15px;
+  background: #fffdf5;
+  border-top: 1px solid #dacba7;
+}
+.qm-stage-dialog .qm-mission-action .qm-detail-action { min-height: 48px; font-size: 18px; padding-block: 8px; }
+.qm-stage-dialog .qm-detail-conditions { min-height: 44px; padding: 8px; }
+.qm-stage-dialog .qm-detail-conditions + .qm-detail-conditions { margin-top: 8px; }
+
+.eq-lesson-world .qm-quest-detail.qm-mission-panel {
+  background: #fffdf5;
+  box-shadow: none;
+}
+.eq-lesson-world .qm-mission-sidebar { background: #e6f2eb; border-color: #9ab6a9; border-radius: 10px 10px 18px 18px; }
+.eq-lesson-world .qm-mission-reward-card { background: #fff9e7; box-shadow: none; }
+.qm-mission-heading-art { width: 29px; height: 29px; flex: none; object-fit: contain; }
+.qm-mission-star { width: 63px; height: 63px; object-fit: contain; }
+.qm-mission-reward-card.is-empty .qm-mission-star { filter: grayscale(1); }
+.eq-lesson-world .qm-required-vocabulary { background: #edf7f3; border-color: #aaccc1; }
+.eq-lesson-world .qm-mission-objectives { background: #fff7e5; border-inline-start: 4px solid #ba8f45; box-shadow: none; }
+.eq-lesson-world .qm-mission-action .qm-detail-action { box-shadow: inset 0 2px #fff5c7, 0 4px 0 #a6640d; }
+.eq-lesson-world .qm-vocab-adventure {
+  background: linear-gradient(105deg, #d8f2e5, #f5f9eb 75%);
+  border-color: #548e78;
+  border-radius: 10px 20px 20px 10px;
+  box-shadow: 0 4px 0 #2d6f5740;
+}
+
+@keyframes atlas-sunrise {
+  from { opacity: .18; }
+  to { opacity: .78; }
+}
+@media (min-width: 760px) and (max-width: 1100px) {
+  .qm-carousel-track { grid-auto-columns: clamp(152px, 32%, 235px); }
+  .qm-carousel-track button { min-height: 174px; grid-template-rows: 83px auto 1fr auto; }
+}
+
+@media (max-width: 759px) {
+  .qm-chapter-picker { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .qm-featured-chapter { min-height: 113px; border-radius: 14px 14px 7px 7px; }
+  .qm-featured-chapter::after { background: linear-gradient(90deg, #0a2935 7%, #0a2935ef 40%, #0a29353b 90%); }
+  .qm-featured-copy { padding: 10px 12px; }
+  .qm-chapter-carousel { padding-inline: 5px; border-radius: 7px 7px 14px 14px; }
+  .qm-carousel-track { grid-auto-columns: clamp(190px, 77%, 240px); gap: 12px; }
+  .qm-carousel-track button { min-height: 162px; grid-template-rows: 80px auto 1fr auto; }
+}
+
+@media (max-width: 599px) {
+  .eq-quest-page.eq-lesson-world .qm-player {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px 10px;
+  }
+  .eq-lesson-world .qm-player > div:first-child { min-width: 0; gap: 1px; }
+  .eq-lesson-world .qm-player-extra { grid-column: 2; grid-row: 1; text-align: end; gap: 1px; }
+  .eq-lesson-world .qm-player .qm-xp { grid-column: 1 / -1; }
+  .eq-lesson-world .qm-player .qm-xp > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 8px; }
+  .eq-lesson-world .qm-view-emblem { flex-basis: 28px; height: 28px; }
+  .eq-quest-page.eq-lesson-world .qm-adventure-banner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: 146px;
+    column-gap: 8px;
+    align-content: center;
+    background: linear-gradient(90deg, #0a2935f5, #0a2935c8 65%, #0a293558), var(--atlas-panorama) 86% center / cover no-repeat, var(--atlas-forest);
+  }
+  .eq-quest-page.eq-lesson-world .qm-adventure-banner .qm-page-heading { grid-row: 1; grid-column: 1; }
+  .qm-hero-compass { display: none; }
+  .eq-lesson-world .qm-adventure-banner .qm-page-heading .qm-eyebrow { display: none; }
+  .eq-lesson-world .qm-adventure-banner .qm-page-heading h1 { font-size: clamp(20px, 6.2vw, 34px); }
+  .eq-lesson-world .qm-banner-progress { grid-column: 1 / -1; grid-row: 2; gap: 4px; }
+  .eq-quest-page.eq-lesson-world .qm-adventure-banner .qm-next { grid-column: 2; grid-row: 1; }
+  .eq-quest-page.eq-lesson-world .qm-adventure-banner .qm-next .qm-primary { width: auto; max-width: 100%; min-height: 44px; padding: 6px 10px; }
+  .eq-quest-page.eq-lesson-world .qm-adventure-banner .qm-next.requires-review { grid-column: 1 / -1; grid-row: 3; }
+  .eq-lesson-world .qm-adventure-map > header .qm-eyebrow { margin-bottom: 0; }
+  .eq-lesson-world .qm-adventure-map > header .qm-map-header-actions { gap: 4px; margin-top: 5px; justify-content: flex-start; }
+  .eq-lesson-world .qm-map-header-actions button { padding-inline: 8px; }
+  .eq-lesson-world .qm-map-header-actions .qm-filter > span { display: none; }
+  .eq-lesson-world .qm-map-header-actions .qm-filter select { padding-inline: 5px; font-size: 13px; width: 80px; }
+}
+
+@media (max-width: 699px) {
+  .qm-stage-dialog {
+    inset: auto 0 0;
+    width: 100%;
+    height: min(760px, 86dvh);
+    margin: 0;
+    border-radius: 20px 20px 0 0;
+  }
+  .qm-stage-dialog .qm-mission-action { padding-bottom: max(15px, env(safe-area-inset-bottom)); }
+  .qm-mission-star { grid-row: 1 / 3; align-self: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eq-lesson-world .qm-adventure-banner::after { animation: none; }
+}
+
+@media (forced-colors: active) {
+  .eq-quest-page.eq-lesson-world .qm-adventure-banner { background: Canvas; color: CanvasText; border-color: CanvasText; box-shadow: none; }
+  .eq-lesson-world .qm-adventure-banner :is(h1, h2, .qm-eyebrow, .qm-banner-progress, .qm-banner-progress strong) { color: CanvasText; }
+  .qm-featured-chapter, .qm-featured-kicker, .qm-featured-world { color: CanvasText; background: Canvas; }
+  .qm-featured-chapter img { display: none; }
+  .qm-carousel-track button[aria-selected=true] { background: Highlight; color: HighlightText; border-color: HighlightText; }
+  .qm-carousel-track button:focus-visible, .qm-carousel-arrows button:focus-visible { outline-color: CanvasText; }
+}

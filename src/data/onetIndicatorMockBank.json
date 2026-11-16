@@ -1,0 +1,2595 @@
+{
+  "1": {
+    "setNumber": 1,
+    "indicator": "ต 1.1 ป.6/3",
+    "title": "ภาพ สัญลกั ษณ์ และเครอื่ งหมาย",
+    "quickKey": {
+      "1": 3,
+      "2": 1,
+      "3": 4,
+      "4": 2,
+      "5": 3,
+      "6": 1,
+      "7": 2,
+      "8": 4,
+      "9": 1,
+      "10": 3,
+      "11": 2,
+      "12": 4,
+      "13": 1,
+      "14": 3,
+      "15": 4,
+      "16": 2,
+      "17": 3,
+      "18": 1,
+      "19": 4,
+      "20": 2,
+      "21": 1,
+      "22": 3,
+      "23": 2,
+      "24": 4,
+      "25": 1
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 3,
+        "correctChoiceText": "The woman is pouring orange juice into a glass.",
+        "explanation": "ผู้หญิงกำลังเทน้ำส้มจากกล่องลงแก้ว ไมใ่ ช่ดื่มหรือเทน้ำเปล่า. คำ/วลีชี้ขาด: pouring = กำลังเท",
+        "decisiveKeyword": "pouring = กำลังเท",
+        "fastTrick": "จับคู่ Who + action + position แล้วเทียบกับภาพทีละคำ."
+      },
+      "2": {
+        "number": 2,
+        "answer": 1,
+        "correctChoiceText": "The boy is reading a book while his dog is sleeping next to him.",
+        "explanation": "เด็กชายอา่ นหนังสือใต้ต้นไม้และสุนัขนอนอยู่ข้าง ๆ. คำ/วลีชี้ขาด: next to = อยู่ข้าง",
+        "decisiveKeyword": "next to = อยู่ข้าง",
+        "fastTrick": "จับคู่ Who + action + position แล้วเทียบกับภาพทีละคำ."
+      },
+      "3": {
+        "number": 3,
+        "answer": 4,
+        "correctChoiceText": "The cat is sitting under the chair, and the ball is on the chair.",
+        "explanation": "แมวนั่งใต้เก้าอ ี้ ขณะที่ลูกบอลอยู่บนที่นั่งเก้าอี้. คำ/วลีชี้ขาด: under = อยู่ใต ้",
+        "decisiveKeyword": "under = อยู่ใต ้",
+        "fastTrick": "จับคู่ Who + action + position แล้วเทียบกับภาพทีละคำ."
+      },
+      "4": {
+        "number": 4,
+        "answer": 2,
+        "correctChoiceText": "There are two apples in the basket and three oranges on the table.",
+        "explanation": "ตะกรา้ มีแอปเปิล 2 ผล และบนโต๊ะมีส้ม 3 ผล.",
+        "decisiveKeyword": "",
+        "fastTrick": "นับแอปเปิลในตะกรา้ และส้มบนโต๊ะทีละกลุ่มก่อนอ่านตวั เลือก."
+      },
+      "5": {
+        "number": 5,
+        "answer": 3,
+        "correctChoiceText": "Three students are sitting at their desks while another student is standing",
+        "explanation": "นักเรียน 3 คนนั่งที่โต๊ะ อีก 1 คนยืนใกล้ประตู.",
+        "decisiveKeyword": "",
+        "fastTrick": "จับคู่ Who + action + position แล้วเทียบกับภาพทีละคำ."
+      },
+      "6": {
+        "number": 6,
+        "answer": 1,
+        "correctChoiceText": "She is paying for a red T-shirt at the counter.",
+        "explanation": "เด็กหญิงจ่ายเงินซื้อเสื้อยืดสีแดงที่เคาน์เตอร์.",
+        "decisiveKeyword": "",
+        "fastTrick": "จับคู่ Who + action + position แล้วเทียบกับภาพทีละคำ."
+      },
+      "7": {
+        "number": 7,
+        "answer": 2,
+        "correctChoiceText": "ภาพตัวเลือก 2 — นักเรียนเก็บขยะและครูปลูกต้นไม้",
+        "explanation": "ภาพท ี่ 2 แสดงนักเรียนเก็บขยะและครูปลูกต้นไม้ชัดเจน.",
+        "decisiveKeyword": "",
+        "fastTrick": "เปรียบเทียบทั้งเด็กที่เก็บขยะและครูที่ปลูกต้นไม้ อยา่ เลือกภาพเพราะเห็นคนปลูกต้นไม้อย่างเดียว. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 2 === PAGE 80 ==="
+      },
+      "8": {
+        "number": 8,
+        "answer": 4,
+        "correctChoiceText": "The girl in yellow is carrying an umbrella, but the girl in blue is not.",
+        "explanation": "เด็กหญิงเสื้อเหลืองถือร่ม แต่เด็กหญิงเสื้อน้ำเงินไม่ได้ถือร่ม. คำ/วลีชี้ขาด: but = แต ่",
+        "decisiveKeyword": "but = แต ่",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "9": {
+        "number": 9,
+        "answer": 1,
+        "correctChoiceText": "The bank is opposite the school, and the hospital is next to the school.",
+        "explanation": "ธนาคารอยู่ตรงข้ามโรงเรียน และโรงพยาบาลอยู่ติดโรงเรียน. คำ/วลีชี้ขาด: opposite = ตรงข้าม ; next to = อยู่ข้าง",
+        "decisiveKeyword": "opposite = ตรงข้าม ; next to =",
+        "fastTrick": "เทียบตำแหน่งทุกจุดตามภาพ อยา่ ใช้ความจำจากชื่อสถานท.ี่"
+      },
+      "10": {
+        "number": 10,
+        "answer": 3,
+        "correctChoiceText": "Two boys are picking up litter while one girl is planting a tree and another is",
+        "explanation": "เด็กชาย 2 คนเก็บขยะ เด็กหญิงคนหนึ่งปลูกและอีกคนรดน้ำต้นไม้.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตรวจภาพแบบ Who–What–Where–How many ไม่ดูแค่สิ่งของที่คล้ายกัน."
+      },
+      "11": {
+        "number": 11,
+        "answer": 2,
+        "correctChoiceText": "Drivers must not park their cars here.",
+        "explanation": "เครื่องหมายตัว P ถูกขีดทับ หมายถึงห้ามจอดรถ. คำ/วลีชี้ขาด: must not = ห้ามทำ",
+        "decisiveKeyword": "must not = ห้ามทำ",
+        "fastTrick": "อ่านรูปทรง สี เส้นขีดทับ และข้อความบนป้ายก่อนอ่านตัวเลอื ก."
+      },
+      "12": {
+        "number": 12,
+        "answer": 4,
+        "correctChoiceText": "The floor may be slippery, so people should walk carefully.",
+        "explanation": "ป้าย Wet Floor เตือนพื้นเปียกและเสี่ยงลื่น. คำ/วลีชี้ขาด: slippery = ลื่น ; should = ควร",
+        "decisiveKeyword": "slippery = ลื่น ; should = ควร",
+        "fastTrick": "อ่านรูปทรง สี เส้นขีดทับ และข้อความบนป้ายก่อนอ่านตัวเลอื ก."
+      },
+      "13": {
+        "number": 13,
+        "answer": 1,
+        "correctChoiceText": "People should turn right to find the emergency exit.",
+        "explanation": "ป้ายทางออกฉกุ เฉินมีลูกศรชี้ไปทางขวา. คำ/วลีชี้ขาด: should = ควร",
+        "decisiveKeyword": "should = ควร",
+        "fastTrick": "เทียบตำแหน่งทุกจุดตามภาพ อยา่ ใช้ความจำจากชื่อสถานท.ี่"
+      },
+      "14": {
+        "number": 14,
+        "answer": 3,
+        "correctChoiceText": "Riders are required to wear helmets to protect their heads.",
+        "explanation": "ป้าย Wear a Helmet บอกให้ผู้ขับขี่สวมหมวกนิรภัย.",
+        "decisiveKeyword": "",
+        "fastTrick": "อ่านรูปทรง สี เส้นขีดทับ และข้อความบนป้ายก่อนอ่านตัวเลอื ก."
+      },
+      "15": {
+        "number": 15,
+        "answer": 4,
+        "correctChoiceText": "Visitors may take pictures, but they must not use a flash.",
+        "explanation": "ป้ายกล้องมีเครอื่ งหมายห้ามเฉพาะแฟลช จึงถ่ายภาพได้แต่ห้ามใช้แฟลช. คำ/วลชี ี้ขาด: must not = ห้ามทำ ; but = แต ่",
+        "decisiveKeyword": "",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "16": {
+        "number": 16,
+        "answer": 2,
+        "correctChoiceText": "Only paper should be placed in this recycling bin.",
+        "explanation": "ถังสีฟ้าเขียน Paper Only ให้ทิ้งเฉพาะกระดาษ. คำ/วลีชี้ขาด: should = ควร ; paper = กระดาษ",
+        "decisiveKeyword": "should = ควร ; paper = กระดาษ",
+        "fastTrick": "อ่านรูปทรง สี เส้นขีดทับ และข้อความบนป้ายก่อนอ่านตัวเลอื ก. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 3 === PAGE 81 ==="
+      },
+      "17": {
+        "number": 17,
+        "answer": 3,
+        "correctChoiceText": "Drivers should slow down and watch out for children.",
+        "explanation": "ป้ายรูปเด็กข้ามถนนเตือนให้ลดความเร็วและระวังเด็ก. คำ/วลชี ขี้ าด: slow down = ชะลอความเร็ว ; watch out = ระวัง",
+        "decisiveKeyword": "",
+        "fastTrick": "อ่านรูปทรง สี เส้นขีดทับ และข้อความบนป้ายก่อนอ่านตัวเลอื ก."
+      },
+      "18": {
+        "number": 18,
+        "answer": 1,
+        "correctChoiceText": "People are not allowed to eat or drink in this room.",
+        "explanation": "ภาพอาหารและเครื่องดื่มถูกขีดทับ หมายถึงห้ามนำเข้า/ห้ามกินดื่ม. คำ/วลีชี้ขาด: not allowed = ไม่ได้รับอนุญาต",
+        "decisiveKeyword": "not allowed =",
+        "fastTrick": "อ่านรูปทรง สี เส้นขีดทับ และข้อความบนป้ายก่อนอ่านตัวเลอื ก."
+      },
+      "19": {
+        "number": 19,
+        "answer": 4,
+        "correctChoiceText": "Visitors should enter through the left door and leave through the right door.",
+        "explanation": "ประตูฝั่งซ้ายเขียน Entrance ส่วนประตูขวามีป้าย Exit. คำ/วลีชี้ขาด: should = ควร",
+        "decisiveKeyword": "should = ควร",
+        "fastTrick": "เทียบตำแหน่งทุกจุดตามภาพ อยา่ ใช้ความจำจากชื่อสถานท.ี่"
+      },
+      "20": {
+        "number": 20,
+        "answer": 2,
+        "correctChoiceText": "Touching electrical equipment in this area may cause an electric shock.",
+        "explanation": "สัญลักษณ์สายฟ้าเตือนความเสี่ยงไฟฟา้ ช็อต. คำ/วลชี ี้ขาด: electric shock = ไฟฟา้ ช็อต",
+        "decisiveKeyword": "",
+        "fastTrick": "อ่านรูปทรง สี เส้นขีดทับ และข้อความบนป้ายก่อนอ่านตัวเลอื ก."
+      },
+      "21": {
+        "number": 21,
+        "answer": 1,
+        "correctChoiceText": "ภาพตัวเลือก 1 — เด็กอยู่หลังต้นไม้และสุนัขอยู่ด้านหน้า",
+        "explanation": "ภาพท ี่ 1 เดก็ ชายอยู่หลังลำต้นและสุนัขนอนด้านหน้าต้นไม้.",
+        "decisiveKeyword": "",
+        "fastTrick": "หาเด็กหลังลำต้นและสุนัขหน้าลำตน้ ให้ครบทั้งสองเงื่อนไข."
+      },
+      "22": {
+        "number": 22,
+        "answer": 3,
+        "correctChoiceText": "Neither swimming nor fishing is allowed in the lake.",
+        "explanation": "ป้าย No Swimming และ No Fishing ห้ามทั้งว่ายน้ำและตกปลา. คำ/วลีชี้ขาด: neither = ไมท่ ั้งสองอย่าง ; nor = และไม ่",
+        "decisiveKeyword": "neither = ไมท่ ั้งสองอย่าง ;",
+        "fastTrick": "โจทย์ภาพหลายสิ่งต้องตรวจทกุ เงื่อนไข และระวังคำว่า ALL / NOT."
+      },
+      "23": {
+        "number": 23,
+        "answer": 2,
+        "correctChoiceText": "The boy is pulling the door although the sign tells him to push it.",
+        "explanation": "ป้ายเขียน Push แต่เด็กชายกำลังดึงประตู. คำ/วลีชี้ขาด: although = แม้ว่า",
+        "decisiveKeyword": "although = แม้ว่า",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "24": {
+        "number": 24,
+        "answer": 4,
+        "correctChoiceText": "ภาพตัวเลือก 4 — FASTEN YOUR SEAT BELT",
+        "explanation": "ภาพหมายเลข 4 มีข้อความ Fasten Your Seat Belt. คำ/วลีชขี้ าด: fasten = คาดหรอื รัดให้แน่น",
+        "decisiveKeyword": "",
+        "fastTrick": "โจทย์ภาพหลายสิ่งต้องตรวจทกุ เงื่อนไข และระวังคำว่า ALL / NOT."
+      },
+      "25": {
+        "number": 25,
+        "answer": 1,
+        "correctChoiceText": "Swimming is not allowed, visitors must stay off the grass, and the emergency",
+        "explanation": "ป้ายทั้งสามแสดงห้ามว่ายนำ้ ห้ามเหยียบหญ้า และทางออกฉุกเฉินไปซ้าย. คำ/วลีชี้ขาด: not allowed = ไม่ได้รับอนุญาต",
+        "decisiveKeyword": "not allowed =",
+        "fastTrick": "เทียบตำแหน่งทุกจุดตามภาพ อยา่ ใช้ความจำจากชื่อสถานท.ี่ เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 4 === PAGE 82 ==="
+      }
+    }
+  },
+  "2": {
+    "setNumber": 2,
+    "indicator": "ต 1.1 ป.6/4",
+    "title": "อ่านจับใจความและตอบคำถามจากเรอื่ ง",
+    "quickKey": {
+      "1": 3,
+      "2": 2,
+      "3": 4,
+      "4": 1,
+      "5": 3,
+      "6": 2,
+      "7": 4,
+      "8": 1,
+      "9": 2,
+      "10": 3,
+      "11": 1,
+      "12": 4,
+      "13": 2,
+      "14": 1,
+      "15": 4,
+      "16": 3,
+      "17": 1,
+      "18": 4,
+      "19": 2,
+      "20": 3,
+      "21": 1,
+      "22": 4,
+      "23": 2,
+      "24": 3,
+      "25": 1
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 3,
+        "correctChoiceText": "She gave it to the teacher.",
+        "explanation": "Jane นำพู่กันทไี่ ม่ใช่ของตนไปส่งให้ครู.",
+        "decisiveKeyword": "",
+        "fastTrick": "ขีดเส้นใต้ผู้กระทำ เวลา และคำเชื่อม however / because / after."
+      },
+      "2": {
+        "number": 2,
+        "answer": 2,
+        "correctChoiceText": "On Friday",
+        "explanation": "แม้กำหนดเดิมวนั พุธ แต่ยา้ ยกิจกรรมไปวันศุกร์. คำ/วลีชี้ขาด: on friday = วันศุกร ์",
+        "decisiveKeyword": "on friday = วันศุกร ์",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "3": {
+        "number": 3,
+        "answer": 4,
+        "correctChoiceText": "The dinner continued with the help of rechargeable lamps.",
+        "explanation": "ไฟดับแต่ใช้โคมไฟชาร์จได ้ ทำให้งานเลี้ยงดำเนินต่อ.",
+        "decisiveKeyword": "",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "4": {
+        "number": 4,
+        "answer": 1,
+        "correctChoiceText": "Yes, he joined in the afternoon.",
+        "explanation": "Sam มาช่วยเกบ็ ขยะช่วงบ่าย แม้ไม่ได้มาช่วงเช้า. คำ/วลีชี้ขาด: after = หลัง",
+        "decisiveKeyword": "after = หลัง",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "5": {
+        "number": 5,
+        "answer": 3,
+        "correctChoiceText": "There was heavy traffic on the roads.",
+        "explanation": "เหตุผลคือรถติดหลังเกิดอุบัติเหตุบนถนน.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "6": {
+        "number": 6,
+        "answer": 2,
+        "correctChoiceText": "At 7:20 a.m.",
+        "explanation": "7:10 บวก 10 นาทีได้ 7:20 น.",
+        "decisiveKeyword": "",
+        "fastTrick": "ระวัง arrive ≠ leave: เวลาทรี่ ถมาถึงไม่ใช่เวลาออกเสมอไป."
+      },
+      "7": {
+        "number": 7,
+        "answer": 4,
+        "correctChoiceText": "He informed the school caretaker about the leaking tap.",
+        "explanation": "Joe แจ้งภารโรงเรื่องก๊อกน้ำรวั่ ไม่ได้ซ่อมเอง.",
+        "decisiveKeyword": "",
+        "fastTrick": "ขีดเส้นใต้ผู้กระทำ เวลา และคำเชื่อม however / because / after. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 5 === PAGE 83 ==="
+      },
+      "8": {
+        "number": 8,
+        "answer": 1,
+        "correctChoiceText": "Turning Food Waste into Something Useful",
+        "explanation": "ใจความหลักคือเปลี่ยนเศษอาหารเป็นปุ๋ยที่มีประโยชน์.",
+        "decisiveKeyword": "",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "9": {
+        "number": 9,
+        "answer": 2,
+        "correctChoiceText": "Control the presentation slides",
+        "explanation": "Tun จะควบคุมสไลด์ ส่วน Pim เป็นผู้พูด.",
+        "decisiveKeyword": "",
+        "fastTrick": "แยกแผนเดิมกับสิ่งที่จะเกิดจริง สังเกต not yet / instead / but."
+      },
+      "10": {
+        "number": 10,
+        "answer": 3,
+        "correctChoiceText": "No, it needs to be checked first.",
+        "explanation": "วันนี้ยืมไม่ได้ เพราะต้องตรวจชุดวทิ ยาศาสตร์ก่อน. คำ/วลชี ี้ขาด: first = อันดับแรก",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "11": {
+        "number": 11,
+        "answer": 1,
+        "correctChoiceText": "At 9:30",
+        "explanation": "ตารางข้อมูลใหม่ระบุรถไฟออก 9:30 น.",
+        "decisiveKeyword": "",
+        "fastTrick": "แยกแผนเดิมกับสิ่งที่จะเกิดจริง สังเกต not yet / instead / but."
+      },
+      "12": {
+        "number": 12,
+        "answer": 4,
+        "correctChoiceText": "In Room 205",
+        "explanation": "ห้องสมุดปิดเร็ว จึงเปลี่ยนไปประชุมห้อง 205.",
+        "decisiveKeyword": "",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "13": {
+        "number": 13,
+        "answer": 2,
+        "correctChoiceText": "On Sunday",
+        "explanation": "พิพธิ ภัณฑ์เปิดวนั อาทิตย์ แต่ปิดวันเสาร์. คำ/วลีชี้ขาด: on sunday = วันอาทติ ย ์",
+        "decisiveKeyword": "on sunday = วันอาทติ ย ์",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "14": {
+        "number": 14,
+        "answer": 1,
+        "correctChoiceText": "Fon completed only part of the report.",
+        "explanation": "Fon ทำกราฟเสร็จแล้วแต่ยังไม่ได้เขียนบทสรุป. คำ/วลีชี้ขาด: only = เท่านั้น",
+        "decisiveKeyword": "only = เท่านั้น",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "15": {
+        "number": 15,
+        "answer": 4,
+        "correctChoiceText": "To share it with Jan",
+        "explanation": "ร่มคันพิเศษเตรยี มไว้ให้ Jan ที่ลืมร่ม.",
+        "decisiveKeyword": "",
+        "fastTrick": "แยกแผนเดิมกับสิ่งที่จะเกิดจริง สังเกต not yet / instead / but."
+      },
+      "16": {
+        "number": 16,
+        "answer": 3,
+        "correctChoiceText": "Clean the desks",
+        "explanation": "สีทายังมาไม่ถึง จึงจะทำความสะอาดโต๊ะแทน.",
+        "decisiveKeyword": "",
+        "fastTrick": "แยกแผนเดิมกับสิ่งที่จะเกิดจริง สังเกต not yet / instead / but."
+      },
+      "17": {
+        "number": 17,
+        "answer": 1,
+        "correctChoiceText": "We should admit our mistakes and take responsibility.",
+        "explanation": "Bank ยอมรับผิด ส่งคืนหนังสือ และขอโทษ เป็นความรับผิดชอบ. คำ/วลีชี้ขาด: should = ควร",
+        "decisiveKeyword": "should = ควร",
+        "fastTrick": "หาเหตุ–ผลและบทเรียนจากเหตุการณ์ ระวังคำถาม NOT TRUE. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 6 === PAGE 84 ==="
+      },
+      "18": {
+        "number": 18,
+        "answer": 4,
+        "correctChoiceText": "Bee left the stage without finishing her song.",
+        "explanation": "Bee ร้องเพลงตอ่ จนจบ ดังนั้นข้อที่ว่าหนีลงเวทีไม่จริง.",
+        "decisiveKeyword": "",
+        "fastTrick": "หาเหตุ–ผลและบทเรียนจากเหตุการณ์ ระวังคำถาม NOT TRUE."
+      },
+      "19": {
+        "number": 19,
+        "answer": 2,
+        "correctChoiceText": "She grew the vegetables in raised pots.",
+        "explanation": "น้ำท่วมแปลงผักจึงนำต้นไม้ไปปลูกในกระถางยกสูง.",
+        "decisiveKeyword": "",
+        "fastTrick": "หาเหตุ–ผลและบทเรียนจากเหตุการณ์ ระวังคำถาม NOT TRUE."
+      },
+      "20": {
+        "number": 20,
+        "answer": 3,
+        "correctChoiceText": "She had wrongly suspected him of taking her pencil case.",
+        "explanation": "Nina สงสัย Tom ผิด ทั้งที่กล่องดินสออยู่ใต้เก้าอี้ตนเอง.",
+        "decisiveKeyword": "",
+        "fastTrick": "หาเหตุ–ผลและบทเรียนจากเหตุการณ์ ระวังคำถาม NOT TRUE."
+      },
+      "21": {
+        "number": 21,
+        "answer": 1,
+        "correctChoiceText": "The Gift That Really Mattered",
+        "explanation": "ของขวัญที่มีค่าทางใจคืออัลบั้มรูปท ี่ Wat ซ่อมให้.",
+        "decisiveKeyword": "",
+        "fastTrick": "หาเหตุ–ผลและบทเรียนจากเหตุการณ์ ระวังคำถาม NOT TRUE."
+      },
+      "22": {
+        "number": 22,
+        "answer": 4,
+        "correctChoiceText": "People helping a trapped bird escape safely",
+        "explanation": "ครูเปิดหน้าต่างและปิดพัดลม ชว่ ยให้นกออกไปปลอดภัย.",
+        "decisiveKeyword": "",
+        "fastTrick": "หาเหตุ–ผลและบทเรียนจากเหตุการณ์ ระวังคำถาม NOT TRUE."
+      },
+      "23": {
+        "number": 23,
+        "answer": 2,
+        "correctChoiceText": "A school project that helped students understand their community",
+        "explanation": "โครงงานสัมภาษณ์คนท้องถิ่นทำให้เข้าใจประเพณีแข่งเรือ. คำ/วลีชี้ขาด: under = อยใู่ ต้",
+        "decisiveKeyword": "under = อยใู่ ต้",
+        "fastTrick": "Main idea ดูภาพรวมทั้งย่อหน้า; NOT mentioned ตอ้ งหาเรื่องที่ไม่มีในข้อความ."
+      },
+      "24": {
+        "number": 24,
+        "answer": 3,
+        "correctChoiceText": "Selling vegetables at a weekend market",
+        "explanation": "บทอ่านไม่มีข้อความเกี่ยวกับการขายผกั ที่ตลาดวันหยุด.",
+        "decisiveKeyword": "",
+        "fastTrick": "Main idea ดูภาพรวมทั้งย่อหน้า; NOT mentioned ตอ้ งหาเรื่องที่ไม่มีในข้อความ."
+      },
+      "25": {
+        "number": 25,
+        "answer": 1,
+        "correctChoiceText": "They changed their plans and enjoyed an unexpected activity before taking",
+        "explanation": "แม้ทัวร์เลื่อนเพราะลมแรง แต่ได้เที่ยวพพิ ิธภัณฑ์และล่องเรือวันถัดไป. คำ/วลีชี้ขาด: before = ก่อน",
+        "decisiveKeyword": "before = ก่อน",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 7 === PAGE 85 ==="
+      }
+    }
+  },
+  "3": {
+    "setNumber": 3,
+    "indicator": "ต 1.2 ป.6/1",
+    "title": "การสื่อสารระหว่างบุคคล",
+    "quickKey": {
+      "1": 3,
+      "2": 1,
+      "3": 4,
+      "4": 2,
+      "5": 4,
+      "6": 2,
+      "7": 1,
+      "8": 3,
+      "9": 2,
+      "10": 3,
+      "11": 1,
+      "12": 4,
+      "13": 1,
+      "14": 4,
+      "15": 3,
+      "16": 2,
+      "17": 4,
+      "18": 1,
+      "19": 2,
+      "20": 3
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 3,
+        "correctChoiceText": "Good evening",
+        "explanation": "เวลาหนึ่งทุ่มและผู้รับทัก Good evening จึงใชค้ ำเดียวกัน.",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูเวลาและคำตอบอีกฝ่าย เช่น Good evening / Not really."
+      },
+      "2": {
+        "number": 2,
+        "answer": 1,
+        "correctChoiceText": "Long time no see!",
+        "explanation": "Long time no see! ใช้เมื่อเพื่อนพบกันอีกครั้งหลังห่างนาน.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "3": {
+        "number": 3,
+        "answer": 4,
+        "correctChoiceText": "Are you okay?",
+        "explanation": "ตอบว่าไม่ค่อยสบายและปวดศีรษะ จึงตอ้ งถาม Are you okay?.",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูเวลาและคำตอบอีกฝ่าย เช่น Good evening / Not really."
+      },
+      "4": {
+        "number": 4,
+        "answer": 2,
+        "correctChoiceText": "Yes, much better. Thanks.",
+        "explanation": "กลับมาเรียนไดแ้ ล้วและอาการดีขึ้น จึงตอบ Yes, much better.",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูเวลาและคำตอบอีกฝ่าย เช่น Good evening / Not really."
+      },
+      "5": {
+        "number": 5,
+        "answer": 4,
+        "correctChoiceText": "Nice to meet you.",
+        "explanation": "May ตอบ Nice to meet you, too แสดงว่าต้องทัก Nice to meet you.",
+        "decisiveKeyword": "",
+        "fastTrick": "ท่องสำนวนตามหน้าที่: แนะนำตวั ทักทาย ลา และอวยพร."
+      },
+      "6": {
+        "number": 6,
+        "answer": 2,
+        "correctChoiceText": "Let me introduce myself.",
+        "explanation": "นักเรียนใหม่แนะนำชื่อและจังหวัดของตวั เอง จึงใช ้ introduce myself.",
+        "decisiveKeyword": "",
+        "fastTrick": "ท่องสำนวนตามหน้าที่: แนะนำตวั ทักทาย ลา และอวยพร."
+      },
+      "7": {
+        "number": 7,
+        "answer": 1,
+        "correctChoiceText": "Have a safe trip!",
+        "explanation": "พ่อกำลังขึ้นรถไฟ จึงอวยพรให้เดินทางปลอดภัย.",
+        "decisiveKeyword": "",
+        "fastTrick": "ท่องสำนวนตามหน้าที่: แนะนำตวั ทักทาย ลา และอวยพร."
+      },
+      "8": {
+        "number": 8,
+        "answer": 3,
+        "correctChoiceText": "Good night. Sleep well.",
+        "explanation": "ก่อนเข้านอนควรกล่าว Good night. Sleep well.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 8 === PAGE 86 ==="
+      },
+      "9": {
+        "number": 9,
+        "answer": 2,
+        "correctChoiceText": "You're welcome. I'm glad they helped.",
+        "explanation": "You're welcome ใช้ตอบคำขอบคุณเรื่องยืมโน้ต.",
+        "decisiveKeyword": "",
+        "fastTrick": "Thank you ตอบ You’re welcome; คำชมตอบ Thank you; คำขอโทษตอบ That’s all right."
+      },
+      "10": {
+        "number": 10,
+        "answer": 3,
+        "correctChoiceText": "No problem. I'm happy to help.",
+        "explanation": "No problem. I'm happy to help ตอบรับคำขอบคุณอย่างเหมาะสม.",
+        "decisiveKeyword": "",
+        "fastTrick": "Thank you ตอบ You’re welcome; คำชมตอบ Thank you; คำขอโทษตอบ That’s all right."
+      },
+      "11": {
+        "number": 11,
+        "answer": 1,
+        "correctChoiceText": "That's all right.",
+        "explanation": "That's all right ใช้ตอบเมื่ออีกฝ่ายขอโทษ.",
+        "decisiveKeyword": "",
+        "fastTrick": "Thank you ตอบ You’re welcome; คำชมตอบ Thank you; คำขอโทษตอบ That’s all right."
+      },
+      "12": {
+        "number": 12,
+        "answer": 4,
+        "correctChoiceText": "He doesn't want Amy to worry about the mistake.",
+        "explanation": "Never mind หมายถึงไม่เป็นไร ไม่ต้องกังวล.",
+        "decisiveKeyword": "",
+        "fastTrick": "Thank you ตอบ You’re welcome; คำชมตอบ Thank you; คำขอโทษตอบ That’s all right."
+      },
+      "13": {
+        "number": 13,
+        "answer": 1,
+        "correctChoiceText": "Thank you. I worked hard on it.",
+        "explanation": "ได้รับคำชมเรอื่ งชิ้นงาน ควรขอบคุณผู้ชม.",
+        "decisiveKeyword": "",
+        "fastTrick": "Thank you ตอบ You’re welcome; คำชมตอบ Thank you; คำขอโทษตอบ That’s all right."
+      },
+      "14": {
+        "number": 14,
+        "answer": 4,
+        "correctChoiceText": "Your presentation was excellent and easy to follow!",
+        "explanation": "ประโยคชมเชยต้องกล่าวถึงคุณภาพการนำเสนอเชิงบวก.",
+        "decisiveKeyword": "",
+        "fastTrick": "Thank you ตอบ You’re welcome; คำชมตอบ Thank you; คำขอโทษตอบ That’s all right."
+      },
+      "15": {
+        "number": 15,
+        "answer": 3,
+        "correctChoiceText": "could you repeat the instructions, please?",
+        "explanation": "Could you repeat the instructions, please? เป็นคำขอร้องสุภาพตรงคำตอบครู. คำ/วลีชี้ขาด: could you = ชว่ ย...ได้ไหม",
+        "decisiveKeyword": "could",
+        "fastTrick": "คำขอสุภาพใช้ Excuse me / Could you / May I ก่อนถาม."
+      },
+      "16": {
+        "number": 16,
+        "answer": 2,
+        "correctChoiceText": "may I come in?",
+        "explanation": "ครูอนุญาตให้เข้าห้อง จึงถาม May I come in?. คำ/วลีชี้ขาด: may i = ฉันขออนุญาต...ได้ไหม",
+        "decisiveKeyword": "may i = ฉันขออนุญาต...ได้ไหม",
+        "fastTrick": "May/Can I…? คือผพู้ ูดขอทำเอง; Can/Could you…? คือขอให้คนอื่นทำ."
+      },
+      "17": {
+        "number": 17,
+        "answer": 4,
+        "correctChoiceText": "Could you repeat that more slowly, please?",
+        "explanation": "ขอให้บรรณารกั ษ์พูดซ้ำช้าลงเพราะฟังไมท่ ัน. คำ/วลีชี้ขาด: could you = ช่วย...ได้ไหม",
+        "decisiveKeyword": "could you = ช่วย...ได้ไหม",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 9 === PAGE 87 ==="
+      },
+      "18": {
+        "number": 18,
+        "answer": 1,
+        "correctChoiceText": "Excuse me. May I interrupt for a moment?",
+        "explanation": "Excuse me. May I interrupt for a moment? ใช้ขอแทรกบทสนทนา. คำ/วลีชี้ขาด: may i = ฉันขออนุญาต...ได้ไหม",
+        "decisiveKeyword": "may i =",
+        "fastTrick": "คำขอสุภาพใช้ Excuse me / Could you / May I ก่อนถาม."
+      },
+      "19": {
+        "number": 19,
+        "answer": 2,
+        "correctChoiceText": "Of course. Go ahead.",
+        "explanation": "Go ahead คืออนุญาตให้ถามต่อได้.",
+        "decisiveKeyword": "",
+        "fastTrick": "May/Can I…? คือผพู้ ูดขอทำเอง; Can/Could you…? คือขอให้คนอื่นทำ."
+      },
+      "20": {
+        "number": 20,
+        "answer": 3,
+        "correctChoiceText": "Politely interrupted to point out a possible mistake.",
+        "explanation": "นักเรียนขัดจังหวะอย่างสุภาพเพื่อแจ้งวา่ ชื่อบนป้ายอาจผิด.",
+        "decisiveKeyword": "",
+        "fastTrick": "คำขอสุภาพใช้ Excuse me / Could you / May I ก่อนถาม. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 10 === PAGE 88 ==="
+      }
+    }
+  },
+  "4": {
+    "setNumber": 4,
+    "indicator": "ต 1.2 ป.6/2",
+    "title": "คำสั่ง คำขอร้อง ขออนุญาต และคำแนะนำ",
+    "quickKey": {
+      "1": 2,
+      "2": 4,
+      "3": 1,
+      "4": 3,
+      "5": 2,
+      "6": 4,
+      "7": 1,
+      "8": 3,
+      "9": 2,
+      "10": 4,
+      "11": 3,
+      "12": 1,
+      "13": 4,
+      "14": 2,
+      "15": 1,
+      "16": 3,
+      "17": 2,
+      "18": 4,
+      "19": 3,
+      "20": 1
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 2,
+        "correctChoiceText": "Put on their safety goggles.",
+        "explanation": "คำสั่งแรกกอ่ นทดลองคือสวมแว่นนริ ภยั .",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "2": {
+        "number": 2,
+        "answer": 4,
+        "correctChoiceText": "Write a short summary.",
+        "explanation": "ขีดเส้นใต้และวงกลมแล้ว ขั้นต่อไปคือเขียนสรุป.",
+        "decisiveKeyword": "",
+        "fastTrick": "เรียง First → Next → Finally และแยก FIRST/AFTER/NOT ให้ชัด."
+      },
+      "3": {
+        "number": 3,
+        "answer": 1,
+        "correctChoiceText": "Cut them into small pieces.",
+        "explanation": "หลังล้างแอปเปิลต้องหั่นเป็นชิ้นเล็ก ๆ.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "4": {
+        "number": 4,
+        "answer": 3,
+        "correctChoiceText": "Ken switches off the projector, closes the windows, and locks the door.",
+        "explanation": "ลำดับปิดโปรเจกเตอร์ ปิดหน้าต่าง แลว้ ล็อกประตูตรงกับ Ken.",
+        "decisiveKeyword": "",
+        "fastTrick": "เรียง First → Next → Finally และแยก FIRST/AFTER/NOT ให้ชัด."
+      },
+      "5": {
+        "number": 5,
+        "answer": 2,
+        "correctChoiceText": "Collect their schoolbags before leaving.",
+        "explanation": "คำถาม NOT ถามสิ่งที่ไม่ควรทำ คือกลบั ไปเก็บกระเป๋า. คำ/วลีชี้ขาด: before = ก่อน",
+        "decisiveKeyword": "before = ก่อน",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "6": {
+        "number": 6,
+        "answer": 4,
+        "correctChoiceText": "Add a short description.",
+        "explanation": "วาดภาพแลว้ จึงเพิ่มคำบรรยายใต้ภาพ.",
+        "decisiveKeyword": "",
+        "fastTrick": "เรียง First → Next → Finally และแยก FIRST/AFTER/NOT ให้ชัด."
+      },
+      "7": {
+        "number": 7,
+        "answer": 1,
+        "correctChoiceText": "Could I have another copy of the worksheet, please?",
+        "explanation": "Could I have another copy...? คือขอใบงานอีกฉบับอย่างสุภาพ. คำ/วลีชี้ขาด: could i = ฉันขอ...ได้ไหม",
+        "decisiveKeyword": "could i = ฉันขอ...ได้ไหม",
+        "fastTrick": "Please และ Could you เป็นคำขอสุภาพ; ตรวจลำดับ before/after."
+      },
+      "8": {
+        "number": 8,
+        "answer": 3,
+        "correctChoiceText": "Certainly. I'll put the books back and push in the chairs.",
+        "explanation": "Certainly พร้อมอธิบายว่าจะเก็บหนังสือและเลื่อนเก้าอี้เข้าที่.",
+        "decisiveKeyword": "",
+        "fastTrick": "Please และ Could you เป็นคำขอสุภาพ; ตรวจลำดับ before/after. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 11 === PAGE 89 ==="
+      },
+      "9": {
+        "number": 9,
+        "answer": 2,
+        "correctChoiceText": "Could you lower your voices while we're recording, please?",
+        "explanation": "Could you lower your voices...? ขอให้ลดเสียงอย่างสุภาพ. คำ/วลีชี้ขาด: could you = ชว่ ย...ได้ไหม",
+        "decisiveKeyword": "could you = ชว่ ย...ได้ไหม",
+        "fastTrick": "Please และ Could you เป็นคำขอสุภาพ; ตรวจลำดับ before/after."
+      },
+      "10": {
+        "number": 10,
+        "answer": 4,
+        "correctChoiceText": "Remove your shoes and place them on the rack before going inside.",
+        "explanation": "Remove your shoes ... before going inside มีลำดับตรงคำสั่ง. คำ/วลีชี้ขาด: before = ก่อน",
+        "decisiveKeyword": "before = ก่อน",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "11": {
+        "number": 11,
+        "answer": 3,
+        "correctChoiceText": "May I come in, please?",
+        "explanation": "May I come in, please? เป็นการขออนุญาตเข้าห้อง. คำ/วลชี ี้ขาด: may i = ฉันขออนุญาต...ได้ไหม",
+        "decisiveKeyword": "",
+        "fastTrick": "May/Can I…? คือผพู้ ูดขอทำเอง; Can/Could you…? คือขอให้คนอื่นทำ."
+      },
+      "12": {
+        "number": 12,
+        "answer": 1,
+        "correctChoiceText": "May I take photographs here?",
+        "explanation": "คำตอบห้ามใช้แฟลช แสดงว่าผพู้ ูดกำลังขอถ่ายภาพ. คำ/วลีชี้ขาด: may i = ฉันขออนุญาต...ได้ไหม",
+        "decisiveKeyword": "may i = ฉันขออนุญาต...ได้ไหม",
+        "fastTrick": "May/Can/Could I = ขออนุญาตให้ตัวเองทำสิ่งหนึ่ง."
+      },
+      "13": {
+        "number": 13,
+        "answer": 4,
+        "correctChoiceText": "May I use the projector for my presentation?",
+        "explanation": "ครูอ้างถึงโปรเจกเตอร์และรีโมต จึงขอใช้โปรเจกเตอร์. คำ/วลีชขี้ าด: may i = ฉันขออนุญาต...ได้ไหม",
+        "decisiveKeyword": "",
+        "fastTrick": "May/Can/Could I = ขออนุญาตให้ตัวเองทำสิ่งหนึ่ง."
+      },
+      "14": {
+        "number": 14,
+        "answer": 2,
+        "correctChoiceText": "Yes, provided you bring a signed note from your parent.",
+        "explanation": "อนุญาตให้กลับก่อนโดยมีใบยินยอมที่ผปู้ กครองลงชื่อ.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "15": {
+        "number": 15,
+        "answer": 1,
+        "correctChoiceText": "You should check a reliable source and compare the information before",
+        "explanation": "ควรตรวจสอบแหล่งข้อมูลน่าเชื่อถือก่อนใช้อ้างอิง. คำ/วลีชี้ขาด: before = ก่อน ; should = ควร",
+        "decisiveKeyword": "before = ก่อน ; should = ควร",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "16": {
+        "number": 16,
+        "answer": 3,
+        "correctChoiceText": "Try writing the words on flashcards and reviewing them every day.",
+        "explanation": "การทำบัตรคำและทบทวนทุกวันเป็นคำแนะนำที่เหมาะสม.",
+        "decisiveKeyword": "",
+        "fastTrick": "Should + V.1 เป็นคำแนะนำ ตัดตวั เลือกที่ทำให้เกิดโทษ."
+      },
+      "17": {
+        "number": 17,
+        "answer": 2,
+        "correctChoiceText": "You should walk slowly and use the covered walkway.",
+        "explanation": "ทางลื่นจากฝนหนัก จึงเดินช้า ๆ และใชท้ างเดินมีหลังคา. คำ/วลีชี้ขาด: should = ควร",
+        "decisiveKeyword": "should = ควร",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "18": {
+        "number": 18,
+        "answer": 4,
+        "correctChoiceText": "You should take a break and rest your eyes before continuing.",
+        "explanation": "ปวดตาจากจอหลายชั่วโมง จึงหยุดพักสายตา. คำ/วลีชี้ขาด: before = ก่อน ; should = ควร",
+        "decisiveKeyword": "before = ก่อน ; should = ควร",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 12 === PAGE 90 ==="
+      },
+      "19": {
+        "number": 19,
+        "answer": 3,
+        "correctChoiceText": "May I hand it in now?",
+        "explanation": "ทำใบงานและตรวจแล้ว ขั้นต่อไปขออนุญาตส่งงาน. คำ/วลีชี้ขาด: may i = ฉันขออนุญาต...ได้ไหม",
+        "decisiveKeyword": "may i = ฉันขออนุญาต...ได้ไหม",
+        "fastTrick": "ทำแล้วสองขั้นคือ finish กับ check ดังนั้นเหลือ hand in."
+      },
+      "20": {
+        "number": 20,
+        "answer": 1,
+        "correctChoiceText": "Please wipe the tables before you leave.",
+        "explanation": "ล้างและเก็บแปรงแล้ว แต่ยังต้องเช็ดโต๊ะ. คำ/วลีชี้ขาด: before = ก่อน",
+        "decisiveKeyword": "before = ก่อน",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 13 === PAGE 91 ==="
+      }
+    }
+  },
+  "5": {
+    "setNumber": 5,
+    "indicator": "ต 1.2 ป.6/3",
+    "title": "แสดงความต้องการและขอความช่วยเหลือ",
+    "quickKey": {
+      "1": 2,
+      "2": 4,
+      "3": 1,
+      "4": 3,
+      "5": 1,
+      "6": 2,
+      "7": 4,
+      "8": 3,
+      "9": 2,
+      "10": 4,
+      "11": 1,
+      "12": 3,
+      "13": 2,
+      "14": 4,
+      "15": 1,
+      "16": 3,
+      "17": 2,
+      "18": 4,
+      "19": 1,
+      "20": 3
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 2,
+        "correctChoiceText": "I need some information about the competition.",
+        "explanation": "Jane ต้องการข้อมูลกติกาการแข่งขัน จึงใช้ I need some information. คำ/วลีชี้ขาด: i need = ฉันจำเป็นต้อง",
+        "decisiveKeyword": "i need =",
+        "fastTrick": "I need / I would like บอกความต้องการ; อา่ นเงื่อนไขเวลา."
+      },
+      "2": {
+        "number": 2,
+        "answer": 4,
+        "correctChoiceText": "I need to hand in my form before the office closes.",
+        "explanation": "สำนักงานปิดสี่โมง จึงต้องส่งแบบฟอร์มให้ทันก่อนปิด. คำ/วลีชี้ขาด: hand in = ส่งงาน ; before = ก่อน",
+        "decisiveKeyword": "hand in = ส่งงาน ; before = ก่อน",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "3": {
+        "number": 3,
+        "answer": 1,
+        "correctChoiceText": "I would like some information about English Camp, please.",
+        "explanation": "I would like ... please เป็นคำขอข้อมูลที่สุภาพ. คำ/วลีชี้ขาด: would like = ต้องการอย่างสุภาพ",
+        "decisiveKeyword": "would like = ต้องการอย่างสุภาพ",
+        "fastTrick": "I need / I would like บอกความต้องการ; อา่ นเงื่อนไขเวลา."
+      },
+      "4": {
+        "number": 4,
+        "answer": 3,
+        "correctChoiceText": "I need to finish my science project before watching the movie.",
+        "explanation": "ต้องทำโครงงานวิทยาศาสตรใ์ ห้เสร็จก่อนดูหนัง. คำ/วลชี ี้ขาด: before = ก่อน ; i need = ฉันจำเป็นต้อง",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "5": {
+        "number": 5,
+        "answer": 1,
+        "correctChoiceText": "Could you help me carry these boxes, please?",
+        "explanation": "Could you help me carry...? ขอใหเ้ พื่อนช่วยยกกล่อง. คำ/วลีชี้ขาด: could you = ช่วย...ได้ไหม",
+        "decisiveKeyword": "could you = ช่วย...ได้ไหม",
+        "fastTrick": "Could you help / give me a hand เป็นผู้ขอความช่วยเหลือ."
+      },
+      "6": {
+        "number": 6,
+        "answer": 2,
+        "correctChoiceText": "He is asking Ben to help him with the model.",
+        "explanation": "Give me a hand หมายถึงช่วยฉันหน่อย ไม่ใช่มอบมือจริง ๆ.",
+        "decisiveKeyword": "",
+        "fastTrick": "Could you help / give me a hand เป็นผู้ขอความช่วยเหลือ."
+      },
+      "7": {
+        "number": 7,
+        "answer": 4,
+        "correctChoiceText": "Could you explain the last step to me, please?",
+        "explanation": "ครูตอบ Let me show you จึงต้องขอให้สาธิตขั้นตอนทา้ ย. คำ/วลีชี้ขาด: could you = ชว่ ย...ได้ไหม",
+        "decisiveKeyword": "could you = ชว่ ย...ได้ไหม",
+        "fastTrick": "Could you help / give me a hand เป็นผู้ขอความช่วยเหลือ. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 14 === PAGE 92 ==="
+      },
+      "8": {
+        "number": 8,
+        "answer": 3,
+        "correctChoiceText": "Could you show me how to upload this file, please?",
+        "explanation": "ต้องการเรียนวธิ ีอัปโหลดไฟล์ ไม่ใช่ให้ครูทำโครงงานแทน. คำ/วลีชี้ขาด: could you = ช่วย...ได้ไหม",
+        "decisiveKeyword": "could you = ช่วย...ได้ไหม",
+        "fastTrick": "Could you help / give me a hand เป็นผู้ขอความช่วยเหลือ."
+      },
+      "9": {
+        "number": 9,
+        "answer": 2,
+        "correctChoiceText": "Help! Please call the school nurse!",
+        "explanation": "เกิดเหตุบาดเจ็บเร่งด่วน จึงร้องขอพยาบาลโรงเรียน.",
+        "decisiveKeyword": "",
+        "fastTrick": "Could you help / give me a hand เป็นผู้ขอความช่วยเหลือ."
+      },
+      "10": {
+        "number": 10,
+        "answer": 4,
+        "correctChoiceText": "May I help you carry those bags?",
+        "explanation": "May I help you carry...? เป็นการเสนอตัวช่วยครู. คำ/วลีชี้ขาด: may i = ฉันขออนุญาต...ได้ไหม",
+        "decisiveKeyword": "may i = ฉันขออนุญาต...ได้ไหม",
+        "fastTrick": "May I help / Let me help เป็นผู้เสนอตัวช่วย แยกจาก Can you help me."
+      },
+      "11": {
+        "number": 11,
+        "answer": 1,
+        "correctChoiceText": "Would you like me to show you the way?",
+        "explanation": "Would you like me to show you the way? เสนอพาเพื่อนไปสำนักงาน.",
+        "decisiveKeyword": "",
+        "fastTrick": "May I help / Let me help เป็นผู้เสนอตัวช่วย แยกจาก Can you help me."
+      },
+      "12": {
+        "number": 12,
+        "answer": 3,
+        "correctChoiceText": "Let me help you clean up the classroom.",
+        "explanation": "Let me help you เป็นการเสนอความช่วยเหลือ ไม่ใช่ขอให้ช่วย. คำ/วลีชี้ขาด: let me help = ให้ฉันช่วย",
+        "decisiveKeyword": "let me help = ให้ฉันช่วย",
+        "fastTrick": "ประโยค “Let me help…” เสนอตัวช่วย ไม่ใช่ขอให้คนอื่นช่วย."
+      },
+      "13": {
+        "number": 13,
+        "answer": 2,
+        "correctChoiceText": "Yes, please. That would be great.",
+        "explanation": "มีของตกแต่งอีกมาก จึงตอบรับด้วย Yes, please. คำ/วลชี ี้ขาด: yes, please = ได้เลย/ช่วยด้วย",
+        "decisiveKeyword": "",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "14": {
+        "number": 14,
+        "answer": 4,
+        "correctChoiceText": "No, thanks. I can carry it myself.",
+        "explanation": "กระเป๋าไม่หนักจึงปฏิเสธอย่างสุภาพว่า No, thanks. คำ/วลชี ี้ขาด: no, thanks = ไม่เป็นไร ขอบคุณ ; can = สามารถ",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูว่าว่างหรอื ไม่: Yes, please / No, thanks / I’m sorry, I can’t."
+      },
+      "15": {
+        "number": 15,
+        "answer": 1,
+        "correctChoiceText": "I'm sorry, I can't. I'm busy right now.",
+        "explanation": "Fah ติดซ้อมการแสดง จึงต้องปฏิเสธเพราะไม่วา่ ง. คำ/วลชี ี้ขาด: right now = ขณะนี้ ; can = สามารถ",
+        "decisiveKeyword": "",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "16": {
+        "number": 16,
+        "answer": 3,
+        "correctChoiceText": "She cannot help right now but is willing to help later.",
+        "explanation": "Amy ช่วยตอนนี้ไม่ได้ แต่ยินดีชว่ ยเวลาอาหารกลางวัน. คำ/วลชี ี้ขาด: right now = ขณะนี้ ; but = แต ่",
+        "decisiveKeyword": "",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "17": {
+        "number": 17,
+        "answer": 2,
+        "correctChoiceText": "Which folder do you need?",
+        "explanation": "เมื่อช่วยหยิบแฟ้มต้องถามวา่ อยากได้แฟ้มเล่มไหน.",
+        "decisiveKeyword": "",
+        "fastTrick": "วิเคราะห์วา่ ใครช่วยใคร เมื่อไร และใช้คำขอที่สุภาพ. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 15 === PAGE 93 ==="
+      },
+      "18": {
+        "number": 18,
+        "answer": 4,
+        "correctChoiceText": "Would you like me to show you how to complete it?",
+        "explanation": "Jane เสนอแนะนำวิธีกรอกฟอร์ม จึงตอบ Yes, please.",
+        "decisiveKeyword": "",
+        "fastTrick": "วิเคราะห์วา่ ใครช่วยใคร เมื่อไร และใช้คำขอที่สุภาพ."
+      },
+      "19": {
+        "number": 19,
+        "answer": 1,
+        "correctChoiceText": "Excuse me, could you help us check the sound when you're available,",
+        "explanation": "ช่างกำลังช่วยหอ้ งอื่น จึงขอให้ช่วยเมื่อสะดวกอย่างสุภาพ. คำ/วลีชี้ขาด: could you = ช่วย...ได้ไหม",
+        "decisiveKeyword": "could you = ช่วย...ได้ไหม",
+        "fastTrick": "วิเคราะห์วา่ ใครช่วยใคร เมื่อไร และใช้คำขอที่สุภาพ."
+      },
+      "20": {
+        "number": 20,
+        "answer": 3,
+        "correctChoiceText": "Pak cannot help before class but offers to help later.",
+        "explanation": "Pak ไปทำหน้าที่ห้องสมุดตอนเช้า แต่เสนอช่วยหลังอาหารกลางวัน. คำ/วลีชี้ขาด: before = ก่อน ; but = แต ่",
+        "decisiveKeyword": "before = ก่อน ; but = แต ่",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 16 === PAGE 94 ==="
+      }
+    }
+  },
+  "6": {
+    "setNumber": 6,
+    "indicator": "ต 1.2 ป.6/4",
+    "title": "การถามและให้ข้อมูลเกี่ยวกับบุคคล",
+    "quickKey": {
+      "1": 3,
+      "2": 2,
+      "3": 4,
+      "4": 1,
+      "5": 3,
+      "6": 2,
+      "7": 1,
+      "8": 2,
+      "9": 4,
+      "10": 3,
+      "11": 1,
+      "12": 2,
+      "13": 4,
+      "14": 3,
+      "15": 1,
+      "16": 2,
+      "17": 4,
+      "18": 1,
+      "19": 3,
+      "20": 4
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 3,
+        "correctChoiceText": "A mechanic",
+        "explanation": "ช่างซ่อมรถและตรวจเครื่องยนต์คือ mechanic.",
+        "decisiveKeyword": "",
+        "fastTrick": "ช่างซ่อมเครื่องยนต์เป็น mechanic ไม่ใช่ driver หรือ architect."
+      },
+      "2": {
+        "number": 2,
+        "answer": 2,
+        "correctChoiceText": "What do you do?",
+        "explanation": "ตอบ I'm an architect จึงถามอาชพี What do you do?. คำ/วลีชี้ขาด: what do you do = คุณทำงานอะไร",
+        "decisiveKeyword": "what do you do =",
+        "fastTrick": "What do you do ถามอาชีพ แต่ What are you doing ถามขณะนี้."
+      },
+      "3": {
+        "number": 3,
+        "answer": 4,
+        "correctChoiceText": "She's an engineer.",
+        "explanation": "ผู้ออกแบบเครื่องจักรและอุปกรณ์ทางเทคนิคคือ engineer.",
+        "decisiveKeyword": "",
+        "fastTrick": "What do you do ถามอาชีพ แต่ What are you doing ถามขณะนี้."
+      },
+      "4": {
+        "number": 4,
+        "answer": 1,
+        "correctChoiceText": "I'm interviewing a firefighter for my school project.",
+        "explanation": "คำถาม What are you doing? ต้องตอบกิจกรรมกำลังทำรูป V-ing.",
+        "decisiveKeyword": "",
+        "fastTrick": "What do you do ถามอาชีพ แต่ What are you doing ถามขณะนี้."
+      },
+      "5": {
+        "number": 5,
+        "answer": 3,
+        "correctChoiceText": "He's fourteen years old.",
+        "explanation": "ฉลองวันเกิดครบสิบสี่ปีเมื่อวาน ปัจจุบันจึงอายุ 14 ปี.",
+        "decisiveKeyword": "",
+        "fastTrick": "แยก How old / How tall / ความสัมพันธ์ครอบครัว และ or-question."
+      },
+      "6": {
+        "number": 6,
+        "answer": 2,
+        "correctChoiceText": "How tall is your sister?",
+        "explanation": "คำตอบเป็นความสูง 158 เซนติเมตร จึงถาม How tall. คำ/วลชี ี้ขาด: how tall = สูงเท่าไร",
+        "decisiveKeyword": "",
+        "fastTrick": "แยก How old / How tall / ความสัมพันธ์ครอบครัว และ or-question."
+      },
+      "7": {
+        "number": 7,
+        "answer": 1,
+        "correctChoiceText": "He's thirteen years old.",
+        "explanation": "เพิ่งฉลองวันเกิด 13 ปี จึงตอบข้อมูลที่เลือก 13 ปี ไมต่ อบ Yes/No.",
+        "decisiveKeyword": "",
+        "fastTrick": "แยก How old / How tall / ความสัมพันธ์ครอบครัว และ or-question. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 17 === PAGE 95 ==="
+      },
+      "8": {
+        "number": 8,
+        "answer": 2,
+        "correctChoiceText": "Ploy's aunt",
+        "explanation": "น้องสาวของแม่คือ aunt หรือป้า/น้า/อาในภาษาอังกฤษ.",
+        "decisiveKeyword": "",
+        "fastTrick": "แยก How old / How tall / ความสัมพันธ์ครอบครัว และ or-question."
+      },
+      "9": {
+        "number": 9,
+        "answer": 4,
+        "correctChoiceText": "My grandfather",
+        "explanation": "father's father คือปู่ (grandfather).",
+        "decisiveKeyword": "",
+        "fastTrick": "แยก How old / How tall / ความสัมพันธ์ครอบครัว และ or-question."
+      },
+      "10": {
+        "number": 10,
+        "answer": 3,
+        "correctChoiceText": "They're cousins.",
+        "explanation": "แม่ของทั้งสองเป็นพี่น้องกัน เด็กจึงเป็นลูกพี่ลูกน้อง.",
+        "decisiveKeyword": "",
+        "fastTrick": "แยก How old / How tall / ความสัมพันธ์ครอบครัว และ or-question."
+      },
+      "11": {
+        "number": 11,
+        "answer": 1,
+        "correctChoiceText": "She can speak Korean.",
+        "explanation": "พูดเกาหลีได้ แต่ไม่เคยเรียนญี่ปุ่น จึงเลือก Korean. คำ/วลีชี้ขาด: can = สามารถ",
+        "decisiveKeyword": "can = สามารถ",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "12": {
+        "number": 12,
+        "answer": 2,
+        "correctChoiceText": "Yes, she can.",
+        "explanation": "คำถามขึ้นต้น Can จึงตอบ Yes, she can. คำ/วลชี ี้ขาด: can = สามารถ",
+        "decisiveKeyword": "",
+        "fastTrick": "Can ตอบ can/can’t และ or-question ต้องเลือกข้อมูลจริง."
+      },
+      "13": {
+        "number": 13,
+        "answer": 4,
+        "correctChoiceText": "Can you play the piano or the violin?",
+        "explanation": "เล่นไวโอลินได้แต่เปียโนไม่ได้ จึงตรงคำถาม or ระหวา่ งเครื่องดนตรี. คำ/วลีชี้ขาด: can = สามารถ",
+        "decisiveKeyword": "can = สามารถ",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "14": {
+        "number": 14,
+        "answer": 3,
+        "correctChoiceText": "He goes cycling with his friends.",
+        "explanation": "usually / Sunday mornings บอกกิจวัตร คือไปปั่นจักรยาน.",
+        "decisiveKeyword": "",
+        "fastTrick": "Usually = Present Simple; right now = Present Continuous."
+      },
+      "15": {
+        "number": 15,
+        "answer": 1,
+        "correctChoiceText": "She's preparing dinner in the kitchen.",
+        "explanation": "right now หมายถึงขณะนี้ จึงตอบ is preparing.",
+        "decisiveKeyword": "",
+        "fastTrick": "Usually = Present Simple; right now = Present Continuous."
+      },
+      "16": {
+        "number": 16,
+        "answer": 2,
+        "correctChoiceText": "They take a walk in the park.",
+        "explanation": "ปู่ย่า/ตายายเดนิ ในสวนก่อนอาหารเชา้ ทุกวัน.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "17": {
+        "number": 17,
+        "answer": 4,
+        "correctChoiceText": "By train",
+        "explanation": "บริการรถบัสยกเลิกและซื้อตั๋วรถไฟ จึงไปด้วย train.",
+        "decisiveKeyword": "",
+        "fastTrick": "Going to / tomorrow / next weekend คืออนาคต ตรวจแผนที่เปลี่ยน. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 18 === PAGE 96 ==="
+      },
+      "18": {
+        "number": 18,
+        "answer": 1,
+        "correctChoiceText": "He's going to join the science club.",
+        "explanation": "สมัครชมรมวิทยาศาสตร์ไว้แล้ว จึงเลือก science club. คำ/วลีชี้ขาด: going to = ตั้งใจจะ",
+        "decisiveKeyword": "going to = ตั้งใจจะ",
+        "fastTrick": "Going to / tomorrow / next weekend คืออนาคต ตรวจแผนที่เปลี่ยน."
+      },
+      "19": {
+        "number": 19,
+        "answer": 3,
+        "correctChoiceText": "She's going to visit our grandparents.",
+        "explanation": "next weekend ต้องตอบแผนอนาคตดว้ ย be going to. คำ/วลีชี้ขาด: going to = ตั้งใจจะ",
+        "decisiveKeyword": "going to = ตั้งใจจะ",
+        "fastTrick": "Going to / tomorrow / next weekend คืออนาคต ตรวจแผนที่เปลี่ยน."
+      },
+      "20": {
+        "number": 20,
+        "answer": 4,
+        "correctChoiceText": "We're going to visit our grandmother instead.",
+        "explanation": "ยกเลิกแคมป์เพราะฝน และเปลี่ยนไปเยี่ยมคุณย่า. คำ/วลชี ี้ขาด: going to = ตั้งใจจะ ; instead = แทนที่จะ",
+        "decisiveKeyword": "",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 19 === PAGE 97 ==="
+      }
+    }
+  },
+  "7": {
+    "setNumber": 7,
+    "indicator": "ต 1.2 ป.6/5",
+    "title": "ความรู้สกึ และการให้เหตุผล",
+    "quickKey": {
+      "1": 2,
+      "2": 4,
+      "3": 1,
+      "4": 3,
+      "5": 4,
+      "6": 1,
+      "7": 2,
+      "8": 3,
+      "9": 1,
+      "10": 4,
+      "11": 3,
+      "12": 2,
+      "13": 1,
+      "14": 4,
+      "15": 2,
+      "16": 3,
+      "17": 1,
+      "18": 2,
+      "19": 4,
+      "20": 3,
+      "21": 2,
+      "22": 1,
+      "23": 4,
+      "24": 3,
+      "25": 1
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 2,
+        "correctChoiceText": "I'm excited because I can't wait to give my speech.",
+        "explanation": "ฝึกมามากและรอขึ้นเวทีแทบไม่ไหว แสดงว่าตื่นเต้น. คำ/วลีชี้ขาด: because = เพราะว่า ; excited = ตื่นเต้น",
+        "decisiveKeyword": "because = เพราะว่า ; excited = ตื่นเต้น",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "2": {
+        "number": 2,
+        "answer": 4,
+        "correctChoiceText": "It makes him feel frightened.",
+        "explanation": "หนังสยองทำให้ Ben กลัวจนหลับไม่ลง. คำ/วลีชี้ขาด: frightened = หวาดกลวั",
+        "decisiveKeyword": "frightened = หวาดกลวั",
+        "fastTrick": "หาคำแสดงอารมณ์และ because ที่บอกสาเหตุ ระวังเหตุผลสวนทาง."
+      },
+      "3": {
+        "number": 3,
+        "answer": 1,
+        "correctChoiceText": "I enjoyed it because I learned something useful.",
+        "explanation": "ทัศนศึกษาสนุกเพราะได้เรียนรวู้ ิธีทำกระดาษรีไซเคิล. คำ/วลีชขี้ าด: because = เพราะว่า",
+        "decisiveKeyword": "",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "4": {
+        "number": 4,
+        "answer": 3,
+        "correctChoiceText": "I'm starving because I haven't eaten for hours.",
+        "explanation": "ไม่ได้กินอะไรตั้งแต่เช้า จึงหิวมาก (starving). คำ/วลีชี้ขาด: because = เพราะวา่",
+        "decisiveKeyword": "because = เพราะวา่",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "5": {
+        "number": 5,
+        "answer": 4,
+        "correctChoiceText": "I don't really like it because it tastes too sour. A: Why does Mew look so sad",
+        "explanation": "ลูกค้าไม่ชอบน้ำมะนาวเพราะเปรี้ยวเกินไป. คำ/วลีชี้ขาด: because = เพราะว่า ; sour = เปรี้ยว",
+        "decisiveKeyword": "because = เพราะว่า ; sour = เปรี้ยว",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "6": {
+        "number": 6,
+        "answer": 1,
+        "correctChoiceText": "She feels sad because her best friend is moving away.",
+        "explanation": "เสียใจเพราะเพอื่ นสนิทย้ายไปต่างประเทศ. คำ/วลีชี้ขาด: because = เพราะวา่",
+        "decisiveKeyword": "because = เพราะวา่",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "7": {
+        "number": 7,
+        "answer": 2,
+        "correctChoiceText": "Yes, I do.",
+        "explanation": "ชอบเรียนด้วยกนั เพราะช่วยอธิบายบทเรียน จึงตอบ Yes, I do.",
+        "decisiveKeyword": "",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 20 === PAGE 98 ==="
+      },
+      "8": {
+        "number": 8,
+        "answer": 3,
+        "correctChoiceText": "I think it's useful",
+        "explanation": "แอปมีประโยชน์เพราะค้นความหมายคำศัพท์ได้เร็ว. คำ/วลีชี้ขาด: i think = ฉันคิดวา่",
+        "decisiveKeyword": "i think = ฉันคิดวา่",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "9": {
+        "number": 9,
+        "answer": 1,
+        "correctChoiceText": "No, it's too loud for me.",
+        "explanation": "แทบไม่ได้ยินอีกฝ่ายเพราะเพลงดังเกินไป.",
+        "decisiveKeyword": "",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "10": {
+        "number": 10,
+        "answer": 4,
+        "correctChoiceText": "Uncomfortable because the bus was crowded.",
+        "explanation": "คนแน่นจนต้องยืนและขยับแทบไม่ได้ จึงอึดอัด. คำ/วลีชี้ขาด: because = เพราะวา่ ; crowded = แออดั",
+        "decisiveKeyword": "because = เพราะวา่ ; crowded = แออดั",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "11": {
+        "number": 11,
+        "answer": 3,
+        "correctChoiceText": "Proud because her team's hard work was successful.",
+        "explanation": "ทีมได้รางวัลที่หนึ่งหลังซ้อมหนัก จึงภูมิใจ. คำ/วลีชี้ขาด: because = เพราะวา่ ; proud = ภูมิใจ",
+        "decisiveKeyword": "because = เพราะวา่ ; proud = ภูมิใจ",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "12": {
+        "number": 12,
+        "answer": 2,
+        "correctChoiceText": "I'm hungry because I skipped breakfast.",
+        "explanation": "ไม่ได้กินอาหารเช้าและท้องร้องตอนเที่ยง จึงหิว. คำ/วลีชี้ขาด: because = เพราะวา่ ; hungry = หิว",
+        "decisiveKeyword": "because = เพราะวา่ ; hungry = หิว",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "13": {
+        "number": 13,
+        "answer": 1,
+        "correctChoiceText": "I'm pleased because my students worked hard and passed.",
+        "explanation": "ครูยิ้มเพราะนักเรียนสอบผ่านหลังพยายามมาก จึงพอใจ. คำ/วลีชี้ขาด: because = เพราะวา่",
+        "decisiveKeyword": "because = เพราะวา่",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "14": {
+        "number": 14,
+        "answer": 4,
+        "correctChoiceText": "Disappointed because her painting was damaged.",
+        "explanation": "ภาพวาดฉีกก่อนส่งประกวด จึงผดิ หวัง. คำ/วลีชี้ขาด: disappointed = ผิดหวัง ; because = เพราะว่า",
+        "decisiveKeyword": "disappointed = ผิดหวัง ; because = เพราะว่า",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "15": {
+        "number": 15,
+        "answer": 2,
+        "correctChoiceText": "I don't want to buy it because it is too expensive.",
+        "explanation": "เสื้อราคา 2,000 บาทเกินงบ 300 บาท จึงแพงเกินไป. คำ/วลีชขี้ าด: too expensive = แพงเกินไป ; because = เพราะวา่",
+        "decisiveKeyword": "",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "16": {
+        "number": 16,
+        "answer": 3,
+        "correctChoiceText": "I don't like this place because it's too crowded and noisy.",
+        "explanation": "ร้านมีคนมากและเสียงดังจนคุยลำบาก จึงไม่ชอบ. คำ/วลีชี้ขาด: because = เพราะว่า ; crowded = แออัด",
+        "decisiveKeyword": "because = เพราะว่า ; crowded = แออัด",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "17": {
+        "number": 17,
+        "answer": 1,
+        "correctChoiceText": "I love this painting because its colors are beautiful.",
+        "explanation": "Anna ชอบภาพเพราะสีสันสดใสสวยงาม. คำ/วลีชี้ขาด: because = เพราะว่า",
+        "decisiveKeyword": "because = เพราะว่า",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 21 === PAGE 99 ==="
+      },
+      "18": {
+        "number": 18,
+        "answer": 2,
+        "correctChoiceText": "He doesn't like noisy places because they make him uncomfortable.",
+        "explanation": "He เป็นเอกพจน์ ต้องใช ้ doesn't like ไม่ใช่ don't/doesn't likes. คำ/วลีชี้ขาด: because = เพราะว่า",
+        "decisiveKeyword": "because = เพราะว่า",
+        "fastTrick": "หลัง doesn’t กริยาต้องไม่เติม -s อีก."
+      },
+      "19": {
+        "number": 19,
+        "answer": 4,
+        "correctChoiceText": "does / won",
+        "explanation": "Why does Lily ...? ใช ้ does และเหตุการณ์เมื่อวานใช้ won.",
+        "decisiveKeyword": "",
+        "fastTrick": "หลัง he/she ใช้ doesn’t + V.1 และ does + V.1; คำว่า yesterday ใช้ past."
+      },
+      "20": {
+        "number": 20,
+        "answer": 3,
+        "correctChoiceText": "I'm disappointed because our school trip was cancelled.",
+        "explanation": "disappointed คือผิดหวัง และเหตุผลคือทริปถูกยกเลิก. คำ/วลชี ี้ขาด: disappointed = ผิดหวัง ; because = เพราะว่า",
+        "decisiveKeyword": "",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "21": {
+        "number": 21,
+        "answer": 2,
+        "correctChoiceText": "I feel more confident because practicing has improved my English.",
+        "explanation": "ฝึกพูดทุกวันจนพูดกับชาวตา่ งชาติได ้ จึงมั่นใจมากขึ้น. คำ/วลีชี้ขาด: because = เพราะว่า",
+        "decisiveKeyword": "because = เพราะว่า",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น."
+      },
+      "22": {
+        "number": 22,
+        "answer": 1,
+        "correctChoiceText": "I liked the singing, but the music was too loud for me.",
+        "explanation": "ชอบนักร้อง แตเ่ สียงดนตรีดังเกินจนปวดศีรษะ. คำ/วลีชี้ขาด: but = แต ่",
+        "decisiveKeyword": "but = แต ่",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "23": {
+        "number": 23,
+        "answer": 4,
+        "correctChoiceText": "I like the vegetables, but the sauce is too spicy for me.",
+        "explanation": "ชอบผักสด แตซ่ อสเผ็ดมากเกินไป. คำ/วลีชี้ขาด: but = แต ่",
+        "decisiveKeyword": "but = แต ่",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "24": {
+        "number": 24,
+        "answer": 3,
+        "correctChoiceText": "She was lonely at first but is now happy.",
+        "explanation": "แรก ๆ เหงา ตอ่ มามีเพื่อนจากชมรมศิลปะจึงมีความสุข. คำ/วลชี ี้ขาด: first = อันดับแรก ; but = แต ่",
+        "decisiveKeyword": "",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "25": {
+        "number": 25,
+        "answer": 1,
+        "correctChoiceText": "I enjoy mathematics because I can understand how to solve problems.",
+        "explanation": "ทำโจทยค์ ณิตได้ด้วยตนเองแล้ว จึงสนุกและอยากทำตอ่ . คำ/วลชี ี้ขาด: because = เพราะว่า ; under = อยู่ใต ้",
+        "decisiveKeyword": "",
+        "fastTrick": "ถาม Why ให้หาประโยคบอกเหตุผล ไม่สับสนกับผลที่เกิดขึ้น. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 22 === PAGE 100 ==="
+      }
+    }
+  },
+  "8": {
+    "setNumber": 8,
+    "indicator": "ต 1.3 ป.6/1",
+    "title": "การให้ข้อมูลเกี่ยวกับตนเองและสิ่งแวดล้อม",
+    "quickKey": {
+      "1": 1,
+      "2": 3,
+      "3": 4,
+      "4": 2,
+      "5": 3,
+      "6": 1,
+      "7": 4,
+      "8": 3,
+      "9": 2,
+      "10": 4,
+      "11": 1,
+      "12": 4,
+      "13": 2,
+      "14": 3,
+      "15": 2,
+      "16": 2,
+      "17": 3,
+      "18": 1,
+      "19": 4,
+      "20": 2,
+      "45": 8
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 1,
+        "correctChoiceText": "Kanda is twelve years old and enjoys playing badminton.",
+        "explanation": "ข้อมูลบอกอายุ 12 ปีและชอบเล่นแบดมินตันหลังเรียน.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "2": {
+        "number": 2,
+        "answer": 3,
+        "correctChoiceText": "Ploy has two younger brothers who enjoy drawing.",
+        "explanation": "Ploy มีน้องชายสองคน ทั้งคู่ชอบวาดภาพ ต้องใช ้ has และ enjoy.",
+        "decisiveKeyword": "",
+        "fastTrick": "จับข้อมูลตรงข้อความ ระวัง frequency, เวลา, in/on/at และเอกพจน์."
+      },
+      "3": {
+        "number": 3,
+        "answer": 4,
+        "correctChoiceText": "There are eight vegetable beds in the school garden.",
+        "explanation": "โปสเตอร์ระบุแปลงผัก 8 แปลง ไม่ใช่ 18.",
+        "decisiveKeyword": "",
+        "fastTrick": "จับข้อมูลตรงข้อความ ระวัง frequency, เวลา, in/on/at และเอกพจน์."
+      },
+      "4": {
+        "number": 4,
+        "answer": 2,
+        "correctChoiceText": "Lisa takes piano lessons twice a week.",
+        "explanation": "เรียนเปียโนอังคารและพฤหัสบดี เท่ากับสองครั้งต่อสัปดาห์.",
+        "decisiveKeyword": "",
+        "fastTrick": "จับข้อมูลตรงข้อความ ระวัง frequency, เวลา, in/on/at และเอกพจน์."
+      },
+      "5": {
+        "number": 5,
+        "answer": 3,
+        "correctChoiceText": "returns",
+        "explanation": "ประธาน She เอกพจน์ ใช้ returns. คำ/วลีชี้ขาด: return = คนื",
+        "decisiveKeyword": "return = คนื",
+        "fastTrick": "จับข้อมูลตรงข้อความ ระวัง frequency, เวลา, in/on/at และเอกพจน์."
+      },
+      "6": {
+        "number": 6,
+        "answer": 1,
+        "correctChoiceText": "The school bus leaves at a quarter to eight in the morning.",
+        "explanation": "7:45 คืออกี 15 นาทีจะ 8 โมง (a quarter to eight). คำ/วลีชี้ขาด: a quarter to = อกี 15 นาทีจะถึง",
+        "decisiveKeyword": "a quarter to = อกี 15 นาทีจะถึง",
+        "fastTrick": "7:45 = 8:00 ลบ 15 นาที จึงเป็น a quarter to eight."
+      },
+      "7": {
+        "number": 7,
+        "answer": 4,
+        "correctChoiceText": "in / on / at",
+        "explanation": "ใช้ in กับเดือน on กับวัน และ at กับเวลา.",
+        "decisiveKeyword": "",
+        "fastTrick": "จับข้อมูลตรงข้อความ ระวัง frequency, เวลา, in/on/at และเอกพจน์."
+      },
+      "8": {
+        "number": 8,
+        "answer": 3,
+        "correctChoiceText": "A notebook costs thirty-five baht.",
+        "explanation": "รายการราคาเขียน notebook ราคา 35 บาท.",
+        "decisiveKeyword": "",
+        "fastTrick": "ขีดเส้นใต้หน่วยและตัวเลขก่อนคำนวณ อย่าอ่านสลับแถวหรือหลัก. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 23 === PAGE 101 ==="
+      },
+      "9": {
+        "number": 9,
+        "answer": 2,
+        "correctChoiceText": "Ben is the twelfth student on the list.",
+        "explanation": "ลำดับที่ 12 เขียน twelfth ไม่ใช่ twelveth.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตัวเลข ราคา อันดับ วันที่ ตอ้ งอ่านทุกหลักและคำลงท้าย."
+      },
+      "10": {
+        "number": 10,
+        "answer": 4,
+        "correctChoiceText": "The exhibition will be held on August 21, 2026.",
+        "explanation": "วันในภาษาอังกฤษใช้ on และชื่อเดือนตอ้ งขึ้นต้นตัวใหญ่.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตัวเลข ราคา อันดับ วันที่ ตอ้ งอ่านทุกหลักและคำลงท้าย."
+      },
+      "11": {
+        "number": 11,
+        "answer": 1,
+        "correctChoiceText": "The mornings are usually cold, while the afternoons can be warmer.",
+        "explanation": "เช้าอากาศเย็นและบ่ายอุ่นขึ้นตามบทอ่าน. คำ/วลีชี้ขาด: usually = โดยปกติ ; after = หลัง",
+        "decisiveKeyword": "usually = โดยปกติ ; after = หลัง",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "12": {
+        "number": 12,
+        "answer": 4,
+        "correctChoiceText": "It is a wide, blue, rectangular board.",
+        "explanation": "กว้าง 2 เมตร สงู 1 เมตร มีมุมฉาก 4 มมุ จึงเป็นสี่เหลี่ยมผืนผ้าสีน้ำเงิน.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตรวจรูปทรง ตำแหน่ง ทิศทาง และความเปลี่ยนแปลงของอากาศ."
+      },
+      "13": {
+        "number": 13,
+        "answer": 2,
+        "correctChoiceText": "The science laboratory is on the right of the library.",
+        "explanation": "ห้องสมุดอยู่ระหว่างสองห้องและห้องคอมอยู่ซ้าย จึงแล็บอยู่ขวา. คำ/วลีชี้ขาด: on the right = ดา้ นขวา",
+        "decisiveKeyword": "on the right = ดา้ นขวา",
+        "fastTrick": "เทียบตำแหน่งทุกจุดตามภาพ อยา่ ใช้ความจำจากชื่อสถานท.ี่"
+      },
+      "14": {
+        "number": 14,
+        "answer": 3,
+        "correctChoiceText": "Go straight to the traffic lights, turn left, and find the post office on your",
+        "explanation": "เส้นทางคือเดินตรงถึงไฟจราจร เลี้ยวซ้าย แล้วพบไปรษณีย์ขวา.",
+        "decisiveKeyword": "",
+        "fastTrick": "เทียบตำแหน่งทุกจุดตามภาพ อยา่ ใช้ความจำจากชื่อสถานท.ี่"
+      },
+      "15": {
+        "number": 15,
+        "answer": 2,
+        "correctChoiceText": "The weather changed from sunny to rainy during the day.",
+        "explanation": "ตอนเช้าแดดออกแต่ต่อมาฝนตกหนัก จึงอากาศเปลี่ยน.",
+        "decisiveKeyword": "",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "16": {
+        "number": 16,
+        "answer": 2,
+        "correctChoiceText": "It is cloudy and humid.",
+        "explanation": "เมฆหนาและอากาศอุ่นชื้นโดยไม่มีฝนคือ cloudy and humid.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตรวจรูปทรง ตำแหน่ง ทิศทาง และความเปลี่ยนแปลงของอากาศ."
+      },
+      "17": {
+        "number": 17,
+        "answer": 3,
+        "correctChoiceText": "The students feel proud of their achievement.",
+        "explanation": "ทำโครงงานสำเร็จและได้รับรางวัล จึงรสู้ ึกภูมิใจ. คำ/วลีชี้ขาด: proud = ภูมิใจ",
+        "decisiveKeyword": "proud = ภูมิใจ",
+        "fastTrick": "ตรวจรูปทรง ตำแหน่ง ทิศทาง และความเปลี่ยนแปลงของอากาศ."
+      },
+      "18": {
+        "number": 18,
+        "answer": 1,
+        "correctChoiceText": "My cousin and I visited Bangkok in October.",
+        "explanation": "I, Bangkok, October ใชต้ ัวพิมพใ์ หญ่ถูกต้อง.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตรวจตวั ใหญ่ ชื่อเฉพาะ apostrophe comma full stop ทีละจุด. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 24 === PAGE 102 ==="
+      },
+      "19": {
+        "number": 19,
+        "answer": 4,
+        "correctChoiceText": "Anna's bicycle is parked behind the classroom.",
+        "explanation": "Anna เป็นเจ้าของจักรยาน ต้องเขียน Anna's bicycle. คำ/วลชี ี้ขาด: behind = ด้านหลัง",
+        "decisiveKeyword": "",
+        "fastTrick": "ตรวจตวั ใหญ่ ชื่อเฉพาะ apostrophe comma full stop ทีละจุด."
+      },
+      "20": {
+        "number": 20,
+        "answer": 2,
+        "correctChoiceText": "My father bought rice, eggs, and vegetables at the market.",
+        "explanation": "ประโยคบอกเล่าที่แจกแจงสามรายการใช้จุลภาคและจบจุด.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตรวจตวั ใหญ่ ชื่อเฉพาะ apostrophe comma full stop ทีละจุด. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 25 === PAGE 103 ==="
+      }
+    }
+  },
+  "9": {
+    "setNumber": 9,
+    "indicator": "ต 1.3 ป.6/2",
+    "title": "ภาพ แผนผัง ตาราง แผนภูมิ",
+    "quickKey": {
+      "1": 3,
+      "2": 2,
+      "3": 1,
+      "4": 4,
+      "5": 2,
+      "6": 1,
+      "7": 3,
+      "8": 2,
+      "9": 3,
+      "10": 30,
+      "11": 4,
+      "12": 2,
+      "13": 3,
+      "14": 1,
+      "15": 2,
+      "16": 4,
+      "17": 1,
+      "18": 3,
+      "19": 2,
+      "20": 4
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 3,
+        "correctChoiceText": "Students collected the highest number of paper items.",
+        "explanation": "ตารางแสดง Paper 36 สูงสดุ เมื่อเทียบกับขวด 24 และกระป๋อง 18. คำ/วลชี ี้ขาด: highest = สูงที่สดุ ; paper = กระดาษ",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูหัวตาราง เวลา แถวและคอลัมน์ แล้วเทียบค่า ไม่เดาจากรูปตกแต่ง."
+      },
+      "2": {
+        "number": 2,
+        "answer": 2,
+        "correctChoiceText": "ภาพตัวเลือก 2 — Plastic bottles 3, Paper 5, Cans 1",
+        "explanation": "ภาพท ี่ 2 มีขวด 3 ใบ กระดาษ 5 แผ่น และกระป๋อง 1 ใบ. คำ/วลีชี้ขาด: paper = กระดาษ",
+        "decisiveKeyword": "paper = กระดาษ",
+        "fastTrick": "นับขวด–กระดาษ–กระป๋องเรียง 3–5–1 อยา่ นับรวมเป็นกลุ่มเดียว."
+      },
+      "3": {
+        "number": 3,
+        "answer": 1,
+        "correctChoiceText": "English",
+        "explanation": "วันอังคารหลัง Science เวลา 9–10 คอื English เวลา 10–11.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "4": {
+        "number": 4,
+        "answer": 4,
+        "correctChoiceText": "Science is the last subject on Wednesday.",
+        "explanation": "วันพุธวิชาสดุ ทา้ ย 11–12 คือ Science.",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูหัวตาราง เวลา แถวและคอลัมน์ แล้วเทียบค่า ไม่เดาจากรูปตกแต่ง."
+      },
+      "5": {
+        "number": 5,
+        "answer": 2,
+        "correctChoiceText": "ตารางตวั เลือก 2 — Science → Art → English",
+        "explanation": "ตัวเลือก 2 เรียง Science 9 น., Art 10 น. และ English 11 น.",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูหัวตาราง เวลา แถวและคอลัมน์ แล้วเทียบค่า ไม่เดาจากรูปตกแต่ง."
+      },
+      "6": {
+        "number": 6,
+        "answer": 1,
+        "correctChoiceText": "Lunch",
+        "explanation": "หลัง Language Workshop ในตารางคือ Lunch.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "7": {
+        "number": 7,
+        "answer": 3,
+        "correctChoiceText": "45 minutes",
+        "explanation": "Group Presentations เวลา 12:30–13:15 รวม 45 นาที.",
+        "decisiveKeyword": "",
+        "fastTrick": "แปลง 12:30–13:15 เป็น 45 นาที ไม่ใช่ 75 นาที. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 26 === PAGE 104 ==="
+      },
+      "8": {
+        "number": 8,
+        "answer": 2,
+        "correctChoiceText": "ตารางตวั เลือก 2 — Sketching → Painting → Display Work",
+        "explanation": "ตารางท ี่ 2 เรียง Sketching 9 น., Painting 10 น., Display Work 11 น.",
+        "decisiveKeyword": "",
+        "fastTrick": "คำวา่ immediately after และ how long ใช้เวลาจากตาราง."
+      },
+      "9": {
+        "number": 9,
+        "answer": 3,
+        "correctChoiceText": "15 students",
+        "explanation": "Football 25 ลบ Science 10 เท่ากับ 15 คน.",
+        "decisiveKeyword": "",
+        "fastTrick": "Football 25 − Science 10 = 15."
+      },
+      "10": {
+        "number": 10,
+        "answer": 1,
+        "correctChoiceText": "30 students",
+        "explanation": "Art 20 รวม Science 10 เท่ากับ 30 คน.",
+        "decisiveKeyword": "",
+        "fastTrick": "Art 20 + Science 10 = 30."
+      },
+      "11": {
+        "number": 11,
+        "answer": 4,
+        "correctChoiceText": "Football is the most popular club, while Science is the least popular.",
+        "explanation": "Football มากสุด 25 และ Science นอ้ ยสุด 10.",
+        "decisiveKeyword": "",
+        "fastTrick": "เทียบตำแหน่งทุกจุดตามภาพ อยา่ ใช้ความจำจากชื่อสถานท.ี่"
+      },
+      "12": {
+        "number": 12,
+        "answer": 2,
+        "correctChoiceText": "กราฟตัวเลือก 2 — Green 20, Red 15, Blue 10",
+        "explanation": "กราฟตวั เลือก 2 มี Green 20, Red 15, Blue 10 ตรงข้อมูล.",
+        "decisiveKeyword": "",
+        "fastTrick": "อ่านแกนและหน่วย คำวา่ more = ลบ, total = บวก, highest = มากสดุ ."
+      },
+      "13": {
+        "number": 13,
+        "answer": 3,
+        "correctChoiceText": "Ubon Ratchathani",
+        "explanation": "Ubon Ratchathani 34°C สูงสุดเหนือ Phuket 30 และ Chiang Mai 26.",
+        "decisiveKeyword": "",
+        "fastTrick": "อ่านแกนและหน่วย คำวา่ more = ลบ, total = บวก, highest = มากสดุ ."
+      },
+      "14": {
+        "number": 14,
+        "answer": 1,
+        "correctChoiceText": "Phuket is four degrees Celsius warmer than Chiang Mai.",
+        "explanation": "Phuket 30°C ลบ Chiang Mai 26°C เท่ากับต่าง 4°C.",
+        "decisiveKeyword": "",
+        "fastTrick": "Phuket 30°C − Chiang Mai 26°C = 4°C."
+      },
+      "15": {
+        "number": 15,
+        "answer": 2,
+        "correctChoiceText": "The Canteen",
+        "explanation": "แผนที่แสดง Canteen อยู่เหนือ School Office โดยตรง.",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูเข็มทิศ: N ขึ้น S ลง W ซ้าย E ขวา."
+      },
+      "16": {
+        "number": 16,
+        "answer": 4,
+        "correctChoiceText": "It is east of the Playground.",
+        "explanation": "School Garden อยู่ด้านขวาหรือทิศตะวันออกของ Playground. คำ/วลีชี้ขาด: east = ทิศตะวันออก",
+        "decisiveKeyword": "east = ทิศตะวันออก",
+        "fastTrick": "เทียบตำแหน่งทุกจุดตามภาพ อยา่ ใช้ความจำจากชื่อสถานท.ี่"
+      },
+      "17": {
+        "number": 17,
+        "answer": 1,
+        "correctChoiceText": "The Library is north of the Playground and west of the Canteen.",
+        "explanation": "Library อยู่เหนือ Playground และตะวนั ตกของ Canteen. คำ/วลีชี้ขาด: north = ทศิ เหนือ ; west = ทิศตะวันตก",
+        "decisiveKeyword": "north = ทศิ เหนือ ; west =",
+        "fastTrick": "เทียบตำแหน่งทุกจุดตามภาพ อยา่ ใช้ความจำจากชื่อสถานท.ี่ เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 27 === PAGE 105 ==="
+      },
+      "18": {
+        "number": 18,
+        "answer": 3,
+        "correctChoiceText": "Plant the seeds.",
+        "explanation": "ขั้นก่อน Water the soil คอื Plant the seeds.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "19": {
+        "number": 19,
+        "answer": 2,
+        "correctChoiceText": "ภาพตัวเลือก 2 — Wash Bottles → Remove Labels → Recycling Bag",
+        "explanation": "แผนภาพตวั เลือก 2 เรียงลา้ งขวด ลอกฉลาก ใส่ถุงรีไซเคิล.",
+        "decisiveKeyword": "",
+        "fastTrick": "หาลูกศรลำดับ wash → remove labels → recycle กอ่ นเลือกภาพ."
+      },
+      "20": {
+        "number": 20,
+        "answer": 4,
+        "correctChoiceText": "Sort Books by Age Group",
+        "explanation": "ลำดับบริจาคหนังสือก่อนส่งห้องสมุดคือคัดแยกตามช่วงอายุ.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 28 === PAGE 106 ==="
+      }
+    }
+  },
+  "10": {
+    "setNumber": 10,
+    "indicator": "ต 1.3 ป.6/3",
+    "title": "การแสดงความคดิ เห็น",
+    "quickKey": {
+      "1": 3,
+      "2": 1,
+      "3": 4,
+      "4": 2,
+      "5": 1,
+      "6": 3,
+      "7": 2,
+      "8": 4,
+      "9": 2,
+      "10": 1,
+      "11": 4,
+      "12": 3,
+      "13": 1,
+      "14": 4,
+      "15": 2,
+      "16": 3,
+      "17": 4,
+      "18": 2,
+      "19": 3,
+      "20": 1
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 3,
+        "correctChoiceText": "I think it's a great place to read.",
+        "explanation": "Mina แสดงความคิดเห็นเชิงประเมินว่ามุมอ่านหนังสือเหมาะและน่าอ่าน. คำ/วลีชี้ขาด: i think = ฉันคิดว่า",
+        "decisiveKeyword": "i think = ฉันคิดว่า",
+        "fastTrick": "หาสำนวนแสดงจุดยืนและเหตุผล แล้วเลือกประโยคที่ไม่ขัดกัน."
+      },
+      "2": {
+        "number": 2,
+        "answer": 1,
+        "correctChoiceText": "In my opinion, the club would help students learn about nature.",
+        "explanation": "In my opinion เป็นวลีแสดงความคิดเห็นและตามด้วยประโยคสมบูรณ์. คำ/วลีชี้ขาด: in my opinion = ในความคดิ เห็นของฉัน",
+        "decisiveKeyword": "in my opinion =",
+        "fastTrick": "หาสำนวนแสดงจุดยืนและเหตุผล แล้วเลือกประโยคที่ไม่ขัดกัน."
+      },
+      "3": {
+        "number": 3,
+        "answer": 4,
+        "correctChoiceText": "I believe tablets can make lessons more interesting.",
+        "explanation": "I believe ... เป็นความเห็นต่อประโยชน์การใช้แท็บเล็ต. คำ/วลีชี้ขาด: i believe = ฉันเชื่อว่า ; can = สามารถ",
+        "decisiveKeyword": "i believe = ฉันเชื่อว่า ; can =",
+        "fastTrick": "หาสำนวนแสดงจุดยืนและเหตุผล แล้วเลือกประโยคที่ไม่ขัดกัน."
+      },
+      "4": {
+        "number": 4,
+        "answer": 2,
+        "correctChoiceText": "In my opinion, visiting museums makes learning more enjoyable.",
+        "explanation": "In my opinion ตามดว้ ยประธานและกริยาที่เป็นประโยคสมบูรณ์. คำ/วลชี ี้ขาด: in my opinion = ในความคดิ เห็นของฉัน",
+        "decisiveKeyword": "",
+        "fastTrick": "หาสำนวนแสดงจุดยืนและเหตุผล แล้วเลือกประโยคที่ไม่ขัดกัน."
+      },
+      "5": {
+        "number": 5,
+        "answer": 1,
+        "correctChoiceText": "I think outdoor lessons are valuable.",
+        "explanation": "I think outdoor lessons are valuable เป็นความคิดเห็น ไม่ใช่ข้อมูลเวลา. คำ/วลชี ขี้ าด: i think = ฉันคิดว่า",
+        "decisiveKeyword": "",
+        "fastTrick": "หาสำนวนแสดงจุดยืนและเหตุผล แล้วเลือกประโยคที่ไม่ขัดกัน."
+      },
+      "6": {
+        "number": 6,
+        "answer": 3,
+        "correctChoiceText": "I agree with you.",
+        "explanation": "Pete ให้เหตุผลสนับสนุน จึงตอบ I agree with you. คำ/วลชี ี้ขาด: i agree = ฉันเห็นด้วย",
+        "decisiveKeyword": "",
+        "fastTrick": "เห็นด้วย: I agree / I think so, too / You’re right."
+      },
+      "7": {
+        "number": 7,
+        "answer": 2,
+        "correctChoiceText": "I think so, too.",
+        "explanation": "May สนับสนุนเรื่องหนังสือเพิ่มเติม จึงใช้ I think so, too. คำ/วลีชี้ขาด: i think = ฉันคิดว่า",
+        "decisiveKeyword": "i think = ฉันคิดว่า",
+        "fastTrick": "หาสำนวนแสดงจุดยืนและเหตุผล แล้วเลือกประโยคที่ไม่ขัดกัน. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 29 === PAGE 107 ==="
+      },
+      "8": {
+        "number": 8,
+        "answer": 4,
+        "correctChoiceText": "You're right.",
+        "explanation": "You're right แสดงเห็นด้วย และเหตุผลเรื่องความเป็นอิสระสนับสนุน. คำ/วลชี ี้ขาด: you're right = คุณพูดถูก",
+        "decisiveKeyword": "",
+        "fastTrick": "หาสำนวนแสดงจุดยืนและเหตุผล แล้วเลือกประโยคที่ไม่ขัดกัน."
+      },
+      "9": {
+        "number": 9,
+        "answer": 2,
+        "correctChoiceText": "I don't think so.",
+        "explanation": "ตัวอยา่ งนักเรียนที่ถนัดเขียนมือแย้งคำว่า always better.",
+        "decisiveKeyword": "",
+        "fastTrick": "ไม่เห็นด้วย: I disagree / I don’t think so / I see your point, but…."
+      },
+      "10": {
+        "number": 10,
+        "answer": 1,
+        "correctChoiceText": "I disagree.",
+        "explanation": "B ชอบการทดลอง จึงไม่เห็นด้วยกับคำวา่ boring. คำ/วลีชี้ขาด: disagree = ไม่เห็นด้วย",
+        "decisiveKeyword": "disagree = ไม่เห็นด้วย",
+        "fastTrick": "หาสำนวนแสดงจุดยืนและเหตุผล แล้วเลือกประโยคที่ไม่ขัดกัน."
+      },
+      "11": {
+        "number": 11,
+        "answer": 4,
+        "correctChoiceText": "I see your point, but I think students should have a choice.",
+        "explanation": "Jane เห็นว่าความสนใจตา่ งกัน จึงแย้งอย่างสุภาพและให้ทางเลือก. คำ/วลีชี้ขาด: i think = ฉันคิดว่า ; should = ควร",
+        "decisiveKeyword": "i think = ฉันคิดว่า ; should",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "12": {
+        "number": 12,
+        "answer": 3,
+        "correctChoiceText": "She recognizes an advantage of online lessons but prefers classroom",
+        "explanation": "Fah เห็นข้อดีออนไลน์แต่คิดว่าชั้นเรียนดีกวา่ สำหรับทำงานกลุ่ม. คำ/วลีชี้ขาด: but = แต่",
+        "decisiveKeyword": "but = แต่",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "13": {
+        "number": 13,
+        "answer": 1,
+        "correctChoiceText": "There are twelve months in a year.",
+        "explanation": "จำนวนเดือน 12 เดือนเป็นข้อเท็จจริงตรวจสอบได้.",
+        "decisiveKeyword": "",
+        "fastTrick": "ปีหนึ่งมี 12 เดือน ตรวจสอบได ้ จึงเป็น Fact."
+      },
+      "14": {
+        "number": 14,
+        "answer": 4,
+        "correctChoiceText": "Learning outdoors is more interesting than studying inside.",
+        "explanation": "คำวา่ more interesting ขึ้นกับความชอบ จึงเป็นความคิดเห็น.",
+        "decisiveKeyword": "",
+        "fastTrick": "หาสำนวนแสดงจุดยืนและเหตุผล แล้วเลือกประโยคที่ไม่ขัดกัน."
+      },
+      "15": {
+        "number": 15,
+        "answer": 2,
+        "correctChoiceText": "A is a fact, but B is an opinion.",
+        "explanation": "เวลาเปิดโรงอาหารเป็นข้อเท็จจริง ส่วนรสชาติอาหารดีกว่าเป็นความเห็น. คำ/วลีชี้ขาด: but = แต ่",
+        "decisiveKeyword": "but = แต ่",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "16": {
+        "number": 16,
+        "answer": 3,
+        "correctChoiceText": "Statement C",
+        "explanation": "most exciting เป็นคำประเมินส่วนตัว ต่างจากวัน/เวลา/จำนวน.",
+        "decisiveKeyword": "",
+        "fastTrick": "ขีดเส้นใต้หน่วยและตัวเลขก่อนคำนวณ อย่าอ่านสลับแถวหรือหลัก. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 30 === PAGE 108 ==="
+      },
+      "17": {
+        "number": 17,
+        "answer": 4,
+        "correctChoiceText": "The museum was enjoyable, but the visit should have been longer.",
+        "explanation": "Tom ชอบพิพิธภัณฑ์แต่คิดวา่ ควรมีเวลาเดินชมนานกว่านี้. คำ/วลีชี้ขาด: should = ควร ; but = แต ่",
+        "decisiveKeyword": "should = ควร ; but = แต ่",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "18": {
+        "number": 18,
+        "answer": 2,
+        "correctChoiceText": "She believes the activity is not difficult.",
+        "explanation": "I don't think ... difficult หมายถึงคิดวา่ ไม่ยาก.",
+        "decisiveKeyword": "",
+        "fastTrick": "แยกข้อดี–ข้อเสียและเหตุผล หลบคำสุดโต่ง always / never."
+      },
+      "19": {
+        "number": 19,
+        "answer": 3,
+        "correctChoiceText": "I see your point, but I think reusable cups are a better choice.",
+        "explanation": "Pete เข้าใจความสะดวกแต่ชอบแก้วใชซ้ ้ำเพราะลดขยะ. คำ/วลีชี้ขาด: i think = ฉันคิดว่า ; but = แต ่",
+        "decisiveKeyword": "i think = ฉันคิดว่า ; but = แต ่",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "20": {
+        "number": 20,
+        "answer": 1,
+        "correctChoiceText": "I believe creative projects can help students develop new skills, but regular",
+        "explanation": "คำตอบสมดุลกล่าวทั้งข้อดีของโครงงานและประโยชน์การบ้านปกติ. คำ/วลชี ี้ขาด: i believe = ฉันเชื่อว่า ; but = แต ่",
+        "decisiveKeyword": "",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 31 === PAGE 109 ==="
+      }
+    }
+  },
+  "11": {
+    "setNumber": 11,
+    "indicator": "ต 2.1 ป.6/2",
+    "title": "เทศกาลและวัฒนธรรมเจ้าของภาษา",
+    "quickKey": {
+      "1": 3,
+      "2": 2,
+      "3": 4,
+      "4": 1,
+      "5": 2,
+      "6": 3,
+      "7": 1,
+      "8": 4,
+      "9": 3,
+      "10": 1,
+      "11": 2,
+      "12": 4,
+      "13": 2,
+      "14": 3,
+      "15": 1,
+      "16": 4,
+      "17": 3,
+      "18": 1,
+      "19": 2,
+      "20": 4
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 3,
+        "correctChoiceText": "Merry Christmas",
+        "explanation": "บนบัตรเห็นข้อความ Merry Christmas ตรงตัว.",
+        "decisiveKeyword": "",
+        "fastTrick": "จับคู่เทศกาลกับวัน สัญลักษณ์ และกิจกรรมในภาพ."
+      },
+      "2": {
+        "number": 2,
+        "answer": 2,
+        "correctChoiceText": "Count down and celebrate the New Year.",
+        "explanation": "คืนส่งท้ายปีใหม่มักนับถอยหลังเพื่อเข้าสู่ปีใหม่.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "3": {
+        "number": 3,
+        "answer": 4,
+        "correctChoiceText": "Easter",
+        "explanation": "รูปไข่สีและกระต่ายสัมพันธ์กับ Easter. คำ/วลีชี้ขาด: easter = อีสเตอร ์",
+        "decisiveKeyword": "easter = อีสเตอร ์",
+        "fastTrick": "เทียบตำแหน่งทุกจุดตามภาพ อยา่ ใช้ความจำจากชื่อสถานท.ี่"
+      },
+      "4": {
+        "number": 4,
+        "answer": 1,
+        "correctChoiceText": "December 24th",
+        "explanation": "Christmas Eve ตรงกับวันที่ 24 ธันวาคม.",
+        "decisiveKeyword": "",
+        "fastTrick": "จับคู่เทศกาลกับวัน สัญลักษณ์ และกิจกรรมในภาพ."
+      },
+      "5": {
+        "number": 5,
+        "answer": 2,
+        "correctChoiceText": "Wearing costumes and collecting treats",
+        "explanation": "การด์ เชิญ Halloween ระบุแต่งชุดแฟนซีและนำถุงใส่ขนม.",
+        "decisiveKeyword": "",
+        "fastTrick": "ให้ความสำคัญกับข้อมูลหลัง but/however เพราะมักเป็นแผนหรือข้อสรุปล่าสุด."
+      },
+      "6": {
+        "number": 6,
+        "answer": 3,
+        "correctChoiceText": "A New Year's resolution",
+        "explanation": "ตั้งเป้าหมายอ่านหนังสือและออกกำลังกายปีใหม่คือ New Year's resolution. คำ/วลชี ขี้ าด: resolution = ความตั้งใจปีใหม่",
+        "decisiveKeyword": "",
+        "fastTrick": "เชื่อมคำหลัก resolution / turkey / fourth Thursday / pudding."
+      },
+      "7": {
+        "number": 7,
+        "answer": 1,
+        "correctChoiceText": "Thanksgiving",
+        "explanation": "กินไก่งวงและกล่าวขอบคุณเป็นลักษณะ Thanksgiving. คำ/วลชี ี้ขาด: thanksgiving = วันขอบคุณพระเจ้า",
+        "decisiveKeyword": "",
+        "fastTrick": "เชื่อมคำหลัก resolution / turkey / fourth Thursday / pudding. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 32 === PAGE 110 ==="
+      },
+      "8": {
+        "number": 8,
+        "answer": 4,
+        "correctChoiceText": "On the fourth Thursday of November",
+        "explanation": "Thanksgiving สหรัฐฯ ตรงกับพฤหัสบดที ี่สี่ของเดือนพฤศจิกายน.",
+        "decisiveKeyword": "",
+        "fastTrick": "สหรัฐฯ ใช้ fourth Thursday of November ไมใ่ ช่วันคงทขี่ องเดือน."
+      },
+      "9": {
+        "number": 9,
+        "answer": 3,
+        "correctChoiceText": "Christmas pudding",
+        "explanation": "ขนมคริสต์มาสแบบอังกฤษคือ Christmas pudding.",
+        "decisiveKeyword": "",
+        "fastTrick": "เชื่อมคำหลัก resolution / turkey / fourth Thursday / pudding."
+      },
+      "10": {
+        "number": 10,
+        "answer": 1,
+        "correctChoiceText": "Autumn",
+        "explanation": "ภาพใบไม้สีแดงส้มเหลืองและร่วงเป็นฤดู Autumn. คำ/วลีชี้ขาด: autumn = ฤดูใบไม้ร่วง",
+        "decisiveKeyword": "autumn = ฤดูใบไม้ร่วง",
+        "fastTrick": "เชื่อมคำหลัก resolution / turkey / fourth Thursday / pudding."
+      },
+      "11": {
+        "number": 11,
+        "answer": 2,
+        "correctChoiceText": "Many British schools require uniforms, while some American schools do not.",
+        "explanation": "โรงเรียนอังกฤษจำนวนมากกำหนดเครื่องแบบ ส่วนโรงเรียนสหรัฐฯ บางแห่งไม่บังคับ.",
+        "decisiveKeyword": "",
+        "fastTrick": "ขีดเส้นใต้หน่วยและตัวเลขก่อนคำนวณ อย่าอ่านสลับแถวหรือหลัก."
+      },
+      "12": {
+        "number": 12,
+        "answer": 4,
+        "correctChoiceText": "Packed lunch",
+        "explanation": "อาหารกลางวันที่เตรียมใส่กล่องไปโรงเรยี นเรียก packed lunch. คำ/วลีชี้ขาด: packed lunch = อาหารกลางวันที่เตรียมไปเอง",
+        "decisiveKeyword": "packed lunch =",
+        "fastTrick": "วัฒนธรรมต่างกันตามสถานที่ ระวัง all/never และเลือกมารยาทสุภาพ."
+      },
+      "13": {
+        "number": 13,
+        "answer": 2,
+        "correctChoiceText": "Join the queue and wait for your turn.",
+        "explanation": "มารยาทเข้าคิวคือไปต่อท้ายและรอตามลำดับ. คำ/วลีชี้ขาด: queue = ต่อแถว",
+        "decisiveKeyword": "queue = ต่อแถว",
+        "fastTrick": "วัฒนธรรมต่างกันตามสถานที่ ระวัง all/never และเลือกมารยาทสุภาพ."
+      },
+      "14": {
+        "number": 14,
+        "answer": 3,
+        "correctChoiceText": "Mother's Day",
+        "explanation": "บัตรมีข้อความ To My Wonderful Mum เหมาะกับวันแม่.",
+        "decisiveKeyword": "",
+        "fastTrick": "วัฒนธรรมต่างกันตามสถานที่ ระวัง all/never และเลือกมารยาทสุภาพ."
+      },
+      "15": {
+        "number": 15,
+        "answer": 1,
+        "correctChoiceText": "St. Patrick's Day",
+        "explanation": "17 มีนาคม สีเขียวและ shamrock คือ St. Patrick's Day.",
+        "decisiveKeyword": "",
+        "fastTrick": "วัฒนธรรมต่างกันตามสถานที่ ระวัง all/never และเลือกมารยาทสุภาพ."
+      },
+      "16": {
+        "number": 16,
+        "answer": 4,
+        "correctChoiceText": "No, thank you. Everything was delicious.",
+        "explanation": "No, thank you และชมว่าอร่อยเป็นการปฏิเสธอย่างสุภาพ.",
+        "decisiveKeyword": "",
+        "fastTrick": "วัฒนธรรมต่างกันตามสถานที่ ระวัง all/never และเลือกมารยาทสุภาพ."
+      },
+      "17": {
+        "number": 17,
+        "answer": 3,
+        "correctChoiceText": "A waterproof jacket and an umbrella",
+        "explanation": "พยากรณ์ฝนหนักจึงควรมีเสื้อกันน้ำและร่ม.",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูฤดูกาล คำศัพท ์ British/American และวันบนการ์ดอย่างละเอียด. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 33 === PAGE 111 ==="
+      },
+      "18": {
+        "number": 18,
+        "answer": 1,
+        "correctChoiceText": "Autumn and fall are different words for the same season.",
+        "explanation": "Autumn (อังกฤษ) และ Fall (อเมริกัน) หมายถึงฤดูใบไม้ร่วงเดยี วกัน. คำ/วลีชี้ขาด: autumn = ฤดูใบไม้ร่วง ; fall = ฤดใู บไม้ร่วง",
+        "decisiveKeyword": "autumn = ฤดูใบไม้ร่วง ;",
+        "fastTrick": "ดูฤดูกาล คำศัพท ์ British/American และวันบนการ์ดอย่างละเอียด."
+      },
+      "19": {
+        "number": 19,
+        "answer": 2,
+        "correctChoiceText": "Card A is about Christmas Eve, and Card B is about New Year's Eve.",
+        "explanation": "การด์ A December 24 = Christmas Eve; B December 31 = New Year's Eve. คำ/วลีชี้ขาด: new year's eve = คืนก่อนวนั ปีใหม่ ; christmas eve = คืนกอ่ นคริสต์มาส",
+        "decisiveKeyword": "new",
+        "fastTrick": "ดูฤดูกาล คำศัพท ์ British/American และวันบนการ์ดอย่างละเอียด."
+      },
+      "20": {
+        "number": 20,
+        "answer": 4,
+        "correctChoiceText": "Christmas traditions may be different from one family to another.",
+        "explanation": "ข้อความระบุวา่ ครอบครัวฉลองแตกต่างกัน บางคนไม่ฉลองเลย.",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูฤดูกาล คำศัพท ์ British/American และวันบนการ์ดอย่างละเอียด. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 34 === PAGE 112 ==="
+      }
+    }
+  },
+  "12": {
+    "setNumber": 12,
+    "indicator": "ต 2.2 ป.6/1",
+    "title": "ความตา่ งภาษาอังกฤษ–ภาษาไทย",
+    "quickKey": {
+      "1": 2,
+      "2": 3,
+      "3": 1,
+      "4": 4,
+      "5": 2,
+      "6": 3,
+      "7": 1,
+      "8": 4,
+      "9": 3,
+      "10": 2,
+      "11": 1,
+      "12": 3,
+      "13": 4,
+      "14": 1,
+      "15": 2,
+      "16": 3,
+      "17": 4,
+      "18": 1,
+      "19": 2,
+      "20": 4
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 2,
+        "correctChoiceText": "Can you play the violin?",
+        "explanation": "Can you ...? เป็นคำถาม Yes/No ปกติลงท้ายเสียงสูง. คำ/วลีชี้ขาด: can = สามารถ",
+        "decisiveKeyword": "can = สามารถ",
+        "fastTrick": "Yes/No มกั เสียงขึ้น Wh-question และคำสั่งมักเสียงลง; คำถามแบบ or มีขึ้น–ลง."
+      },
+      "2": {
+        "number": 2,
+        "answer": 3,
+        "correctChoiceText": "Does your brother speak Chinese?",
+        "explanation": "Does your brother ...? เป็น Yes/No ต่างจากอกี สามข้อที่เป็น Wh-.",
+        "decisiveKeyword": "",
+        "fastTrick": "Yes/No มกั เสียงขึ้น Wh-question และคำสั่งมักเสียงลง; คำถามแบบ or มีขึ้น–ลง."
+      },
+      "3": {
+        "number": 3,
+        "answer": 1,
+        "correctChoiceText": "How often do you visit your grandparents?",
+        "explanation": "How often ...? เป็น Wh-question ปกติลงท้ายเสียงตำ่ .",
+        "decisiveKeyword": "",
+        "fastTrick": "Yes/No มกั เสียงขึ้น Wh-question และคำสั่งมักเสียงลง; คำถามแบบ or มีขึ้น–ลง."
+      },
+      "4": {
+        "number": 4,
+        "answer": 4,
+        "correctChoiceText": "Sentence A is a Wh-question, while B is an exclamation; both usually have",
+        "explanation": "A เป็น Wh-question ส่วน B เป็นคำอทุ าน จึงมักเสียงตำ่ ทั้งคู่. คำ/วลีชี้ขาด: usually = โดยปกต ิ ; falling = เสียงต่ำลง",
+        "decisiveKeyword": "usually = โดยปกต ิ ; falling =",
+        "fastTrick": "Yes/No มกั เสียงขึ้น Wh-question และคำสั่งมักเสียงลง; คำถามแบบ or มีขึ้น–ลง."
+      },
+      "5": {
+        "number": 5,
+        "answer": 2,
+        "correctChoiceText": "Tea (↗) — Coffee (↘)",
+        "explanation": "คำถามเสนอทางเลือก Tea หรือ Coffee มักสูงที่ tea และต่ำที่ coffee.",
+        "decisiveKeyword": "",
+        "fastTrick": "Or-question มักเสียงขึ้นที่ตัวเลือกแรก ลงที่ตวั เลือกสุดทา้ ย."
+      },
+      "6": {
+        "number": 6,
+        "answer": 3,
+        "correctChoiceText": "Where is the museum? / Close the window.",
+        "explanation": "Where is ...? และ Close ... เป็น Wh-question/คำสั่ง จึงมักเสียงต่ำทั้งคู่.",
+        "decisiveKeyword": "",
+        "fastTrick": "Yes/No มกั เสียงขึ้น Wh-question และคำสั่งมักเสียงลง; คำถามแบบ or มีขึ้น–ลง."
+      },
+      "7": {
+        "number": 7,
+        "answer": 1,
+        "correctChoiceText": "What a wonderful surprise!",
+        "explanation": "What a wonderful surprise! เป็นคำอุทานต้องใช้เครื่องหมายตกใจ.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตรวจ ? ! “ ” และ ’ ให้ตรงหน้าที่ อย่าอ่านแค่ความหมาย. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 35 === PAGE 113 ==="
+      },
+      "8": {
+        "number": 8,
+        "answer": 4,
+        "correctChoiceText": "Where is your English teacher?",
+        "explanation": "Where ...? เป็นคำถามต้องลงท้ายเครื่องหมายคำถาม.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตรวจ ? ! “ ” และ ’ ให้ตรงหน้าที่ อย่าอ่านแค่ความหมาย."
+      },
+      "9": {
+        "number": 9,
+        "answer": 3,
+        "correctChoiceText": "This is Lily's bicycle.",
+        "explanation": "แสดงการเป็นเจ้าของ Lily ใช ้ Lily's.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตรวจ ? ! “ ” และ ’ ให้ตรงหน้าที่ อย่าอ่านแค่ความหมาย."
+      },
+      "10": {
+        "number": 10,
+        "answer": 2,
+        "correctChoiceText": "English usually separates words with spaces, while Thai generally does not",
+        "explanation": "ภาษาอังกฤษเวน้ วรรคระหว่างคำ สว่ นภาษาไทยโดยทั่วไปไม่เว้นทุกคำ. คำ/วลีชี้ขาด: usually = โดยปกต ิ",
+        "decisiveKeyword": "usually = โดยปกต ิ",
+        "fastTrick": "ตรวจ ? ! “ ” และ ’ ให้ตรงหน้าที่ อย่าอ่านแค่ความหมาย."
+      },
+      "11": {
+        "number": 11,
+        "answer": 1,
+        "correctChoiceText": "Sarah said, \"Please wait here.\"",
+        "explanation": "มีเครื่องหมายอญั ประกาศเปิดและปิดครบในจุดที่ถูกต้อง.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตรวจ ? ! “ ” และ ’ ให้ตรงหน้าที่ อย่าอ่านแค่ความหมาย."
+      },
+      "12": {
+        "number": 12,
+        "answer": 3,
+        "correctChoiceText": "Anna asked, \"Where is Tom's notebook?\"",
+        "explanation": "Anna, Where และ Tom's สะกดตัวใหญ่/อัญประกาศ/เครื่องหมายคำถามถูก.",
+        "decisiveKeyword": "",
+        "fastTrick": "ตรวจ ? ! “ ” และ ’ ให้ตรงหน้าที่ อย่าอ่านแค่ความหมาย."
+      },
+      "13": {
+        "number": 13,
+        "answer": 4,
+        "correctChoiceText": "a small wooden box",
+        "explanation": "ลำดับคุณศพั ทข์ นาดก่อนวัสด ุ คือ a small wooden box.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "14": {
+        "number": 14,
+        "answer": 1,
+        "correctChoiceText": "The classroom is bright.",
+        "explanation": "ประธานเอกพจน์ The classroom ใช ้ is bright.",
+        "decisiveKeyword": "",
+        "fastTrick": "โครงสรา้ งคำ: adjective ก่อน noun; หลัง do/does/did ใช้กริยารูปปกติ."
+      },
+      "15": {
+        "number": 15,
+        "answer": 2,
+        "correctChoiceText": "The girl carries a basket.",
+        "explanation": "โครงสรา้ งประธาน The girl + กริยา carries + กรรม a basket.",
+        "decisiveKeyword": "",
+        "fastTrick": "โครงสรา้ งคำ: adjective ก่อน noun; หลัง do/does/did ใช้กริยารูปปกติ."
+      },
+      "16": {
+        "number": 16,
+        "answer": 3,
+        "correctChoiceText": "Where does your brother study?",
+        "explanation": "Where does + subject + กริยารูปปกติ study.",
+        "decisiveKeyword": "",
+        "fastTrick": "โครงสรา้ งคำ: adjective ก่อน noun; หลัง do/does/did ใช้กริยารูปปกติ."
+      },
+      "17": {
+        "number": 17,
+        "answer": 4,
+        "correctChoiceText": "Did she go to the museum yesterday?",
+        "explanation": "หลัง Did ต้องใช้กริยารูปปกติ go ไม่ใช ่ went/goes.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 36 === PAGE 114 ==="
+      },
+      "18": {
+        "number": 18,
+        "answer": 1,
+        "correctChoiceText": "English usually places adjectives before nouns, while Thai usually places",
+        "explanation": "อังกฤษมักวางคณุ ศัพท์หน้าคำนาม แต่ไทยมักวางหลังคำนาม. คำ/วลีชี้ขาด: usually = โดยปกต ิ ; before = ก่อน",
+        "decisiveKeyword": "usually = โดยปกต ิ ; before =",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "19": {
+        "number": 19,
+        "answer": 2,
+        "correctChoiceText": "Who teaches science at your school?",
+        "explanation": "Who เป็นประธานของประโยคจึงใช้ Who teaches ไม่เติม does.",
+        "decisiveKeyword": "",
+        "fastTrick": "โครงสรา้ งคำ: adjective ก่อน noun; หลัง do/does/did ใช้กริยารูปปกติ."
+      },
+      "20": {
+        "number": 20,
+        "answer": 4,
+        "correctChoiceText": "The girl wears a blue jacket. / Where does she live?",
+        "explanation": "She wears + a blue jacket และ Where does she live? ถูกทั้งสองประโยค.",
+        "decisiveKeyword": "",
+        "fastTrick": "โครงสรา้ งคำ: adjective ก่อน noun; หลัง do/does/did ใช้กริยารูปปกติ. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 37 === PAGE 115 ==="
+      }
+    }
+  },
+  "13": {
+    "setNumber": 13,
+    "indicator": "ต 4.1 ป.6/1",
+    "title": "ภาษาในห้องเรียนและสถานศึกษา",
+    "quickKey": {
+      "1": 3,
+      "2": 1,
+      "3": 4,
+      "4": 2,
+      "5": 1,
+      "6": 3,
+      "7": 4,
+      "8": 2,
+      "9": 4,
+      "10": 1,
+      "11": 3,
+      "12": 2,
+      "13": 1,
+      "14": 4,
+      "15": 2,
+      "16": 3,
+      "17": 4,
+      "18": 1,
+      "19": 2,
+      "20": 3
+    },
+    "items": {
+      "1": {
+        "number": 1,
+        "answer": 3,
+        "correctChoiceText": "Give a worksheet to each classmate.",
+        "explanation": "Hand out หมายถึงแจกใบงานให้เพื่อนแต่ละคน.",
+        "decisiveKeyword": "",
+        "fastTrick": "จำเป็นคู่: hand out = แจก, hand in = ส่ง."
+      },
+      "2": {
+        "number": 2,
+        "answer": 1,
+        "correctChoiceText": "Review their answers for mistakes.",
+        "explanation": "Check your answers คือกลับมาตรวจคำตอบก่อนส่ง.",
+        "decisiveKeyword": "",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "3": {
+        "number": 3,
+        "answer": 4,
+        "correctChoiceText": "Students discuss page 36 with one partner.",
+        "explanation": "Work in pairs คือทำกับเพื่อนหนึ่งคน เปิดหน้า 36.",
+        "decisiveKeyword": "",
+        "fastTrick": "รู้คำสั่ง hand out / hand in / work in pairs / not yet."
+      },
+      "4": {
+        "number": 4,
+        "answer": 2,
+        "correctChoiceText": "Not yet.",
+        "explanation": "ยังต้องเขียนบทสรุปจึงตอบ Not yet. คำ/วลีชี้ขาด: not yet = ยังไม ่",
+        "decisiveKeyword": "not yet = ยังไม ่",
+        "fastTrick": "รู้คำสั่ง hand out / hand in / work in pairs / not yet."
+      },
+      "5": {
+        "number": 5,
+        "answer": 1,
+        "correctChoiceText": "may I come in, please?",
+        "explanation": "มาถึงห้องช้าจึงขออนุญาตเข้าห้องด้วย May I come in. คำ/วลีชี้ขาด: may i = ฉันขออนุญาต...ได้ไหม",
+        "decisiveKeyword": "may i = ฉันขออนุญาต...ได้ไหม",
+        "fastTrick": "May/Can I…? คือผพู้ ูดขอทำเอง; Can/Could you…? คือขอให้คนอื่นทำ."
+      },
+      "6": {
+        "number": 6,
+        "answer": 3,
+        "correctChoiceText": "Could you explain it again, please?",
+        "explanation": "ฟังคำสั่งชว่ งทา้ ยไม่ทัน จึงขอให้ครูอธิบายอีกครั้ง. คำ/วลีชี้ขาด: could you = ช่วย...ได้ไหม",
+        "decisiveKeyword": "could you = ช่วย...ได้ไหม",
+        "fastTrick": "ใช้ May I... ขออนุญาต และ Could you... ขอให้ช่วย."
+      },
+      "7": {
+        "number": 7,
+        "answer": 4,
+        "correctChoiceText": "I forgot to bring my textbook.",
+        "explanation": "หนังสือลืมไว้ที่บ้าน จึงบอก I forgot to bring my textbook.",
+        "decisiveKeyword": "",
+        "fastTrick": "ใช้ May I... ขออนุญาต และ Could you... ขอให้ช่วย. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 38 === PAGE 116 ==="
+      },
+      "8": {
+        "number": 8,
+        "answer": 2,
+        "correctChoiceText": "could you lend me your ruler, please?",
+        "explanation": "Ben ตอ้ งการยมื ไม้บรรทัดของ Anna จงึ ขอ Could you lend me. คำ/วลีชี้ขาด: could you = ช่วย...ได้ไหม ; lend = ให้ยืม",
+        "decisiveKeyword": "could you = ช่วย...ได้ไหม",
+        "fastTrick": "ใช้ May I... ขออนุญาต และ Could you... ขอให้ช่วย."
+      },
+      "9": {
+        "number": 9,
+        "answer": 4,
+        "correctChoiceText": "return it to me",
+        "explanation": "หลังยืมเครื่องคิดเลข ผู้ให้ยืมขอให้ return it to me. คำ/วลีชี้ขาด: return = คืน",
+        "decisiveKeyword": "return = คืน",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "10": {
+        "number": 10,
+        "answer": 1,
+        "correctChoiceText": "May I borrow your dictionary? I'll return it after class.",
+        "explanation": "Borrow = ยืมมาใช้ และ return = ส่งคืน หลังเลิกเรียน. คำ/วลีชี้ขาด: return = คืน ; borrow = ยืม",
+        "decisiveKeyword": "return = คืน ; borrow = ยืม",
+        "fastTrick": "วงคำวา่ before/after แล้วไล่ลำดบั เหตุการณ์ทีละขั้น."
+      },
+      "11": {
+        "number": 11,
+        "answer": 3,
+        "correctChoiceText": "On Friday at 9:00 a.m.",
+        "explanation": "ประกาศเลื่อน Science Fair จากพฤหสั ฯ เป็นศุกร์ เวลาเดิม 9 โมง. คำ/วลีชี้ขาด: on friday = วันศุกร ์",
+        "decisiveKeyword": "on friday = วันศุกร ์",
+        "fastTrick": "ประกาศตอ้ งแยกวันใหม่ เวลาเดิม วันครบกำหนด และเงื่อนไขทุกข้อ."
+      },
+      "12": {
+        "number": 12,
+        "answer": 2,
+        "correctChoiceText": "The Art Club meeting will not take place today.",
+        "explanation": "Cancelled หมายถึงยกเลิก จึงไม่มีประชุมชมรมวันนี้.",
+        "decisiveKeyword": "",
+        "fastTrick": "ประกาศตอ้ งแยกวันใหม่ เวลาเดิม วันครบกำหนด และเงื่อนไขทุกข้อ."
+      },
+      "13": {
+        "number": 13,
+        "answer": 1,
+        "correctChoiceText": "May submits her project on Wednesday at 2:30 p.m.",
+        "explanation": "กำหนดส่งไม่เกนิ วันพุธ 15:00 น. May ส่งพุธ 14:30 น. จึงทัน.",
+        "decisiveKeyword": "",
+        "fastTrick": "วันพุธ 14:30 มาก่อน deadline 15:00 จึงส่งทัน."
+      },
+      "14": {
+        "number": 14,
+        "answer": 4,
+        "correctChoiceText": "A Grade 6 student who registers on Wednesday with a signed permission",
+        "explanation": "ตรงทกุ เงื่อนไข: นักเรียน ป.6 ลงทะเบียนวันพุธและมีใบยินยอมลงชื่อ.",
+        "decisiveKeyword": "",
+        "fastTrick": "ประกาศตอ้ งแยกวันใหม่ เวลาเดิม วันครบกำหนด และเงื่อนไขทุกข้อ."
+      },
+      "15": {
+        "number": 15,
+        "answer": 2,
+        "correctChoiceText": "Where will the competition take place?",
+        "explanation": "ครูตอบสถานทหี่ อประชุม จึงเป็นคำถาม Where.",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูว่าคำตอบตอบเรื่อง Where / When / registration / สงิ่ ของหาย."
+      },
+      "16": {
+        "number": 16,
+        "answer": 3,
+        "correctChoiceText": "Do I need to register?",
+        "explanation": "ครูฝึกตอบให้ sign up จึงถามว่าต้องลงทะเบียนหรือไม่. คำ/วลชี ี้ขาด: i need = ฉันจำเป็นต้อง",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูว่าคำตอบตอบเรื่อง Where / When / registration / สงิ่ ของหาย. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 39 === PAGE 117 ==="
+      },
+      "17": {
+        "number": 17,
+        "answer": 4,
+        "correctChoiceText": "Students should bring sports shoes and a water bottle.",
+        "explanation": "ประกาศ Sports Day ระบุให้นำรองเทา้ กีฬาและขวดน้ำ. คำ/วลีชี้ขาด: should = ควร",
+        "decisiveKeyword": "should = ควร",
+        "fastTrick": "ดูว่าคำตอบตอบเรื่อง Where / When / registration / สงิ่ ของหาย."
+      },
+      "18": {
+        "number": 18,
+        "answer": 1,
+        "correctChoiceText": "when should I return this book?",
+        "explanation": "บรรณารักษ์ตอบกำหนดส่งคืนวันพุธหนา้ จึงถาม When should I return. คำ/วลีชี้ขาด: return = คืน ; should = ควร",
+        "decisiveKeyword": "return = คืน ;",
+        "fastTrick": "ดูว่าคำตอบตอบเรื่อง Where / When / registration / สงิ่ ของหาย."
+      },
+      "19": {
+        "number": 19,
+        "answer": 2,
+        "correctChoiceText": "I don't feel well. May I go to the nurse's office?",
+        "explanation": "เวียนหัวและปวดท้องจึงแจ้งไม่สบายและขอไปห้องพยาบาล. คำ/วลีชี้ขาด: may i = ฉันขออนุญาต...ได้ไหม",
+        "decisiveKeyword": "may i = ฉันขออนุญาต...ได้ไหม",
+        "fastTrick": "ดูว่าคำตอบตอบเรื่อง Where / When / registration / สงิ่ ของหาย."
+      },
+      "20": {
+        "number": 20,
+        "answer": 3,
+        "correctChoiceText": "Has anyone handed in a blue backpack?",
+        "explanation": "Lost and Found เป็นจุดของหาย จึงถามว่ามใี ครเก็บกระเป๋ามาส่งไหม.",
+        "decisiveKeyword": "",
+        "fastTrick": "ดูว่าคำตอบตอบเรื่อง Where / When / registration / สงิ่ ของหาย. เฉลย O-NET องักฤษ ป.6 • 275 ขอ้ • หน้า 40"
+      }
+    }
+  }
+}

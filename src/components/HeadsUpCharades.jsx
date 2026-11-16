@@ -28,7 +28,7 @@ const DEFAULT_CATEGORIES = {
   ]
 };
 
-export default function HeadsUpCharades({ cards, title, onBack, onComplete }) {
+export default function HeadsUpCharades({ cards, title, onBack, onComplete, onPracticed }) {
   const { navigate } = useApp();
   const [phase, setPhase] = useState('menu'); // menu, countdown, play, result
   const [timeLeft, setTimeLeft] = useState(60);
@@ -43,7 +43,7 @@ export default function HeadsUpCharades({ cards, title, onBack, onComplete }) {
   };
 
   const startGameWithList = (wordList) => {
-    const shuffled = [...wordList].sort(() => Math.random() - 0.5);
+    const shuffled = cards?.length ? [...wordList] : [...wordList].sort(() => Math.random() - 0.5);
     setCurrentWords(shuffled);
     setWordIndex(0);
     setScore(0);
@@ -56,6 +56,7 @@ export default function HeadsUpCharades({ cards, title, onBack, onComplete }) {
   const startCategoryGame = () => {
     if (cards && cards.length > 0) {
       const mapped = cards.map(c => ({
+        sourceCard: c,
         word: (c.frontLabel || c.back || '').toUpperCase(),
         thai: c.backThai || c.leftThai || '',
         emoji: c.frontType === 'text' ? '' : c.front || '📱'
@@ -81,6 +82,7 @@ export default function HeadsUpCharades({ cards, title, onBack, onComplete }) {
   const handleAnswer = (isCorrect) => {
     const word = currentWords[wordIndex];
     if (!word) return;
+    onPracticed?.(word.sourceCard);
 
     setResults(r => [...r, { ...word, status: isCorrect ? 'correct' : 'pass' }]);
 

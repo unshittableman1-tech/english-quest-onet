@@ -139,10 +139,18 @@ export default function StudentLoginPage() {
         {/* Top actions bar */}
         <div className="flex items-center justify-between mb-4">
           <button
-            className="btn-ghost flex items-center gap-2 text-sm font-semibold px-4 py-2"
+            className="btn-ghost flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5"
             onClick={() => navigate('landing')}
           >
             <UIIcon value={"←"} /> กลับหน้าหลัก
+          </button>
+          <button
+            type="button"
+            className="btn-ghost flex items-center gap-1.5 text-xs font-bold text-amber-900 bg-amber-100/80 hover:bg-amber-200/90 px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm"
+            onClick={() => navigate('teacher-login')}
+          >
+            <span>👩‍🏫</span>
+            <span>เข้าสู่ระบบครู / Admin</span>
           </button>
         </div>
 
@@ -278,6 +286,18 @@ export default function StudentLoginPage() {
               ไม่ใช่โรงเรียนของคุณ? เปลี่ยนโรงเรียน
             </button>
           )}
+
+          {/* Quick link to Teacher / Admin Login */}
+          <div className="pt-3 border-t border-slate-200/60 mt-2 text-center">
+            <button
+              type="button"
+              onClick={() => navigate('teacher-login')}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 hover:text-amber-950 hover:underline cursor-pointer py-1"
+            >
+              <span>👩‍🏫</span>
+              <span>สำหรับคุณครูและผู้ดูแลระบบ เข้าสู่ระบบที่นี่ →</span>
+            </button>
+          </div>
         </div>
 
       </div>

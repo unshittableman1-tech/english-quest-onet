@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { playCorrectSound, playWrongSound } from '../../utils/audio';
 import { useSpeech } from '../../utils/useSpeech';
 
-export default function MemoryMatchGame({ cards, title, onBack, onComplete, onMatch }) {
+export default function MemoryMatchGame({ cards, title, onBack, onComplete, onMatch, onPracticed, coveragePlanned = false }) {
   const { speak } = useSpeech();
   const [deck, setDeck] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -32,7 +32,7 @@ export default function MemoryMatchGame({ cards, title, onBack, onComplete, onMa
     if (!cards || cards.length === 0) return;
 
     // Pick up to 6 unique cards
-    const sample = [...cards].sort(() => Math.random() - 0.5).slice(0, 6);
+    const sample = (coveragePlanned ? cards : [...cards].sort(() => Math.random() - 0.5)).slice(0, 6);
 
     // Create 2 tiles for each: one English and one Thai
     const tiles = [];
@@ -88,6 +88,7 @@ export default function MemoryMatchGame({ cards, title, onBack, onComplete, onMa
       // Match check: same pairId but different types (en vs th)
       if (card1.pairId === card2.pairId && card1.type !== card2.type) {
         onMatch?.({ cardId: card1.pairId, otherCardId: card2.pairId });
+        onPracticed?.(cards.find(card => card.id === card1.pairId));
         // MATCH!
         playCorrectSound();
         setCombo(c => c + 1);
@@ -155,7 +156,7 @@ export default function MemoryMatchGame({ cards, title, onBack, onComplete, onMa
               key={idx}
               aria-label={isFlipped ? card.text : `เปิดการ์ด ${idx + 1}`}
               onClick={() => handleCardClick(idx)}
-              className={`h-24 md:h-28 rounded-2xl p-2 flex flex-col items-center justify-center text-center transition-all duration-300 transform border-2 ${
+              className={`${deck.some(tile => (tile.text || '').length > 35) ? 'min-h-28 h-auto' : 'h-24 md:h-28'} rounded-2xl p-2 flex flex-col items-center justify-center text-center transition-all duration-300 transform border-2 ${
                 isMatched
                   ? 'bg-emerald-950/40 border-emerald-500/60 opacity-80 scale-95'
                   : isFlipped
@@ -166,7 +167,7 @@ export default function MemoryMatchGame({ cards, title, onBack, onComplete, onMa
               {isFlipped ? (
                 <div className="animate-scale-in flex flex-col items-center">
                   {card.image ? <img className="vocab-memory-image" src={card.image} alt={card.imageAlt || ''} /> : <span className="text-2xl mb-1">{card.emoji}</span>}
-                  <span className={`text-xs font-black leading-tight ${card.type === 'en' ? 'text-amber-300 font-mono' : 'text-sky-200'}`}>
+                  <span className={`${(card.text || '').length > 35 ? 'text-[10px] break-words' : 'text-xs'} font-black leading-tight ${card.type === 'en' ? 'text-amber-300 font-mono' : 'text-sky-200'}`}>
                     {card.text}
                   </span>
                 </div>

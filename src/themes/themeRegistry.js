@@ -1,0 +1,8 @@
+/** @typedef {import('./types').ThemeDefinition} ThemeDefinition */
+/** @type {Readonly<Record<string, ThemeDefinition>>} */
+export const themeRegistry=Object.freeze({
+ classic:Object.freeze({key:'classic',name:'Classic',description:'หน้าตาเดิมของ English O-NET Adventure',tokens:{primary:'#1d6fb8',accent:'#ffc233',surface:'#ffffff',text:'#1a3a5c',border:'#c8d4de',glow:'none'},assets:{logo:'/assets/english-quest-ai-logo-v1.png',compactLogo:'/assets/english-quest-ai-logo-v1.png',emblem:'/assets/navigation/badge-nav-3d-v1-128.webp',quest:'/assets/navigation/quest-nav-3d-v1-128.webp',vocab:'/assets/navigation/vocab-nav-3d-v1-128.webp',exam:'/assets/exam-world/trophy.webp',progress:'/assets/navigation/report-nav-3d-v1-128.webp',background:'/assets/adventure-hero-v2.png',mascot:null}}),
+ onex_fantasy:Object.freeze({key:'onex_fantasy',name:'ONEX Fantasy',description:'สถาบันเวทมนตร์บนเกาะลอยฟ้า · น้ำเงิน ทอง และเส้นทางแห่งการเรียนรู้',tokens:{primary:'#0b3d91',accent:'#f4c86b',surface:'#f4f8ff',text:'#142c50',border:'#c7a65e',glow:'0 0 22px #00c2ff26'},assets:{logo:'/assets/themes/onex-fantasy/logo.svg',compactLogo:'/assets/themes/onex-fantasy/emblem.svg',emblem:'/assets/themes/onex-fantasy/emblem.svg',quest:'/assets/themes/onex-fantasy/quest.svg',vocab:'/assets/themes/onex-fantasy/vocab.svg',exam:'/assets/themes/onex-fantasy/exam.svg',progress:'/assets/themes/onex-fantasy/progress.svg',background:'/assets/lesson-world/atlas-overlook.webp'}}),
+});
+export function resolveTheme(key='classic'){return Object.hasOwn(themeRegistry,key)?themeRegistry[key]:themeRegistry.classic;}
+export function resolveThemeAsset(key,asset){return resolveTheme(key).assets[asset] || themeRegistry.classic.assets[asset] || null;}

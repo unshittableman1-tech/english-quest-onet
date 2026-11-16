@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import { ThemeProvider } from './themes/ThemeProvider.jsx'
+import './themes/themes.css'
 import './index.css'
 import './styles/theme.css'
 import './styles/questMapPremium.css'
@@ -56,10 +58,12 @@ async function clearLocalDevelopmentCaches() {
 async function startApp() {
   await clearLocalDevelopmentCaches()
 
+  const localReview = import.meta.env.DEV && ['localhost','127.0.0.1','[::1]'].includes(window.location.hostname) && window.location.pathname === '/__theme-review';
+  const RootPage = localReview ? (await import('./themes/ThemeReview.jsx')).default : App;
   ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
       <ErrorBoundary>
-        <App />
+        <ThemeProvider><RootPage /></ThemeProvider>
       </ErrorBoundary>
     </React.StrictMode>,
   )

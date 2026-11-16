@@ -1,3 +1,5 @@
+import { buildExecutivePretestReport, renderExecutivePretestReport } from '../utils/executivePretestReport';
+import TeacherArenaProgress from './teacher/TeacherArenaProgress';
 import UIIcon, { UIIconText } from './UIIcon';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Menu, RefreshCw, Download, ArrowRight, X } from 'lucide-react';
@@ -7,6 +9,9 @@ import SchoolAdminDashboard from './SchoolAdminDashboard';
 import { canManageSchoolStudents } from '../utils/roleAccess';
 import TeacherPracticeReview from './teacher/TeacherPracticeReview';
 import TeacherVocabularyReport from './teacher/TeacherVocabularyReport';
+import PretestTeacherPreview from './teacher/PretestTeacherPreview';
+import LearningAnalysis from './teacher/LearningAnalysis';
+import { validQuestPercent } from '../utils/learningAnalysis';
 import Student360Profile from './teacher/Student360Profile';
 import OfficialExamTeacherPanel from './teacher/OfficialExamTeacherPanel';
 import YearSimulationsTeacherPanel from './teacher/YearSimulationsTeacherPanel';
@@ -633,6 +638,25 @@ export default function TeacherDashboard({ initialTab = 'overview' }) {
     printWindow.document.close();
   };
 
+  const handleExportPreTestExecutivePDF = () => {
+    if (loadError || loading || loadedRosterContext !== rosterContext) {
+      alert('ไม่สามารถสร้างรายงานได้ เนื่องจากยังยืนยันข้อมูลนักเรียนล่าสุดไม่ได้ กรุณาลองโหลดข้อมูลอีกครั้ง');
+      return;
+    }
+    const report = buildExecutivePretestReport(filteredStudents);
+    const html = renderExecutivePretestReport(report, displaySchool, {
+      scope: selectedClass === 'all' ? 'นักเรียนทุกห้องในรายชื่อที่โหลด' : 'ห้อง ' + selectedClass,
+    });
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('เบราว์เซอร์บล็อกหน้าต่าง Pop-up กรุณาอนุญาต Pop-up เพื่อพิมพ์หรือบันทึก PDF');
+      return;
+    }
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+  };
+
   const schoolStudents = useMemo(() => {
     if (loadedRosterContext !== rosterContext) return [];
     const raw = students.filter(s => s.role !== 'teacher' && !s.isDemo);
@@ -929,7 +953,8 @@ export default function TeacherDashboard({ initialTab = 'overview' }) {
     const matchingStudents = filteredStudents.filter(student => {
       const result = student.questProgress?.[quest.id] || student.arenaStats?.[quest.id];
       const score = result?.pct ?? result?.percent;
-      return score !== null && score !== undefined && Number.isFinite(Number(score)) && Number(score) < 70;
+      const validScore = validQuestPercent(score);
+      return validScore !== null && validScore < 70;
     });
     if (matchingStudents.length === 1) openStudentReport(matchingStudents[0].id, 'errors');
     else setSelectedWeakQuest({ ...quest, students: matchingStudents });
@@ -939,8 +964,9 @@ export default function TeacherDashboard({ initialTab = 'overview' }) {
     ...(canManageSchoolStudents(currentTeacher, displaySchool.id) ? [{ id:'student_management', label:'จัดการนักเรียนและชั้นเรียน', desc:'รายชื่อ นำเข้า PIN และที่นั่ง', icon:'👥' }] : []),
     { id: 'overview', label: 'ภาพรวมห้องเรียน', icon: '📊', desc: 'สถิติรวม & ชาร์ตสรุป' },
     { id: 'table', label: 'รายชื่อนักเรียน', icon: '👥', desc: 'ตาราง & จัดการข้อมูล' },
-    { id: 'skills', label: 'วิเคราะห์ทักษะ', icon: '🎯', desc: 'Skill Breakdown 30 วิชา' },
+    { id: 'skills', label: 'วิเคราะห์ผลการเรียนรู้', icon: '🎯', desc: 'ตัวชี้วัด ทักษะ และผล Quest' },
     { id: 'final_exam', label: 'สอบปลายภาค', icon: '🎓', desc: 'เปิด/ปิดสอบ & รายงานผล', badge: examSession?.isOpen ? 'เปิดสอบ' : null, badgeColor: 'bg-emerald-500 text-white' },
+    ...(canManageSchoolStudents(currentTeacher, displaySchool.id) ? [{ id: 'pretest_review', label: 'ตรวจข้อสอบ Pre-Test', desc: 'ดูข้อสอบ เฉลยเดิม และสถานะการตรวจ' }] : []),
     { id: 'warning', label: 'Early Warning', icon: '⚠️', desc: 'แจ้งเตือนกลุ่มเสี่ยง', badge: atRiskCount > 0 ? `${atRiskCount}` : null, badgeColor: 'bg-rose-500 text-white' },
     { id: 'ranking', label: 'สรุปอันดับ', icon: '🏆', desc: 'Leaderboard & Tiers' },
     { id: 'year_simulations', label: 'จำลองข้อสอบ 64–68', icon: '📝', desc: 'สถิติและคะแนนสอบจำลอง 5 ปี (2564–2568)' },
@@ -1203,10 +1229,19 @@ export default function TeacherDashboard({ initialTab = 'overview' }) {
                 <button key={option.value} aria-pressed={selectedClass === option.value} onClick={() => { setSelectedClass(option.value); setCurrentPage(1); setOnlineStatus(null); }} className={`min-h-9 shrink-0 whitespace-nowrap rounded-md px-3 text-xs font-semibold transition-colors ${selectedClass === option.value ? 'bg-sky-700 text-white' : 'text-slate-400 hover:text-white'}`}>{option.label}</button>
               ))}
             </div>
-            <button onClick={handleCheckOnline} disabled={onlineLoading} className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-slate-700 px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800 disabled:opacity-50">
-              <span className={`h-2 w-2 rounded-full ${onlineCount ? 'bg-emerald-400' : 'bg-slate-500'}`} />
-              {onlineLoading ? 'กำลังตรวจสอบ...' : onlineCount === null ? 'ตรวจสอบออนไลน์' : `ออนไลน์ ${onlineCount}/${totalStudents}`}
-            </button>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={handleExportPreTestExecutivePDF}
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 px-3.5 text-xs font-black text-slate-950 shadow-md transition-all cursor-pointer"
+                title="พิมพ์รายงานสรุปผล O-NET สำหรับเสนอผู้บริหาร / ผอ."
+              >
+                <span>📄</span> พิมพ์รายงานเสนอ ผอ. (PDF)
+              </button>
+              <button onClick={handleCheckOnline} disabled={onlineLoading} className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-slate-700 px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800 disabled:opacity-50">
+                <span className={`h-2 w-2 rounded-full ${onlineCount ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                {onlineLoading ? 'กำลังตรวจสอบ...' : onlineCount === null ? 'ตรวจสอบออนไลน์' : `ออนไลน์ ${onlineCount}/${totalStudents}`}
+              </button>
+            </div>
           </div>
         </header>
 
@@ -1214,6 +1249,7 @@ export default function TeacherDashboard({ initialTab = 'overview' }) {
         <main className="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto space-y-6">
           {activeTab === 'student_management' && canManageSchoolStudents(currentTeacher, displaySchool.id) && <SchoolAdminDashboard key={displaySchool.id} embedded schoolContext={displaySchool} onChanged={() => refresh({silent:true}).catch(()=>{})} />}
           {activeTab === 'practice_review' && <TeacherPracticeReview schoolId={displaySchool.id} showToast={showToast} />}
+          {activeTab === 'pretest_review' && canManageSchoolStudents(currentTeacher, displaySchool.id) && <PretestTeacherPreview />}
           {activeTab === 'vocabulary_report' && <TeacherVocabularyReport key={displaySchool.id} schoolId={displaySchool.id} students={filteredStudents} />}
           {/* Tab: Overview */}
           {activeTab === 'overview' && (
@@ -1225,6 +1261,7 @@ export default function TeacherDashboard({ initialTab = 'overview' }) {
           currentAvg={currentAvg}
           riskStudents={riskStudents}
           Chart={DonutChart}
+          onExportExecutivePDF={handleExportPreTestExecutivePDF}
           onWarning={() => setActiveTab('warning')}
           onExam={() => setActiveTab('final_exam')}
           onStudent={(studentId) => studentId ? openStudentReport(studentId) : setActiveTab('table')}
@@ -1402,77 +1439,9 @@ export default function TeacherDashboard({ initialTab = 'overview' }) {
             </div>
           )}
 
-        {/* ── Tab: Skill Breakdown ─────────────────────────────────── */}
-        {activeTab === 'skills' && (
-          <div className="space-y-6">
-            {filteredStudents.length > 0 && (() => {
-              // Collect all quest scores across all students
-              const SKIP_QUESTS_SK = new Set(['finalboss', 'strategy_boss']);
-              const skillMap = {}; // questId -> { total, count }
-              filteredStudents.forEach(s => {
-                Object.entries(s.questProgress || {}).forEach(([q, v]) => {
-                  if (SKIP_QUESTS_SK.has(q)) return;
-                  if (!skillMap[q]) skillMap[q] = { total: 0, count: 0 };
-                  skillMap[q].total += (v.pct || 0);
-                  skillMap[q].count++;
-                });
-              });
-              const skills = Object.entries(skillMap)
-                .map(([q, { total, count }]) => ({
-                  id: q,
-                  label: formatQuestLabel(q),
-                  avg: Math.round(total / count),
-                  count,
-                }))
-                .filter(s => s.count >= Math.ceil(filteredStudents.length * 0.1)) // show only quests played by ≥10% of class
-                .sort((a, b) => a.avg - b.avg); // weakest first
-
-              if (skills.length === 0) {
-                return (
-                  <div className="glass-card-dark p-8 text-center text-slate-400">
-                    <div className="text-3xl mb-2"><UIIcon value={"🎯"} /></div>
-                    <p>ยังไม่มีข้อมูลคะแนนรายวิชาของนักเรียนในห้องนี้</p>
-                  </div>
-                );
-              }
-
-              return (
-                <div className="glass-card-dark p-6 mb-5 border border-rose-500/25 shadow-xl">
-                  <h3 className="font-bold text-rose-300 mb-4 flex items-center gap-2 text-base">
-                    <span><UIIcon value={"🎯"} /></span> Skill Breakdown — คะแนนเฉลี่ยรายวิชา (เรียงจากอ่อนสุด)
-                    <span className="text-slate-400 text-xs font-normal">เฉลี่ย class</span>
-                  </h3>
-                  <div className="space-y-2.5">
-                    {skills.map((sk, i) => (
-                      <button key={sk.id} type="button" onClick={() => openWeakQuestStudents({ id: sk.id, name: sk.label })} className="flex min-h-11 w-full items-center gap-3 rounded-lg px-2 text-left hover:bg-slate-800/70" aria-label={`ดูผู้เรียนใน ${sk.label}`}>
-                        <div className="w-5 text-xs text-slate-500 shrink-0 text-right">{i + 1}</div>
-                        <div className="w-52 text-xs text-slate-200 font-medium shrink-0 truncate" title={sk.label}>{sk.label}</div>
-                        <div className="flex-1 h-2 rounded-full bg-slate-800 border border-white/5 overflow-hidden">
-                          <div
-                            className="h-full rounded-full transition-all duration-700"
-                            style={{
-                              width: `${sk.avg}%`,
-                              backgroundColor: sk.avg >= 80 ? '#10b981' : sk.avg >= 70 ? '#3b82f6' : sk.avg >= 50 ? '#f59e0b' : '#ef4444',
-                              boxShadow: sk.avg < 50 ? '0 0 6px #ef444466' : 'none',
-                            }}
-                          />
-                        </div>
-                        <div
-                          className="w-10 text-xs font-black text-right shrink-0"
-                          style={{ color: sk.avg >= 80 ? '#10b981' : sk.avg >= 70 ? '#3b82f6' : sk.avg >= 50 ? '#f59e0b' : '#ef4444' }}
-                        >
-                          {sk.avg}%
-                        </div>
-                        <div className="w-12 text-xs text-slate-400 font-mono shrink-0">{sk.count}คน</div>
-                        <ArrowRight size={14} className="shrink-0 text-sky-400" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        )}
+        {activeTab === 'skills' && <LearningAnalysis students={filteredStudents} formatQuestLabel={formatQuestLabel} dataUnavailable={loading || loadError || loadedRosterContext !== rosterContext}
+          onQuest={openWeakQuestStudents} onStudentList={() => setActiveTab('table')}
+          onQuestionReview={canManageSchoolStudents(currentTeacher, displaySchool.id) ? () => setActiveTab('pretest_review') : undefined} />}
 
         {/* Tab: Early Warning */}
         {activeTab === 'warning' && (() => {
@@ -2036,6 +2005,7 @@ export default function TeacherDashboard({ initialTab = 'overview' }) {
 
           return (
             <div className="space-y-4">
+              <TeacherArenaProgress actor={currentTeacher} schoolId={displaySchool.id} students={filteredStudents} />
               {/* Arena Summary Cards */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="glass-card-dark p-4 text-center border border-sky-500/30 shadow-xl shadow-sky-950/20 hover:border-sky-500/50 transition-all">

@@ -1,3 +1,4 @@
+import { PDF_VOCABULARY_CATEGORIES, PDF_VOCABULARY_SUMMARY, getPdfVocabularyMission } from './pdfVocabulary';
 import { CH1_LEARNING_DECKS } from './missions/ch1_missions.js';
 import { CH2_MISSIONS } from './missions/ch2_missions.js';
 import { CH5_MISSIONS } from './missions/ch5_missions.js';
@@ -155,6 +156,36 @@ const cultureIllustrations = [
   ['mothers-new-year', 'ภาพการอวยพรปีใหม่ด้วยของขวัญและดาวประดับ'],
 ].map(([slug, imageAlt]) => ({ image: `/learning/culture_festivals/${slug}-v1.png`, imageAlt }));
 
+// Learning phrases from the supplied student handout, kept together as one deck.
+const onetQuestionPhraseRows = [
+  ['Read the sentences.', 'อ่านประโยค'],
+  ['Read the dialogue.', 'อ่านบทสนทนา'],
+  ['Read ... and answer questions.', 'อ่าน ... และตอบคำถาม'],
+  ['Look at the sign.', 'ดูที่ป้าย'],
+  ['Look at the graph.', 'ดูที่กราฟ'],
+  ['Look at the notice.', 'ดูที่ประกาศ'],
+  ['Look at the picture.', 'ดูที่รูปภาพ'],
+  ['Look at the label.', 'ดูที่ฉลาก'],
+  ['What does the sign mean?', 'ป้ายนี้หมายความว่าอะไร'],
+  ['What do you think about ...?', 'คุณคิดอย่างไรเกี่ยวกับ ...'],
+  ['What does it mean?', 'มันหมายความว่าอะไร'],
+  ['What time is it?', 'ตอนนี้เวลาเท่าไร'],
+  ['Which pie chart is correct?', 'แผนภูมิวงกลมใดถูกต้อง'],
+  ['Which sentence does NOT have correct punctuation?', 'ประโยคใดใช้เครื่องหมายวรรคตอนไม่ถูกต้อง'],
+  ['Which sentence has the correct punctuation?', 'ประโยคใดใช้เครื่องหมายวรรคตอนถูกต้อง'],
+  ['Which sign are they talking about?', 'พวกเขากำลังพูดถึงป้ายใด'],
+  ['Which season is it most likely to be?', 'น่าจะเป็นฤดูใดมากที่สุด'],
+  ['Which of the following is correct?', 'ข้อใดต่อไปนี้ถูกต้อง'],
+  ['Which map is correct?', 'แผนที่ใดถูกต้อง'],
+  ['Which bar chart is correct?', 'แผนภูมิแท่งใดถูกต้อง'],
+  ['Which table is correct?', 'ตารางใดถูกต้อง'],
+  ['Which sentence is correct?', 'ประโยคใดถูกต้อง'],
+  ['Which question has a different intonation?', 'คำถามข้อใดมีเสียงสูงต่ำต่างจากข้ออื่น'],
+  ['Who can answer this question?', 'ใครสามารถตอบคำถามนี้ได้'],
+  ['Where is your ...?', '... ของคุณอยู่ที่ไหน'],
+  ['Do you like ...?', 'คุณชอบ ... ไหม'],
+];
+
 const examCommandRows = [
   ['according to', 'จากเรื่องที่อ่าน / ตามที่ระบุ', 'According to the passage, what did Tom find?', 'จากเรื่องที่อ่าน ทอมพบอะไร'],
   ['mainly about', 'ใจความสำคัญหลัก', 'What is the story mainly about?', 'เรื่องนี้มีใจความสำคัญหลักเกี่ยวกับอะไร'],
@@ -186,6 +217,10 @@ const decisivePairRows = [
 ];
 
 const NEW_DECKS = {
+  onet_question_phrases: learningDeck('onet_question_phrases_v1', onetQuestionPhraseRows, [], {
+    sourceScope: 'user_supplied_student_handout_page_11',
+    cardMetadata: { learningOnly: true },
+  }),
   verbs: learningDeck('verbs_learning_v1', verbRows, verbIllustrations),
   daily_routine: learningDeck('daily_routine_learning_v1', routineRows, routineIllustrations),
   culture_festivals: learningDeck('culture_festivals_learning_v1', cultureRows, cultureIllustrations, {
@@ -515,6 +550,7 @@ const SUPPLEMENTAL_CARDS = {
   ],
 };
 export const VOCAB_GROUPS = [
+  { id: 'pdf_vocabulary', name: `คำศัพท์จากเอกสาร ป.6 · ${PDF_VOCABULARY_SUMMARY.uniqueWords} คำ/วลี`, description: `${PDF_VOCABULARY_SUMMARY.sets} ชุด · รวมคำซ้ำจาก 496 รายการตามต้นฉบับ · มีคำที่พบในหมวดเดิมด้วย` },
   { id: 'quest_verbs', name: 'กริยาที่พบใน Quest' },
   { id: 'words', name: 'คำศัพท์ใกล้ตัว' },
   { id: 'communication', name: 'การสื่อสาร' },
@@ -554,12 +590,15 @@ export const VOCAB_CATEGORIES = [
   { id: 'pronouns', name: 'สรรพนาม (Pronouns)', icon: '👥', tone: 'rose', group: 'grammar', questId: 'pronouns_master', missionId: 'pm_flip' },
   { id: 'quantifiers', name: 'ปริมาณ (Quantifiers)', icon: '🥛', tone: 'sky', group: 'grammar', questId: 'nouns_quantifiers', missionId: 'nq_match' },
   { id: 'tenses', name: 'ไวยากรณ์ Tenses', icon: '⚡', tone: 'lilac', group: 'grammar', questId: 'tenses_arena', missionId: 'ten_flip' },
-  { id: 'exam_commands', name: 'คำสั่งข้อสอบ (Exam Commands)', icon: '🎯', tone: 'sky', group: 'exam_intelligence', deckId: 'exam_commands' },
-  { id: 'decisive_pairs', name: 'คู่คำตัดสินสอบ (Decisive Pairs)', icon: '⚖️', tone: 'lilac', group: 'exam_intelligence', deckId: 'decisive_pairs' },
+  { id: 'onet_question_phrases', presentation: 'text', name: 'ประโยคคำถามในข้อสอบ O-NET', icon: '💬', tone: 'sky', group: 'exam_intelligence', deckId: 'onet_question_phrases' },
+  { id: 'exam_commands', presentation: 'text', name: 'คำสั่งข้อสอบ (Exam Commands)', icon: '🎯', tone: 'sky', group: 'exam_intelligence', deckId: 'exam_commands' },
+  { id: 'decisive_pairs', presentation: 'text', name: 'คู่คำตัดสินสอบ (Decisive Pairs)', icon: '⚖️', tone: 'lilac', group: 'exam_intelligence', deckId: 'decisive_pairs' },
+  ...PDF_VOCABULARY_CATEGORIES,
 ];
 const MISSIONS = { ...CH1_LEARNING_DECKS, ...CH2_MISSIONS, ...CH5_MISSIONS };
 export function getDrillMission(category) {
   if (!category) return null;
+  if (category.deckId?.startsWith('pdf_vocab_set_')) return getPdfVocabularyMission(category.deckId);
   if (category.deckId) return NEW_DECKS[category.deckId] || null;
   return MISSIONS[category.questId]?.find(m => m.id === category.missionId) || null;
 }
@@ -598,4 +637,13 @@ export function getDrillCards(category) {
     frontType: c.frontType || (/[A-Za-z]/.test(c.front) ? 'text' : 'symbol'),
     ...(LEGACY_ILLUSTRATION_LOOKUP[`${category.id}:${c.id}`] || {}),
   }));
+}
+
+// Search words and meanings as well as category titles, including imported sets.
+export function filterVocabCategories(query, categories = VOCAB_CATEGORIES) {
+  const normalize = value => String(value || '').normalize('NFKC').toLocaleLowerCase().replace(/\s+/g,' ').trim();
+  const term = normalize(query);
+  if (!term) return [...categories];
+  return categories.filter(category => normalize(category.name).includes(term) ||
+    getDrillCards(category).some(card => [card.frontLabel,card.back,card.backThai].some(value=>normalize(value).includes(term))));
 }

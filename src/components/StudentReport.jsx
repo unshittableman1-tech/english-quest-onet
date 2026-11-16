@@ -1,3 +1,6 @@
+import useArenaProgress from '../hooks/useArenaProgress';
+import { ArenaProgressCard, ArenaProgressHistory } from './report/ArenaProgress';
+import { readStudySeconds, formatStudyTime } from '../utils/studyTime';
 import { useEffect, useMemo, useState } from 'react';
 import {
   AlertCircle,
@@ -59,6 +62,8 @@ export default function StudentReport() {
   const { student, questProgress = {}, unlockedQuests = {}, navigate = () => {} } = app;
   const [openChapters, setOpenChapters] = useState([]);
   const reportStudent = student || {};
+  const arenaProgress = useArenaProgress(student);
+  const studySeconds = readStudySeconds(student);
   const accountKey = JSON.stringify([reportStudent.school_id || '', reportStudent.id || '', reportStudent.auth_user_id || '']);
   const [arenaAccount, setArenaAccount] = useState({ key: null, status: 'idle', data: null });
   const [vocabularyAccount, setVocabularyAccount] = useState({ key: null, status: 'idle', rows: [] });
@@ -253,26 +258,14 @@ export default function StudentReport() {
               </div>
               <span className="metric-title">เวลาเรียน</span>
               <strong className="metric-value">
-                0 ชม. 39 นาที
+                {formatStudyTime(studySeconds)}
               </strong>
               <p className="metric-sub">
-                ในระบบ Quest Map
+                {studySeconds === null ? 'ยังไม่มีเวลาบันทึกที่เชื่อถือได้' : 'เวลาที่บันทึกบนเครื่องนี้ · เริ่มเก็บตั้งแต่เปิดใช้ระบบใหม่'}
               </p>
             </div>
 
-            {/* Card 2: Average Test Results */}
-            <div className="overview-metric-card metric-test" data-report-pretest={preResult.state}>
-              <div className="metric-icon-wrap bg-purple-100 text-purple-600">
-                <BarChart2 size={20} aria-hidden="true" />
-              </div>
-              <span className="metric-title">ผลสอบเฉลี่ย</span>
-              <strong className="metric-value">
-                {preResult.percent === null ? '—' : `${preResult.percent}%`}
-              </strong>
-              <p className="metric-sub">
-                {preResult.label}{preResult.total ? ` · ${preResult.score}/${preResult.total} ข้อ` : ''}
-              </p>
-            </div>
+            <ArenaProgressCard progress={arenaProgress} preResult={preResult} navigate={navigate} />
 
             {/* Card 3: Vocabulary Drill */}
             <div className="overview-metric-card metric-vocab">
@@ -358,6 +351,7 @@ export default function StudentReport() {
           {/* RIGHT: Test Results & Achievements */}
           <div className="report-column-right">
             {/* Test Results */}
+            <ArenaProgressHistory progress={arenaProgress} />
             <section className="report-section report-exams" aria-labelledby="report-exam-heading">
               <div className="report-section-heading">
                 <div>

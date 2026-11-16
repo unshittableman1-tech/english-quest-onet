@@ -1,5 +1,5 @@
 import UIIcon, { UIIconText } from './UIIcon';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SpeakButton from './SpeakButton';
 import ConversationPractice from './ConversationPractice';
 
@@ -423,11 +423,211 @@ export const ALL_TECHNIQUES = [
       },
     ],
   },
+  {
+    id: 'part9',
+    part: 'Part 9',
+    title: '🚦 Sign & Symbol Decoder (ถอดรหัสป้ายและสัญลักษณ์)',
+    icon: '🚦',
+    color: 'from-amber-500 to-rose-500',
+    description: 'ถอดรหัสป้ายเตือน ป้ายห้าม และป้ายบอกข้อมูลตามมาตรฐาน ต 1.1 ป.6/3',
+    rules: [
+      {
+        q: 'ป้ายวงกลมขอบแดงมีเส้นขีดทับ 🚫',
+        qTh: 'Prohibition Signs (ข้อห้ามเด็ดขาด)',
+        a: 'No ... / Do not ... / You must not ...',
+        aTh: 'ห้ามกระทำสิ่งนั้นโดยเด็ดขาด เช่น No photos, No parking, Do not touch',
+        note: 'สูตรจำ: แดงขีดทับ = ห้ามทำเด็ดขาด'
+      },
+      {
+        q: 'ป้ายสามเหลี่ยมสีเหลือง ⚠️',
+        qTh: 'Warning Signs (ป้ายเตือนอันตราย)',
+        a: 'Be careful / Watch out / Caution / Slippery',
+        aTh: 'เตือนให้ระวังอันตราย เช่น พื้นเปียกลื่น ทางคนข้าม',
+        note: 'คำตัดสิน: มักเฉลยว่า slow down หรือ watch out'
+      },
+      {
+        q: 'ป้ายสี่เหลี่ยมสีเขียว / น้ำเงิน 🟩',
+        qTh: 'Information & Safety Signs (ข้อมูลและความปลอดภัย)',
+        a: 'Emergency exit / First aid / Entrance',
+        aTh: 'ป้ายบอกทางออกฉุกเฉิน จุดปฐมพยาบาล หรือทางเข้าอาคาร',
+        note: 'สีเขียว = ความปลอดภัย / สีน้ำเงิน = ข้อมูลแนะนำ'
+      },
+      {
+        q: 'โจทย์ถาม "Who can go into the shop?"',
+        qTh: 'ใครสามารถเข้าไปในร้านได้?',
+        a: 'อ่านเงื่อนไขบนป้ายหน้าร้านอย่างละเอียด',
+        aTh: 'เช่น ป้ายระบุ "Mask Required" -> ตอบคนที่ "wearing a mask"',
+        note: 'จับคู่คุณสมบัติของบุคคลกับข้อความบนป้ายตรงๆ'
+      },
+    ],
+  },
+  {
+    id: 'part10',
+    part: 'Part 10',
+    title: '🧭 Map & Spatial Navigator (ถอดรหัสแผนที่และทิศทาง)',
+    icon: '🧭',
+    color: 'from-teal-500 to-cyan-600',
+    description: 'สูตรอ่านแผนผัง บอกตำแหน่ง และนำทางสถานที่ตามมาตรฐาน ต 1.3 ป.6/2',
+    rules: [
+      {
+        q: 'opposite vs next to',
+        qTh: 'ตรงข้าม vs อยู่ติดกัน',
+        a: 'opposite = คนละฝั่งถนน (ข้ามถนนไป) / next to = ฝั่งเดียวกัน (ไม่มีถนนคั่น)',
+        aTh: 'The bank is opposite the school. (อยู่คนละฝั่งถนน)',
+        note: 'จุดตาย: ตรวจดูว่ามีถนนคั่นกลางระหว่างสองอาคารหรือไม่'
+      },
+      {
+        q: 'between A and B',
+        qTh: 'อยู่ตรงกลางระหว่างสองสถานที่',
+        a: 'อาคารเป้าหมายตั้งอยู่ตรงกลางขนาบด้วยสถานที่ A และ B',
+        aTh: 'The clinic is between the shop and the post office.',
+        note: 'ต้องมีสถานที่ 2 แห่งขนาบข้างเสมอ'
+      },
+      {
+        q: 'walk past X, then turn...',
+        qTh: 'เดินผ่านสถานที่ X ไปก่อน แล้วจึงเลี้ยว',
+        a: 'เดินเลยจุด X ไปข้างหน้าก่อน แล้วค่อยหักเลี้ยวซ้ายหรือขวา',
+        aTh: 'Jane walks past the pond, then turns left.',
+        note: 'ระวังหลอก: อย่าเลี้ยวก่อนที่จะถึงจุด X'
+      },
+      {
+        q: 'on the corner',
+        qTh: 'ตรงหัวมุมถนน',
+        a: 'อาคารที่ตั้งอยู่ตรงจุดตัดของถนนสองสาย',
+        aTh: 'The bookstore is on the corner of Main Street.',
+        note: 'สังเกตจุดตัดของทางแยกหรือสี่แยก'
+      },
+    ],
+  },
+  {
+    id: 'part11',
+    part: 'Part 11',
+    title: '📊 Timetable & Chart Detective (ถอดรหัสตารางและแผนภูมิ)',
+    icon: '📊',
+    color: 'from-indigo-500 to-blue-600',
+    description: 'คำนวณและเปรียบเทียบข้อมูลจากตารางสอน ตารางเวลา และแผนภูมิแท่ง',
+    rules: [
+      {
+        q: 'immediately BEFORE / immediately AFTER',
+        qTh: 'ก่อนหน้าทันที vs หลังจากทันที',
+        a: 'BEFORE = คาบเรียนหรือเวลาที่อยู่ "ก่อนหน้าติดกัน"',
+        aTh: 'AFTER = คาบเรียนหรือเวลาที่อยู่ "ถัดไปติดกัน"',
+        note: 'วงกลมคำว่า BEFORE หรือ AFTER ให้ชัดก่อนดูตาราง'
+      },
+      {
+        q: 'How long does ... last?',
+        qTh: 'กิจกรรมนี้ใช้เวลานานเท่าใด?',
+        a: 'นำ [เวลาสิ้นสุด] ลบด้วย [เวลาเริ่มต้น]',
+        aTh: 'เช่น เริ่ม 09:30 จบ 10:15 -> ใช้เวลา 45 minutes',
+        note: 'ระวังหน่วยชั่วโมงกับนาที ทดเลขให้รอบคอบ'
+      },
+      {
+        q: 'How many more A than B?',
+        qTh: 'จำนวน A มากกว่า B อยู่เท่าไร?',
+        a: 'ถามหาส่วนต่าง นำจำนวนแท่ง A ลบด้วยแท่ง B เสมอ',
+        aTh: 'Football = 25, Tennis = 15 -> 25 - 15 = 10 more students',
+        note: 'อย่าเผลอเอาตัวเลขมารวมกัน โจทย์ถามหาส่วนต่าง'
+      },
+      {
+        q: 'the most vs the least',
+        qTh: 'มากที่สุด vs น้อยที่สุด',
+        a: 'the most = แท่งที่สูงที่สุด / the least = แท่งที่เตี้ยที่สุด',
+        aTh: 'ตรวจยอดแกนตัวเลขแนวตั้งหรือแนวนอนให้ตรงกับชื่อแท่ง',
+        note: 'ตัดช้อยส์ที่กล่าวถึงอันดับกลางๆ ทิ้ง'
+      },
+    ],
+  },
+  {
+    id: 'part12',
+    part: 'Part 12',
+    title: '🎄 Festival & Culture Clues (กุญแจเทศกาลและวัฒนธรรม)',
+    icon: '🎄',
+    color: 'from-red-500 to-amber-600',
+    description: 'คีย์เวิร์ดชี้ขาดสำหรับวันสำคัญและประเพณีเจ้าของภาษาตามมาตรฐาน ต 2.1 ป.6/2',
+    rules: [
+      {
+        q: 'Halloween (October 31st)',
+        qTh: 'วันฮาโลวีน (31 ตุลาคม)',
+        a: 'trick or treat, costumes, witch, pumpkin lantern, ghost',
+        aTh: 'เด็กๆ แต่งชุดแฟนซี ถือโคมฟักทอง และเคาะประตูขอขนม',
+        note: 'คีย์เวิร์ดชี้ขาด: 31st October, carve a pumpkin'
+      },
+      {
+        q: 'Christmas Day (December 25th)',
+        qTh: 'วันคริสต์มาส (25 ธันวาคม)',
+        a: 'Santa Claus, chimney, stockings, pine tree, gifts, carol',
+        aTh: 'ซานตาคลอสลงมาตามปล่องไฟ ใส่ของขวัญในถุงเท้ายาว',
+        note: 'คีย์เวิร์ดชี้ขาด: 25th December, chimney, wreath'
+      },
+      {
+        q: 'Easter Day (Springtime)',
+        qTh: 'เทศกาลอีสเตอร์ (ฤดูใบไม้ผลิ)',
+        a: 'Easter eggs, egg hunt, bunny, painting eggs, spring',
+        aTh: 'ตามหาไข่หลากสีที่ซ่อนอยู่ในสวนและระบายสีไข่',
+        note: 'คีย์เวิร์ดชี้ขาด: colorful eggs, hide in the garden'
+      },
+      {
+        q: 'Thanksgiving Day (November)',
+        qTh: 'วันขอบคุณพระเจ้า (พฤหัสบดีที่ 4 ของพฤศจิกายน)',
+        a: 'roast turkey, family dinner, pumpkin pie, harvest',
+        aTh: 'ครอบครัวรวมตัวรับประทานไก่งวงอบเพื่อขอบคุณผลผลิต',
+        note: 'คีย์เวิร์ดชี้ขาด: fourth Thursday of November, turkey'
+      },
+    ],
+  },
+  {
+    id: 'part13',
+    part: 'Part 13',
+    title: '🤝 Polite Requests & School Life (ภาษาในห้องเรียน)',
+    icon: '🤝',
+    color: 'from-sky-500 to-indigo-600',
+    description: 'สำนวนขออนุญาต ขอร้อง ขอยืมอุปกรณ์ และสนทนาในโรงเรียนตามมาตรฐาน ต 4.1 ป.6/1',
+    rules: [
+      {
+        q: 'May I come in / go out, please?',
+        qTh: 'ขออนุญาตเข้าห้อง / ออกนอกห้อง',
+        a: 'ถามครูอย่างสุภาพ -> ครูตอบ: Yes, you may. / Of course.',
+        aTh: 'ถ้าไม่อนุญาต -> ครูตอบ: No, you may not. Please wait.',
+        note: 'May I = นักเรียนขออนุญาตตนเองกระทำ'
+      },
+      {
+        q: 'Could you lend me your pencil, please?',
+        qTh: 'ช่วยให้ฉันยืมดินสอหน่อยได้ไหม?',
+        a: 'เมื่อเราลืมดินสอไว้ที่บ้าน -> ขอเพื่อน: Could you lend me...?',
+        aTh: 'เพื่อนตอบ: Of course. Take your choice. / Here you are.',
+        note: 'ห้ามพูด Can you borrow me! ต้องใช้ Could you lend me'
+      },
+      {
+        q: 'I don\'t feel good today.',
+        qTh: 'วันนี้ฉันรู้สึกไม่ค่อยสบาย',
+        a: 'เพื่อนตอบ: You should go to the nurse\'s room.',
+        aTh: 'ให้คำแนะนำอย่างห่วงใยตามมารยาท (ไปห้องพยาบาลหรือพักผ่อน)',
+        note: 'ตัดช้อยส์ที่บอกให้ไปเล่นกีฬาหรือคำตอบที่ไม่แสดงความเห็นใจ'
+      },
+      {
+        q: 'Thank you very much. -> ???',
+        qTh: 'เมื่อเพื่อนช่วยแล้วกล่าวขอบคุณ',
+        a: 'ตอบรับด้วย: You\'re welcome. / No problem. / My pleasure.',
+        aTh: 'ด้วยความยินดี / ไม่มีปัญหา / ยินดีที่ได้ช่วย',
+        note: 'อย่าตอบ Yes, please หรือ That\'s all right ในการรับคำขอบคุณ'
+      },
+    ],
+  },
 ];
 
-export default function TechniqueHub({ onBack }) {
-  const [activePart, setActivePart] = useState('part1');
-  const [practicing, setPracticing] = useState(false);
+export default function TechniqueHub({ onBack, initialPart, initialPracticing = false }) {
+  const [activePart, setActivePart] = useState(initialPart || 'part1');
+  const [practicing, setPracticing] = useState(initialPracticing || false);
+
+  useEffect(() => {
+    if (initialPart && ALL_TECHNIQUES.some(t => t.id === initialPart)) {
+      setActivePart(initialPart);
+    }
+    if (initialPracticing) {
+      setPracticing(true);
+    }
+  }, [initialPart, initialPracticing]);
+
   const currentTech = ALL_TECHNIQUES.find(t => t.id === activePart) || ALL_TECHNIQUES[0];
 
   return (
@@ -488,7 +688,16 @@ export default function TechniqueHub({ onBack }) {
         </div>
         <p className="text-slate-800 font-bold text-xs md:text-sm leading-relaxed ml-1">{currentTech.description}</p>
         {!practicing && (
-          <button type="button" onClick={() => setPracticing(true)} className="mt-4 rounded-xl bg-amber-400 hover:bg-amber-300 border border-amber-600 px-5 py-2.5 font-black text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700">ลองฝึก {currentTech.part}</button>
+          <div className="flex flex-wrap items-center gap-3 mt-4">
+            <button
+              type="button"
+              onClick={() => setPracticing(true)}
+              className="rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 border-2 border-amber-600 px-6 py-2.5 font-black text-slate-950 text-sm md:text-base flex items-center gap-2 shadow-md hover:scale-[1.02] active:scale-95 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+            >
+              <span>🚀 เข้าสู่สนามฝึกทำโจทย์ {currentTech.part} (เริ่มทันที)</span>
+              <UIIcon value={"➜"} />
+            </button>
+          </div>
         )}
       </div>
 

@@ -12,8 +12,8 @@ export const FALLBACK_PLANS = PRICING_PLANS.map((p) => ({
   currency: 'THB',
   price_monthly: p.prices.monthly,
   price_yearly: p.prices.yearly,
-  max_students: p.id === 'student_hero' ? 1 : p.id === 'teacher_pro' ? 50 : p.id === 'school_starter' ? 60 : p.id === 'school_growth' ? 200 : 500,
-  max_teachers: p.id === 'superpower' ? 999 : p.id === 'school_growth' ? 10 : p.id === 'school_starter' ? 3 : p.id === 'teacher_pro' ? 1 : 0,
+  max_students: p.id === 'student_hero' ? 1 : p.id === 'school_micro' ? 25 : p.id === 'teacher_pro' ? 50 : p.id === 'school_starter' ? 60 : p.id === 'school_growth' ? 200 : 500,
+  max_teachers: p.id === 'superpower' ? 999 : p.id === 'school_growth' ? 10 : p.id === 'school_starter' ? 3 : (p.id === 'school_micro' || p.id === 'teacher_pro') ? 1 : 0,
   max_classes: p.id === 'teacher_pro' ? 2 : p.id === 'student_hero' ? 1 : 10,
   features: { features_list: p.features, price_semester: p.prices.semester },
   is_active: true,
@@ -208,6 +208,7 @@ export async function platformListSchools() {
       expiresAt: dashboard?.subscription?.ends_at ?? null,
       subscriptionStatus: dashboard?.subscription?.status ?? null,
       planName: dashboard?.plan?.name ?? null,
+      agreedPrice: dashboard?.subscription?.features_override?.agreed_price_thb ?? null,
     };
   }));
 }

@@ -2,6 +2,7 @@ import { ArrowRight, Award, BarChart3, BookCheck, Gamepad2, RotateCcw, Sparkles,
 import PageShell from '../components/PageShell';
 import PricingSection from '../components/PricingSection';
 import logo from '../assets/logo.png';
+import ThemeImage from '../themes/ThemeImage';
 
 const FEATURES = [
   { Icon: BookCheck, title: 'O-NET Blueprint', text: 'ฝึกครบตามตัวชี้วัดสำคัญ 4 ทักษะ' },
@@ -34,7 +35,7 @@ export default function Home({ onStart, onDemo, onTeacher, onSchoolApply, onSele
           <span className="eq-treasure-spark spark-two"><Sparkles /></span>
           <span className="eq-treasure-spark spark-three"><Star /></span>
         </div>
-        <img className="eq-home-logo" src={logo} alt="English Quest AI" />
+        <ThemeImage className="eq-home-logo" assetKey="logo" classicSrc={logo} alt="English Quest AI" />
         <p className="eq-adventure-label">O-NET ADVENTURE ป.6</p>
         <h1 id="home-title">ภารกิจพิชิตอังกฤษ</h1>
         <p className="eq-home-lead">เรียนผ่านเกม สะสม XP พิชิต O-NET</p>
@@ -67,14 +68,24 @@ export default function Home({ onStart, onDemo, onTeacher, onSchoolApply, onSele
         </div>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           {onSchoolApply && (
-            <button
-              type="button"
-              className="eq-btn"
-              style={{ background: '#f59e0b', color: '#020617', fontWeight: 900 }}
-              onClick={() => onSchoolApply()}
-            >
-              🏫 สมัครแพ็กเกจโรงเรียน
-            </button>
+            <>
+              <button
+                type="button"
+                className="eq-btn"
+                style={{ background: '#f59e0b', color: '#020617', fontWeight: 900 }}
+                onClick={() => onSchoolApply('school_starter', 'trial')}
+              >
+                🎁 ทดลองฟรี 15 วัน ยกโรงเรียน
+              </button>
+              <button
+                type="button"
+                className="eq-btn ghost"
+                style={{ borderColor: 'rgba(255,255,255,0.2)' }}
+                onClick={() => onSchoolApply()}
+              >
+                🏫 ขอใบเสนอราคา
+              </button>
+            </>
           )}
           <button className="eq-btn ghost" onClick={onTeacher} disabled={demoMode}>
             {demoMode ? 'ปิดใช้งานใน Demo' : 'ดู Teacher Hub'}<ArrowRight aria-hidden="true" />

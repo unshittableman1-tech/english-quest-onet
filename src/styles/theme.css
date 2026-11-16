@@ -454,6 +454,10 @@ h1, h2, h3, button, .eq-display { font-family: 'Mali', 'Sarabun', sans-serif; le
 .ranking-metric-note, .ranking-source-note { margin: 0; padding: 0 4px 12px; color: var(--muted); font-size: .9375rem; line-height: 1.6; }
 .ranking-source-note { color: #704500; font-weight: 700; }
 .ranking-feedback { display: grid; justify-items: center; gap: 16px; margin-top: 20px; padding: 28px 18px; border-radius: 18px; color: var(--ink); background: #fff; text-align: center; }
+.ranking-empty { display:flex; align-items:center; justify-content:center; gap:24px; margin:20px 0; padding:32px; border:1px solid #cce5e7; border-radius:22px; background:#fffffff2; box-shadow:0 8px 24px #18445a17; color:#1a3a5c; }
+.ranking-empty-art { display:grid; place-items:center; flex:none; width:100px; height:100px; border:5px solid #fff; border-radius:30px; background:#fff0c4; box-shadow:0 5px 0 #e4c677; font-size:48px; }
+.ranking-empty-label { color:#15755e; font-size:12px; font-weight:800; } .ranking-empty h2 { margin:3px 0 5px; color:#1a3a5c; font-size:22px; font-weight:800; } .ranking-empty p { max-width:460px; margin:4px 0 10px; color:#526c7e; font-size:14px; line-height:1.6; } .ranking-empty strong { color:#1a3a5c; font-size:15px; } .ranking-empty .eq-btn { display:inline-flex; align-items:center; gap:8px; min-height:44px; margin-top:7px; }
+@media(max-width:600px) { .ranking-empty { flex-direction:column; align-items:center; padding:24px 18px; text-align:center; } .ranking-empty-art { width:80px; height:80px; font-size:38px; } }
 .ranking-skill-select { padding: 0 12px 12px; background: #fffffff0; }
 .ranking-skill-select select { width: 100%; min-height: 42px; padding: 8px 12px; border: 1px solid #9fc1d3; border-radius: 10px; color: var(--ink); background: #fff; font-weight: 700; }
 .ranking-results { color: var(--ink); }

@@ -81,7 +81,8 @@ export default function RankingPage() {
       const rStats = s.rankingStats || {};
       const rawFastGuess = rStats.fastGuessCount || 0;
       const mistakesFromBank = Object.values(s.mistakeBank || {}).reduce((acc, m) => {
-        const count = (m.correctInReview || 0) + (m.mastered ? 2 : 0);
+        const reviews = Number(m?.correctInReview);
+        const count = (Number.isFinite(reviews) && reviews > 0 ? reviews : 0) + (m?.mastered === true ? 2 : 0);
         return acc + count;
       }, 0);
       const mistakesFixed = Math.max(bStats.mistakesFixed || 0, mistakesFromBank);
@@ -270,11 +271,15 @@ export default function RankingPage() {
         ) : loadError ? (
           <div className="ranking-feedback" role="alert"><p>ยังโหลดอันดับไม่ได้ ไม่แสดงข้อมูลตัวอย่างแทนข้อมูลจริง</p><button type="button" className="eq-btn ghost" onClick={() => setReload(value => value + 1)}>ลองโหลดอันดับอีกครั้ง</button></div>
         ) : leaderboard.length === 0 ? (
-          <div className="text-center p-10 bg-white/5 rounded-2xl mx-4 border border-amber-200">
-            <div className="text-4xl mb-3"><UIIcon value={"🤔"} /></div>
-            <p className="text-slate-500 font-bold mb-1">ยังไม่มีผู้ติดอันดับ</p>
-            {activeTab === 'accuracy' && <p className="text-xs text-slate-500">ต้องตอบอย่างน้อย 50 ข้อ และไม่กดเร็วกว่า 3 วิ</p>}
-          </div>
+          <section className="ranking-empty" aria-labelledby="ranking-empty-title">
+            <div className="ranking-empty-art" aria-hidden="true"><UIIcon value={"🏆"} /></div>
+            <div><span className="ranking-empty-label">เส้นทางนักผจญภัย</span><h2 id="ranking-empty-title">ยังไม่มีผู้ติดอันดับ</h2>
+              <p>{activeTab === 'overall' ? 'เมื่อมีข้อมูลการฝึกที่พร้อมแสดง อันดับของห้องที่เลือกจะปรากฏที่นี่' : 'ยังไม่มีข้อมูลที่เข้าเงื่อนไขสำหรับอันดับประเภทนี้'}</p>
+              {activeTab === 'accuracy' && <p>อันดับ Accuracy ต้องมีคำตอบอย่างน้อย 50 ข้อ และเวลาเฉลี่ยอย่างน้อย 3 วินาทีต่อข้อ</p>}
+              <strong>เริ่มฝึกเพื่อสะสม XP</strong><p>เลือก Quest ที่สนใจ แล้วค่อยกลับมาดูความคืบหน้ากัน</p>
+              <button type="button" className="eq-btn" onClick={() => navigate('map')}>กลับไปฝึก Quest <UIIcon value="→" /></button>
+            </div>
+          </section>
         ) : (
           <>
             {/* Top 3 Podium */}

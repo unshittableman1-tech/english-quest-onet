@@ -224,11 +224,10 @@
 /* Part Selector Pills */
 .skills-parts-selector {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
-  overflow-x: auto;
   padding-bottom: 6px;
   margin-bottom: 12px;
-  scrollbar-width: thin;
 }
 
 .skills-part-pill {
@@ -265,6 +264,8 @@
   padding: 14px 16px;
   margin-bottom: 20px;
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .skills-preview-title {
@@ -298,42 +299,233 @@
   line-height: 1.4;
 }
 
+.skills-rules-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.skills-rules-count-badge {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+
+.skills-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skills-enter-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border: none;
+  cursor: pointer;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 5px rgba(245, 158, 11, 0.35);
+  transition: all 0.15s ease;
+}
+
+.skills-enter-pill-btn:hover {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  transform: scale(1.04);
+}
+
+.skills-fullscreen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #d97706;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.skills-fullscreen-btn:hover {
+  color: #b45309;
+  text-decoration: underline;
+}
+
+.skills-sample-rule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-height: 180px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.skills-sample-rule-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.skills-sample-rule-list::-webkit-scrollbar-track {
+  background: #fef3c7;
+  border-radius: 4px;
+}
+
+.skills-sample-rule-list::-webkit-scrollbar-thumb {
+  background: #fbbf24;
+  border-radius: 4px;
+}
+
+.skills-sample-rule-list::-webkit-scrollbar-thumb:hover {
+  background: #d97706;
+}
+
 .skills-sample-rule {
   background: #ffffff;
-  border: 1px solid #fed7aa;
+  border: 1.5px solid #fde68a;
   border-radius: 12px;
   padding: 10px 12px;
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.skills-sample-rule:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 3px 8px rgba(245, 158, 11, 0.12);
+}
+
+.sample-q-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.sample-rule-num {
+  font-size: 11px;
+  font-weight: 900;
+  color: #b45309;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 6px;
+  padding: 1px 6px;
+  flex-shrink: 0;
+  font-family: ui-monospace, monospace;
+}
+
+.sample-q-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.sample-q-main {
+  display: flex;
+  align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
-.sample-q {
-  font-size: 13px;
-  color: #1e293b;
-}
-
-.sample-bullet {
+.sample-q-main strong {
+  font-size: 13.5px;
   font-weight: 800;
-  color: #d97706;
-  margin-right: 6px;
+  color: #1e293b;
+  line-height: 1.35;
+}
+
+.sample-speak-btn {
+  padding: 2px 4px;
+  background: #fef3c7;
+  color: #b45309;
+  border-radius: 6px;
+  border: 1px solid #fde68a;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.sample-speak-btn:hover {
+  background: #fde68a;
+  color: #78350f;
 }
 
 .sample-trans {
   font-size: 12px;
   color: #64748b;
-  margin-left: 6px;
-  font-weight: 500;
+  font-weight: 600;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.sample-trans-tag {
+  font-size: 10px;
+  font-weight: 800;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 0 4px;
 }
 
 .sample-a {
   background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  color: #065f46;
+  border: 1.5px solid #a7f3d0;
+  border-radius: 10px;
+  padding: 7px 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.sample-a-icon {
+  font-size: 13px;
+  color: #059669;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.sample-a-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.sample-a-text {
   font-size: 12.5px;
-  font-weight: 700;
-  padding: 6px 10px;
-  border-radius: 8px;
+  font-weight: 800;
+  color: #065f46;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.sample-a-sub {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #047857;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed #a7f3d0;
+  line-height: 1.35;
+}
+
+.sample-sub-tag {
+  font-weight: 800;
+  color: #065f46;
 }
 
 .sample-note {
@@ -341,11 +533,13 @@
   align-items: center;
   gap: 6px;
   font-size: 11.5px;
-  font-weight: 600;
-  color: #b45309;
+  font-weight: 700;
+  color: #92400e;
   background: #fffbeb;
-  padding: 4px 8px;
-  border-radius: 6px;
+  border: 1px solid #fed7aa;
+  padding: 5px 9px;
+  border-radius: 8px;
+  line-height: 1.35;
 }
 
 /* Vocab Showcase Pills */
@@ -460,6 +654,49 @@
 .skills-primary-btn:active {
   transform: translateY(1px);
   border-bottom-width: 1px;
+}
+
+.skills-sub-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.skills-sub-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 8px 6px;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1.5px solid #cbd5e1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.skills-sub-btn:hover {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+  transform: translateY(-1px);
+}
+
+.skills-sub-btn.indicator {
+  background: #eff6ff;
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+
+.skills-sub-btn.indicator:hover {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #93c5fd;
 }
 
 /* ── 3. Error Bank Section ───────────────────────────────────── */

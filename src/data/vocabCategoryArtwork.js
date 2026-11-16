@@ -1,0 +1,42 @@
+import { PDF_VOCABULARY_CATEGORIES } from './pdfVocabulary';
+export const VOCAB_CATEGORY_ARTWORK = Object.freeze({
+  ...Object.fromEntries(PDF_VOCABULARY_CATEGORIES.map(category => [category.id, '/learning/verbs/read-v1.png'])),
+  exam_commands: '/learning/verbs/read-v1.png',
+  onet_question_phrases: '/learning/verbs/ask-v1.png',
+  decisive_pairs: '/learning/verbs/choose-v1.png',
+  profile: '/learning/verbs/speak-v1.png',
+  family_words: '/learning/verbs/visit-v1.png',
+  classroom_words: '/learning/verbs/study-v1.png',
+  quest_verbs_classroom: '/learning/verbs/read-v1.png',
+  quest_verbs_communication: '/learning/verbs/listen-v1.png',
+  quest_verbs_daily: '/learning/verbs/wake-up-v1.png',
+  quest_verbs_places: '/learning/verbs/travel-v1.png',
+  quest_verbs_environment: '/learning/verbs/plant-v1.png',
+  verbs: '/learning/verbs/run-v1.png',
+  daily_routine: '/learning/routines/brush-my-teeth-v1.png',
+  transport: '/learning/transport/bus-v1.png',
+  place: '/learning/places/school-v1.png',
+  illness: '/learning/illness/cough-v1.png',
+  jobs: '/learning/jobs/teacher-v1.png',
+  food: '/learning/food/fried-rice-v1.png',
+  clothes: '/learning/clothes/shirt-and-t-shirt-v1.png',
+  weather: '/learning/weather/sunny-v1.png',
+  emotions: '/learning/emotions/happy-v1.png',
+  countries: '/learning/countries/thailand-thai-v1.png',
+  shapes: '/learning/subjects/art-v1.png',
+  environment: '/learning/environment/plant-trees-v1.png',
+  subjects: '/learning/subjects/english-v1.png',
+  signs: '/learning/signs/traffic-light-v3.png',
+  directions: '/learning/directions/turn-right-v2.png',
+  greeting: '/learning/greeting/nice-to-meet-you-v1.png',
+  question_words: '/learning/emotions/confused-v1.png',
+  culture_festivals: '/learning/culture_festivals/songkran-v1.png',
+  numbers: '/learning/subjects/math-v1.png',
+  pronouns: '/learning/greeting/how-are-you-v1.png',
+  quantifiers: '/learning/food/chicken-soup-v1.png',
+  tenses: '/learning/routines/wake-up-v1.png',
+});
+
+export function getVocabCategoryArtwork(categoryId) {
+  return VOCAB_CATEGORY_ARTWORK[categoryId] || null;
+}

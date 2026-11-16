@@ -1,3 +1,4 @@
+import ArenaDeliveryStatus from './report/ArenaDeliveryStatus';
 import UIIcon, { UIIconText } from './UIIcon';
 import React, { useState, useEffect } from 'react';
 
@@ -126,6 +127,7 @@ export default function FinalExamReport({ attempt, student, onBack }) {
   // ── Main result page ─────────────────────────────────────────
   return (
     <div className={`min-h-screen bg-gradient-to-b ${getGradientClass(attempt.percent)} pb-20 relative overflow-hidden`}>
+      <ArenaDeliveryStatus student={student} attemptId={attempt.attemptId} />
       {/* Glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] rounded-full blur-[120px] opacity-30 pointer-events-none bg-blue-500" />
 

@@ -7,6 +7,7 @@ import { createDemoStudent, DEMO_RANKING_STUDENTS } from '../data/demoFixtures';
 import { submitQuestToServer, addXPToServer, syncStudentProgressToServer } from './studentProgressApi';
 import { recordQuestMistake, reviewQuestMistake } from './questReviewGate';
 import { normalizeClassName } from './studentImportFile';
+import { submitPretestAttempt, stagePretestAttempt, clearPendingPretest } from './pretestPersistence';
 
 const PREFIX = 'eq_onet_';
 
@@ -594,6 +595,19 @@ export async function savePreTest(studentId, categoryScores, totalScore) {
   const data = { categoryScores, totalScore, total, version: 'pretest-v2', date: new Date().toISOString() };
   await updateCurrentStudent({ preTest: data });
   return data;
+}
+
+export async function saveConfirmedPreTest(studentId, attempt) {
+  const current = getCurrentStudent();
+  if (!current || current.id !== studentId || current.preTest != null) throw new Error('pretest_session_invalid');
+  stagePretestAttempt(current, attempt);
+  const receipt = await submitPretestAttempt(current, attempt);
+  const latest = getCurrentStudent();
+  if (!latest || latest.id !== current.id || latest.school_id !== current.school_id || latest.auth_user_id !== current.auth_user_id) throw new Error('pretest_session_changed');
+  const updated = { ...latest, preTest: receipt.result };
+  localStorage.setItem(`${PREFIX}current`, JSON.stringify(updated));
+  clearPendingPretest(current);
+  return updated;
 }
 
 export function getPreTest(studentId) {

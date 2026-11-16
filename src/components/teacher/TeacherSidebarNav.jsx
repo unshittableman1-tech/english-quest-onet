@@ -3,11 +3,11 @@ import { LayoutDashboard, Users, ChartNoAxesCombined, GraduationCap, TriangleAle
 const GROUPS = [
   { label: 'ห้องเรียน', ids: ['overview', 'table', 'warning'] },
   { label: 'วิเคราะห์ผล', ids: ['skills', 'vocabulary_report', 'strategy', 'ranking'] },
-  { label: 'สนามสอบ', ids: ['final_exam', 'year_simulations', 'arena'] },
+  { label: 'สนามสอบ', ids: ['pretest_review', 'final_exam', 'year_simulations', 'arena'] },
   { label: 'สื่อการเรียน', ids: ['practice_review'] },
   { label: 'บริหารโรงเรียน', ids: ['student_management'] },
 ];
-const ICONS = { student_management: Users, overview: LayoutDashboard, table: Users, skills: ChartNoAxesCombined, vocabulary_report: BookOpen, final_exam: GraduationCap, year_simulations: FileCheck2, warning: TriangleAlert, ranking: Trophy, arena: ClipboardCheck, strategy: Brain, practice_review: ShieldCheck };
+const ICONS = { student_management: Users, overview: LayoutDashboard, table: Users, skills: ChartNoAxesCombined, vocabulary_report: BookOpen, pretest_review: ClipboardCheck, final_exam: GraduationCap, year_simulations: FileCheck2, warning: TriangleAlert, ranking: Trophy, arena: ClipboardCheck, strategy: Brain, practice_review: ShieldCheck };
 
 export default function TeacherSidebarNav({ items, activeTab, onChange }) {
   return (

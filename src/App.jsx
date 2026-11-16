@@ -1,3 +1,7 @@
+import { clearArenaDraft } from './utils/arenaDraft';
+import { queueArenaAttempt } from './utils/arenaProgress';
+import { useArenaSync } from './hooks/useArenaProgress';
+import useStudyTime from './hooks/useStudyTime';
 import { useState, useEffect, createContext, useContext, useCallback, useRef, lazy, Suspense } from 'react';
 import confetti from 'canvas-confetti';
 import LandingPage from './components/LandingPage';
@@ -32,11 +36,12 @@ const RealOnetSimulator = lazy(() => import('./components/RealOnetSimulator'));
 const FinalExamReport = lazy(() => import('./components/FinalExamReport'));
 const SuperAdminDashboard = lazy(() => import('./components/SuperAdminDashboard'));
 const SchoolAdminDashboard = lazy(() => import('./components/SchoolAdminDashboard'));
+const IndicatorBankModal = lazy(() => import('./components/IndicatorBankModal'));
 import AcceptInvitationModal from './components/AcceptInvitationModal';
 import OwnerActivationPage from './components/OwnerActivationPage';
 import {
   getCurrentStudent, updateCurrentStudent, clearCurrentStudent,
-  saveStudent, addXP as storageAddXP, saveQuestResult, awardBadge, savePreTest,
+  saveStudent, addXP as storageAddXP, saveQuestResult, awardBadge, saveConfirmedPreTest,
   saveMistake as storageSaveMistake, processReviewAnswer, updateBadgeStats, updateLastActive, setOffline,
 } from './utils/storage';
 import {
@@ -97,6 +102,8 @@ export default function App() {
   const [mapView, setMapView]         = useState('lessons');
   const [student, setStudentState]    = useState(null);
   const studentRef = useRef(null);
+  useArenaSync(student);
+  useStudyTime(student, page);
   const setStudent = useCallback((value) => {
     const next = typeof value === 'function' ? value(studentRef.current) : value;
     studentRef.current = next;
@@ -121,6 +128,8 @@ export default function App() {
   const [pendingInvitationToken, setPendingInvitationToken] = useState(null);
   const [chapter3Check, setChapter3Check] = useState(null);
   const [chapter3CheckRequest, setChapter3CheckRequest] = useState(0);
+  const [techniquePracticeMode, setTechniquePracticeMode] = useState(false);
+  const [indicatorBankSet, setIndicatorBankSet] = useState(1);
 
   useEffect(() => {
     if (!student?.id || student?.isDemo || student?.role !== 'student' || !['127.0.0.1', 'localhost'].includes(window.location.hostname)) {
@@ -196,7 +205,44 @@ export default function App() {
       setPage('teacher-login');
       return;
     }
-    if ((routeParam === 'student-login' || schoolEntry.kind === 'school') && !saved) {
+
+    // ── School Entry / Student Login Routing & Session Guard ────────────
+    if (schoolEntry.kind === 'school') {
+      const targetSchoolCode = schoolEntry.code ? String(schoolEntry.code).toUpperCase() : null;
+      if (!saved) {
+        setStudent(null);
+        setPage('student-login');
+        return;
+      }
+      if (saved.isStaff || saved.role === 'teacher' || saved.role === 'super_admin') {
+        // Staff sessions continue to staff verification flow below
+      } else {
+        // Enforce strict school tenant isolation for students:
+        // 1. Demo sessions must never enter a school route
+        // 2. Mismatched school sessions must be rejected immediately
+        // 3. Unverified students must not bypass authentication
+        const savedSchool = saved.school_code ? String(saved.school_code).toUpperCase() : null;
+        if (saved.isDemo || saved.isGuestDemo || !savedSchool || savedSchool !== targetSchoolCode || saved.authVerified !== true) {
+          clearCurrentStudent();
+          setStudent(null);
+          setPage('student-login');
+          return;
+        }
+        // Matching school student with verified flag: verify with server
+        restoreStudentSession().then((verified) => {
+          if (!active) return;
+          if (!verified || String(verified.school_code).toUpperCase() !== targetSchoolCode) {
+            clearCurrentStudent();
+            setStudent(null);
+            setPage('student-login');
+            return;
+          }
+          setStudent(verified);
+          setPage(verified.preTest != null ? 'map' : 'pretest');
+        });
+        return () => { active = false; };
+      }
+    } else if (routeParam === 'student-login' && !saved) {
       setStudent(null);
       setPage('student-login');
       return;
@@ -252,7 +298,24 @@ export default function App() {
         }
       }
     }
-    return () => { active = false; };
+    const handlePopState = () => {
+      const currentEntry = readSchoolEntry(window.location);
+      if (currentEntry.kind === 'school') {
+        const cur = getCurrentStudent();
+        const curCode = cur?.school_code ? String(cur.school_code).toUpperCase() : null;
+        const tgtCode = currentEntry.code ? String(currentEntry.code).toUpperCase() : null;
+        if (!cur || cur.isDemo || cur.isGuestDemo || !curCode || curCode !== tgtCode || cur.authVerified !== true) {
+          clearCurrentStudent();
+          setStudent(null);
+          setPage('student-login');
+        }
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      active = false;
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
 
   useEffect(() => {
@@ -274,6 +337,14 @@ export default function App() {
 
   // ── Navigation ───────────────────────────────────────────
   const navigate = useCallback(async (target, questIdOrMission = null) => {
+    if (target === 'landing') {
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/s/')) {
+        window.history.pushState({}, '', '/');
+      }
+      setPage('landing');
+      window.scrollTo(0, 0);
+      return;
+    }
     if (target === 'demo') {
       const demo = getGuestDemoSession();
       setStudent(demo);
@@ -287,6 +358,27 @@ export default function App() {
     }
     if(target==='exam-hub'){setMapView('exams');setPage('map');window.scrollTo(0,0);return;}
     if(target==='skills-hub'){setMapView('skills');setPage('map');window.scrollTo(0,0);return;}
+    if (target === 'technique-practice') {
+      setCurrentQuest(questIdOrMission || 'part1');
+      setTechniquePracticeMode(true);
+      setPage('technique-hub');
+      window.scrollTo(0, 0);
+      return;
+    }
+    if (target === 'technique-hub') {
+      setCurrentQuest(questIdOrMission || 'part1');
+      setTechniquePracticeMode(false);
+      setPage('technique-hub');
+      window.scrollTo(0, 0);
+      return;
+    }
+    if (target === 'indicator-bank') {
+      const setVal = typeof questIdOrMission === 'number' ? questIdOrMission : parseInt(String(questIdOrMission).replace(/\D/g, ''), 10) || 1;
+      setIndicatorBankSet(setVal);
+      setPage('indicator-bank');
+      window.scrollTo(0, 0);
+      return;
+    }
     if(target==='map')setMapView('lessons');
     if (target === 'multiplayer-arena') {
       showToast('โหมดประลองทีมถูกนำออกแล้ว กรุณาเลือกสนามสอบ O-NET Arena');
@@ -471,19 +563,19 @@ export default function App() {
   }, [student, addXP]);
 
   // ── Pre-test Save ─────────────────────────────────────────
-  const completePreTest = useCallback(async (categoryScores, totalScore) => {
+  const completePreTest = useCallback(async (categoryScores, totalScore, attempt) => {
     if (!student) return;
     if (!student.isDemo) {
-      const data = await savePreTest(student.id, categoryScores, totalScore);
-      const pct = Math.round((totalScore / data.total) * 100);
-      const statsUpdates = { pretestScore: pct };
-      await updateBadgeStats(statsUpdates);
-      const updated = await updateCurrentStudent({ preTest: data });
+      const fullAttempt = {
+        ...attempt,
+        categoryScores,
+        totalScore,
+      };
+      const updated = await saveConfirmedPreTest(student.id, fullAttempt);
       setStudent(updated);
-      await addXP(XP_RULES.PRETEST_DONE, 'ทำ Pre-test เสร็จ');
     }
     navigate('map');
-  }, [student, addXP, navigate]);
+  }, [student, navigate]);
 
   const completeGameMission = useCallback(async (questId, mission, xpEarned) => {
     const current = studentRef.current;
@@ -825,7 +917,20 @@ export default function App() {
             onBack={() => { setPage('mission-select'); window.scrollTo(0, 0); }}
           />
         )}
-        {page === 'technique-hub'  && isStudentSession && <TechniqueHub onBack={() => { setMapView('skills'); setPage('map'); }} />}
+        {page === 'technique-hub'  && isStudentSession && (
+          <TechniqueHub
+            initialPart={currentQuest}
+            initialPracticing={techniquePracticeMode}
+            onBack={() => { setMapView('skills'); setPage('map'); setTechniquePracticeMode(false); }}
+          />
+        )}
+        {page === 'indicator-bank' && isStudentSession && (
+          <IndicatorBankModal
+            initialSet={indicatorBankSet}
+            onBack={() => { setMapView('skills'); setPage('map'); }}
+            onAddXP={addXP}
+          />
+        )}
         {page === 'vocab-drill'    && isStudentSession && <VocabDrillHub onBack={() => { setMapView('skills'); setPage('map'); }} onAddXP={addXP} initialQuestId={currentQuest} />}
         {page === 'real-simulator' && isStudentSession && <RealOnetSimulator student={student} onBack={() => setPage('map')} onAddXP={addXP} />}
         {page === 'lesson'    && isStudentSession && currentQuest && <MiniLesson questId={currentQuest} />}
@@ -853,7 +958,8 @@ export default function App() {
                                       onCancel={() => setPage('arena')}
                                       onFinish={(attempt) => {
                                         import('./utils/arenaStorage').then(({ saveArenaAttempt }) => {
-                                          saveArenaAttempt(student.id, attempt);
+                                          try { saveArenaAttempt(student.id, attempt); } catch { showToast('บันทึกผลในเครื่องไม่ได้ กรุณาอย่าปิดหน้านี้', 'warning'); }
+                                          try { queueArenaAttempt(student, attempt); clearArenaDraft(student, attempt.mode); } catch { showToast('บันทึกคิวส่งผลไม่ได้ กรุณาอย่าปิดหน้านี้และติดต่อครู', 'warning'); }
                                           setLastAttempt(attempt);
                                           setPage('exam-report');
                                         });
@@ -865,14 +971,18 @@ export default function App() {
                                       onCancel={() => setPage('map')}
                                       onFinish={(attempt) => {
                                         import('./utils/arenaStorage').then(({ saveFinalExamResult }) => {
-                                          const saved = saveFinalExamResult(student.id, attempt);
-                                          setLastFinalExamAttempt(saved || attempt);
+                                          let saved;
+                                          try { saved = saveFinalExamResult(student.id, attempt); } catch { showToast('บันทึกผลในเครื่องไม่ได้ กรุณาอย่าปิดหน้านี้', 'warning'); }
+                                          const sameRun = !saved || saved.startedAt === attempt.startedAt;
+                                          if (sameRun) { try { queueArenaAttempt(student, { ...attempt, mode: 'final_exam' }); clearArenaDraft(student, 'final_exam'); } catch { showToast('บันทึกคิวส่งผลไม่ได้ กรุณาอย่าปิดหน้านี้และติดต่อครู', 'warning'); } }
+                                          setLastFinalExamAttempt({ ...attempt, ...saved, attemptId: sameRun ? attempt.attemptId : saved.attemptId, mode: 'final_exam' });
                                           setPage('final-exam-report');
                                         });
                                       }}
                                     />}
         {page === 'exam-report' && isStudentSession && lastAttempt && <ExamReport 
                                       attempt={lastAttempt}
+                                      student={student}
                                       onBackToArena={() => setPage('arena')}
                                     />}
         {page === 'final-exam-report' && isStudentSession && lastFinalExamAttempt && <FinalExamReport

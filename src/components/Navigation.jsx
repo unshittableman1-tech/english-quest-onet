@@ -1,6 +1,7 @@
 import { useApp } from '../App';
 import { QUEST_PALETTES } from '../utils/questPalette';
 import ResilientArtwork from './ResilientArtwork';
+import {useTheme} from '../themes/ThemeProvider';
 
 const NAV_ITEMS = [
   { id: 'map', artwork: '/assets/navigation/quest-nav-3d-v1-128.webp', label: 'แผนที่', english: 'Quest', tone: 'sky' },
@@ -13,6 +14,8 @@ const NAV_ITEMS = [
 
 export default function Navigation() {
   const { page, navigate } = useApp();
+  const {theme,asset}=useTheme();
+  const themeArtwork=item=>theme.key==='classic'?item.artwork:asset(({map:'quest','vocab-drill':'vocab',report:'progress',badge:'emblem'})[item.id])||item.artwork;
 
   return (
     <nav className="nav-bottom" aria-label="เมนูการเรียนของนักเรียน">
@@ -26,7 +29,7 @@ export default function Navigation() {
           aria-label={`${item.label} (${item.english})`}
           onClick={() => navigate(item.id)}
         >
-          <ResilientArtwork className="nav-artwork" src={item.artwork} width="38" height="38" alt="" aria-hidden="true" eager fallback={<span className="nav-artwork-fallback" aria-hidden="true">{item.label.slice(0, 1)}</span>} />
+          <ResilientArtwork className="nav-artwork" src={themeArtwork(item)} width="38" height="38" alt="" aria-hidden="true" eager fallback={<img src={item.artwork} width="38" height="38" alt=""/>} />
           <span className="nav-label">{item.label}</span>
         </button>
       ))}

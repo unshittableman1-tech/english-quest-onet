@@ -102,7 +102,7 @@ export function useSpeech() {
 
       // Settings
       utterance.lang  = lang;
-      utterance.rate  = options.rate  ?? (isThai ? 0.95 : 0.70);
+      utterance.rate  = options.rate  ?? (isThai ? 0.95 : 0.525);
       utterance.pitch = options.pitch ?? 1.05;
       utterance.volume = options.volume ?? 1;
 
@@ -141,7 +141,7 @@ export function speakText(text, options = {}) {
     const voice = isThai ? getBestThaiVoice() : getBestEnglishVoice();
 
     utterance.lang   = lang;
-    utterance.rate   = options.rate   ?? (isThai ? 0.95 : 0.70);
+    utterance.rate   = options.rate   ?? (isThai ? 0.95 : 0.525);
     utterance.pitch  = options.pitch  ?? 1.05;
     utterance.volume = options.volume ?? 1;
     if (voice) utterance.voice = voice;

@@ -1,13 +1,15 @@
 import UIIcon, { UIIconText } from './UIIcon';
 import { useState, useCallback } from 'react';
 import { useApp } from '../App';
-import { pretestV2Questions } from '../data/pretestV2';
+import { studentPretestQuestions } from '../data/pretestV2';
 import QuestionStimulus from './QuestionStimulus';
 import QuestionMediaGate from './QuestionMediaGate';
 import useQuestionMedia from '../hooks/useQuestionMedia';
 import { playClickSound, playLevelUpSound } from '../utils/audio';
+import { readPendingPretest } from '../utils/pretestPersistence';
+import '../styles/pretestPage.css';
 
-const questions = pretestV2Questions.map((item, index) => ({
+const questions = studentPretestQuestions.map((item, index) => ({
   ...item,
   id: `pretest-v2-${index + 1}`,
   question: item.prompt,
@@ -17,12 +19,20 @@ const questions = pretestV2Questions.map((item, index) => ({
 }));
 
 export default function PreTestPage() {
-  const { completePreTest, navigate, handleLogout } = useApp();
+  const { completePreTest, navigate, handleLogout, student } = useApp();
+  const [pending] = useState(() => {
+    try { return readPendingPretest(student); } catch { return null; }
+  });
+  const [attemptId] = useState(() => pending?.attemptId || crypto.randomUUID());
+  const [restored] = useState(() => {
+    if (!pending || !Array.isArray(pending.answers) || pending.answers.length !== questions.length || pending.answers.some((answer, index) => answer.id !== questions[index].id || !Number.isInteger(answer.choice) || answer.choice < 0 || answer.choice > 3)) return null;
+    return { categoryScores: {}, totalScore: null, responses: pending.answers };
+  });
   const [currentIdx, setCurrentIdx]   = useState(0);
   const [selected, setSelected]       = useState(null);
   const [answers, setAnswers]         = useState([]);
-  const [showResult, setShowResult]   = useState(false);
-  const [results, setResults]         = useState(null);
+  const [showResult, setShowResult]   = useState(Boolean(restored));
+  const [results, setResults]         = useState(restored);
   const [saveError, setSaveError] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -38,20 +48,11 @@ export default function PreTestPage() {
   const handleNext = useCallback(() => {
     if (!q) return;
     playClickSound();
-    const isCorrect = selected === q.answer;
-    const newAnswers = [...answers, { q, selected, correct: isCorrect }];
+    const newAnswers = [...answers, { q, selected }];
     setAnswers(newAnswers);
 
     if (currentIdx + 1 >= questions.length) {
-      const categoryScores = {};
-      newAnswers.forEach(a => {
-        const cat = a.q.quest;
-        if (!categoryScores[cat]) categoryScores[cat] = { correct: 0, total: 0 };
-        categoryScores[cat].total++;
-        if (a.correct) categoryScores[cat].correct++;
-      });
-      const totalScore = newAnswers.filter(a => a.correct).length;
-      setResults({ categoryScores, totalScore });
+      setResults({ categoryScores: {}, totalScore: null, responses: newAnswers.map(a => ({ id: a.q.id, choice: a.selected })) });
       setShowResult(true);
       playLevelUpSound();
     } else {
@@ -66,52 +67,42 @@ export default function PreTestPage() {
     setSaving(true);
     setSaveError(null);
     try {
-      await completePreTest(results.categoryScores, results.totalScore);
+      await completePreTest(results.categoryScores, results.totalScore, { attemptId, answers: results.responses });
     } catch (error) {
-      setSaveError(error.message || 'ไม่สามารถบันทึกผลสอบได้');
+      setSaveError('ยังยืนยันการบันทึกกับเซิร์ฟเวอร์ไม่ได้ กรุณาตรวจสอบการเชื่อมต่อและพื้นที่จัดเก็บ แล้วลองอีกครั้งโดยไม่ออกจากหน้านี้');
       setSaving(false);
     }
-  }, [results, saving, completePreTest]);
+  }, [results, saving, completePreTest, attemptId]);
 
   // ── Early returns AFTER all hooks ─────────────────────────────
   if (questions.length && mediaStatus !== 'ready') return <QuestionMediaGate status={mediaStatus} onBack={() => navigate('landing')} />;
   if (showResult && results) {
-    const pct = Math.round((results.totalScore / questions.length) * 100);
+    const hasScore = typeof results.totalScore === 'number';
+    const pct = hasScore ? Math.round((results.totalScore / questions.length) * 100) : null;
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
-        <div className="glass-card w-full max-w-md p-7 text-center">
-          <div className="text-5xl mb-3"><UIIcon value={"📊"} /></div>
-          <h2 className="text-2xl font-black text-amber-800 mb-1">ผลการทดสอบก่อนเรียน</h2>
-          <p className="text-slate-500 text-sm mb-5">Pre-test อิง Blueprint — {questions.length} ข้อ</p>
-
-          <div className="glass-card p-4 mb-5">
-            <div className="text-5xl font-black text-gradient-gold">{results.totalScore}/{questions.length}</div>
-            <div className="text-lg font-bold text-slate-600 mt-1">{pct}% คะแนนรวม</div>
-            <div className="progress-track h-3 mt-3">
-              <div className="progress-fill bg-gradient-to-r from-amber-400 to-amber-500" style={{ width: `${pct}%`, height: '100%' }} />
+      <div className="pretest-page pretest-result-page">
+        <div className="pretest-result">
+          <div className="pretest-result-icon"><UIIcon value={"📊"} /></div>
+          <p className="pretest-overline">ทำครบแล้ว เก่งมาก!</p>
+          <h2>ผลการทดสอบก่อนเรียน</h2>
+          <p className="pretest-muted">Pre-test · {questions.length} ข้อ</p>
+          {hasScore ? (
+            <div className="pretest-result-score">
+              <span className="pretest-result-number">{results.totalScore}<small> / {questions.length}</small></span>
+              <span>{pct}% คะแนนรวมเบื้องต้น</span>
+              <div className="pretest-meter"><span style={{ width: `${pct}%` }} /></div>
             </div>
-          </div>
-
-          <div className="space-y-2 mb-6">
-            <h3 className="font-bold text-slate-700 text-left text-sm">คะแนนรายหมวด:</h3>
-            {Object.entries(results.categoryScores).map(([cat, s]) => {
-              const catPct = Math.round((s.correct / s.total) * 100);
-              const color = catPct >= 70 ? 'from-emerald-400 to-green-400' : catPct >= 50 ? 'from-amber-400 to-yellow-400' : 'from-rose-400 to-red-400';
-              return (
-                <div key={cat} className="flex items-center gap-3">
-                  <span className="text-xs text-slate-500 w-24 text-right shrink-0">{cat}</span>
-                  <div className="progress-track h-2 flex-1">
-                    <div className={`progress-fill bg-gradient-to-r ${color}`} style={{ width: `${catPct}%`, height: '100%' }} />
-                  </div>
-                  <span className="text-xs font-bold text-slate-700 w-12 shrink-0">{s.correct}/{s.total}</span>
-                </div>
-              );
-            })}
-          </div>
-
-          {saveError && <p role="alert" className="text-rose-700 mb-3">{saveError}</p>}
-          <button className="btn-primary w-full text-lg py-4" onClick={handleContinue} disabled={saving}>
-            <UIIcon value={"🗺️"} /> {saving ? 'กำลังบันทึก...' : 'ไป Quest Map!'}
+          ) : (
+            <div className="pretest-result-score">
+              <span className="pretest-result-number">{questions.length}<small> / {questions.length}</small></span>
+              <span>ตอบครบแล้วทั้ง {questions.length} ข้อ</span>
+              <div className="pretest-meter"><span style={{ width: '100%' }} /></div>
+            </div>
+          )}
+          <p className="pretest-save-note">กดปุ่มด้านล่างเพื่อส่งตรวจและบันทึกคะแนนกับเซิร์ฟเวอร์ก่อนเริ่มผจญภัย</p>
+          {saveError && <p role="alert" className="pretest-error">{saveError}</p>}
+          <button className="pretest-next" onClick={handleContinue} disabled={saving}>
+            <UIIcon value={"🗺️"} /> {saving ? 'กำลังบันทึกและตรวจผล...' : 'ไป Quest Map!'}
           </button>
         </div>
       </div>
@@ -122,49 +113,22 @@ export default function PreTestPage() {
   const progress = Math.round((currentIdx / questions.length) * 100);
 
   return (
-    <div className="min-h-screen flex flex-col px-4 py-6">
-      {/* Header */}
-      <div className="glass-card p-4 mb-5 max-w-lg mx-auto w-full">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h1 className="font-black text-amber-800 text-lg"><UIIcon value={"📝"} /> Pre-test อิง Blueprint</h1>
-            <p className="text-slate-500 text-xs">ข้อ {currentIdx + 1} จาก {questions.length}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button type="button" onClick={handleLogout} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50">
-              ออกจากระบบ
-            </button>
-            <div className="text-right">
-              <div className="text-2xl font-black text-gradient-gold">{currentIdx + 1}</div>
-              <div className="text-slate-500 text-xs">/{questions.length}</div>
-            </div>
-          </div>
-        </div>
-        <div className="progress-track h-2.5">
-          <div
-            className="progress-fill bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-500"
-            style={{ width: `${progress}%`, height: '100%' }}
-          />
-        </div>
-      </div>
-
-      {/* Question */}
-      <div className="max-w-lg mx-auto w-full flex-1 flex flex-col">
-        <div className="glass-card p-5 mb-4">
-          <span className="inline-block text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200 mb-3">
-            {q.quest}
-          </span>
-
+    <div className="pretest-page">
+      <main className="pretest-shell">
+        <header className="pretest-header">
+          <div className="pretest-header-top"><div className="pretest-heading"><span className="pretest-header-icon"><UIIcon value={"📝"} /></span><div><p className="pretest-overline">ก่อนเริ่มการผจญภัย</p><h1>Pre-test อิง Blueprint</h1></div></div><button type="button" onClick={handleLogout} className="pretest-logout">ออกจากระบบ</button></div>
+          <div className="pretest-progress-label"><span>ความคืบหน้า</span><strong>ข้อ {currentIdx + 1} <span>จาก {questions.length}</span></strong></div>
+          <div className="pretest-meter" role="progressbar" aria-label="ความคืบหน้าการสอบ" aria-valuemin={0} aria-valuemax={questions.length} aria-valuenow={currentIdx}><span style={{ width: `${progress}%` }} /></div>
+        </header>
+        <div className="pretest-question">
+          <div className="pretest-question-label"><span>คำถามที่ {currentIdx + 1}</span><span>เลือกคำตอบที่เหมาะสมที่สุด</span></div>
           <QuestionStimulus question={q} onFailure={onMediaFailure} />
-
-          <p className="text-slate-800 font-bold text-lg leading-relaxed">{q.question}</p>
+          <p className="pretest-question-text">{q.question}</p>
         </div>
-
-        {/* Options */}
-        <div className={q.options.some(option => typeof option !== 'string') ? 'grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6' : 'space-y-3 mb-6'}>
+        <div className={q.options.some(option => typeof option !== 'string') ? 'pretest-options pretest-options-images' : 'pretest-options'}>
           {q.options.map((opt, i) => {
-            let cls = 'option-btn';
-            if (i === selected) cls += ' border-amber-400 bg-amber-50';
+            let cls = 'option-btn pretest-option';
+            if (i === selected) cls += ' is-selected';
             return (
               <button
                 key={i}
@@ -173,8 +137,8 @@ export default function PreTestPage() {
                 onClick={() => handleSelect(i)}
                 aria-pressed={i === selected}
               >
-                <span className="mr-3 text-slate-500 font-bold">{String.fromCharCode(65 + i)}.</span>
-                {typeof opt === 'string' ? opt : <img src={opt.image} alt={opt.alt} className="block w-full rounded-lg mt-2" onError={onMediaFailure} />}
+                <span className="pretest-option-letter">{String.fromCharCode(65 + i)}</span>
+                {typeof opt === 'string' ? <span>{opt}</span> : <img src={opt.image} alt={opt.alt} className="block w-full rounded-lg" onError={onMediaFailure} />}
               </button>
             );
           })}
@@ -182,14 +146,14 @@ export default function PreTestPage() {
 
         {selected !== null && (
           <button
-            className="btn-primary w-full text-lg py-4 animate-slide-up"
+            className="pretest-next"
             onClick={handleNext}
           >
             <UIIconText value={currentIdx + 1 >= questions.length ? '📊 ดูผลการทดสอบ' : 'ข้อต่อไป →'} />
           </button>
         )}
 
-      </div>
+      </main>
     </div>
   );
 }

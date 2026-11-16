@@ -5,6 +5,7 @@ import { useSpeech } from '../utils/useSpeech';
 import { getQuestionTranslation, getSpokenFeedbackText } from '../utils/questionTranslator';
 import { getQuestionFeedback } from '../utils/questionFormat';
 import AICompanionPanel from './AICompanionPanel';
+import LinkedLearningFeedback from './LinkedLearningFeedback';
 import { getLearningFeedback } from '../utils/questionUnderstanding';
 
 function HighlightKeyword({ text = '', keyword = '' }) {
@@ -103,6 +104,7 @@ export default function FeedbackModal({ feedbackData, onNext, onRetry, aiVerific
           {learning.vocabulary.length > 0 && <p><strong>คำสำคัญ:</strong> {learning.vocabulary.map(item => `${item.word} = ${item.meaningTh}`).join(' · ')}</p>}
           {learning.tip && <p><strong>ลองฝึกต่อ:</strong> {learning.tip}</p>}
         </section>}
+        <LinkedLearningFeedback question={question} learningMode={feedbackData.learningMode} questId={feedbackData.learningQuestId} />
         <ChoiceAnalysis title="วิเคราะห์ตัวเลือก" options={question.options} answer={question.answer} selected={selectedIdx} />
         {question.type === 'two_step' && <ChoiceAnalysis title="วิเคราะห์เหตุผล" options={question.reasonChoices} answer={question.correctReasonIndex ?? question.reasonAnswer} selected={reasonSelectedIdx} />}
         {!isCorrect && <AICompanionPanel questId={feedbackData.questId || question.quest} questionId={question.id} verificationPending={aiVerificationPending} />}

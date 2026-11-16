@@ -1,0 +1,217 @@
+.qm-map-viewport .chapter-world { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; background: #bde9ea; }
+.chapter-world-art, .chapter-world-atmosphere, .chapter-world-light { position: absolute; inset: 0; pointer-events: none; }
+.chapter-world-art { background: var(--chapter-world-image) center 52% / cover no-repeat; }
+.chapter-world-atmosphere { background: linear-gradient(180deg, #e5f5ff08, #092c4c0b 73%, #102f3e2b); }
+.chapter-world.is-forest .chapter-world-atmosphere { background: linear-gradient(155deg, #154c4050, transparent 55%, #16463845); }
+.chapter-world.is-academy .chapter-world-atmosphere { background: linear-gradient(150deg, #6b49833b, transparent 55%, #3d28663d); }
+.chapter-world.is-sky .chapter-world-atmosphere { background: linear-gradient(180deg, #bdeeff36, transparent 70%, #4760a634); }
+.chapter-world.is-crystal .chapter-world-atmosphere { background: linear-gradient(145deg, #3a28715c, transparent 60%, #244e8055); }
+.chapter-world-light { inset: -10%; opacity: .35; background: radial-gradient(ellipse at 28% 8%, #fff9d695, transparent 34%), radial-gradient(ellipse at 85% 16%, #e9faff88, transparent 28%); animation: chapter-world-drift 16s ease-in-out infinite alternate; }
+.chapter-world.is-forest .chapter-world-light { background: radial-gradient(ellipse at 20% 5%, #b9ec9b91, transparent 30%), radial-gradient(ellipse at 78% 20%, #d4f4b873, transparent 28%); animation-duration: 13s; }
+.chapter-world.motion-shimmer .chapter-world-light { animation-name: chapter-world-shimmer; animation-duration: 7s; }
+@keyframes chapter-world-drift { from { transform: translateX(-2%); } to { transform: translateX(2%); } }
+@keyframes chapter-world-shimmer { from { opacity: .2; } to { opacity: .5; } }
+@media (prefers-reduced-motion: reduce) { .chapter-world-light { animation: none; } }
+
+/* Ambient layers stay inside the map and never intercept stage interactions. */
+.chapter-world-mist { position: absolute; inset: 65% -8% -10%; opacity: .22; background: radial-gradient(ellipse at 30% 70%, #ecffffb0, transparent 48%), radial-gradient(ellipse at 78% 60%, #ffffff80, transparent 42%); animation: chapter-world-drift 22s ease-in-out infinite alternate; }
+.chapter-world.is-sky .chapter-world-mist { inset: 4% -8% 50%; opacity: .38; }
+.chapter-world-particles { position: absolute; inset: 0; }
+.chapter-world-particles i { position: absolute; left: calc(8% + var(--particle) * 12%); top: calc(15% + var(--particle) * 8%); width: 4px; height: 4px; border-radius: 50%; background: #fff3b0; box-shadow: 0 0 8px 2px #fff3b070; opacity: .5; animation: chapter-world-float 9s ease-in-out infinite alternate; animation-delay: calc(var(--particle) * -1.3s); }
+.chapter-world.is-forest .chapter-world-particles i { background: #d3ff8a; }
+.chapter-world.is-crystal .chapter-world-particles i { background: #b8faff; box-shadow: 0 0 8px 2px #b8faff80; }
+.chapter-world.is-sky .chapter-world-particles { display: none; }
+@keyframes chapter-world-float { from { transform: translate(0, 8px); opacity: .2; } to { transform: translate(12px, -18px); opacity: .7; } }
+@media (max-width: 600px) { .chapter-world-particles i:nth-child(n+5) { display: none; } }
+@media (prefers-reduced-motion: reduce) { .chapter-world *, .chapter-world *::before, .chapter-world *::after { animation: none !important; } }
+
+/* Recognizable foreground props: motion is visible in the clear top/bottom bands. */
+.chapter-world-decorations { position: absolute; inset: 0; pointer-events: none; }
+.chapter-world-sprite { position: absolute; display: block; width: clamp(52px, 7vw, 100px); left: 12%; bottom: 6%; animation: chapter-prop-travel 12s ease-in-out infinite alternate; }
+.chapter-world-sprite img { display: block; width: 100%; height: auto; animation: chapter-prop-bob 3.6s ease-in-out infinite alternate; }
+.chapter-world-sprite.sprite-1 { left: 65%; bottom: 9%; animation-delay: -6s; }
+.chapter-world-sprite.sprite-1 img { animation-delay: -1.8s; }
+.chapter-world-sprite.sprite-2 { left: 44%; bottom: 3%; width: 55px; animation-delay: -3s; }
+.effect-flutter img { animation: chapter-prop-flutter 1.4s ease-in-out infinite alternate; }
+.effect-leaves .chapter-world-sprite { bottom: auto; top: 2%; width: 64px; animation: chapter-leaf-drift 10s ease-in-out infinite; }
+.effect-leaves .sprite-1 { left: 72%; animation-delay: -5s; }
+.effect-leaves .sprite-2 { left: 38%; animation-delay: -8s; }
+.effect-levitate .chapter-world-sprite { width: clamp(60px, 7vw, 90px); animation-duration: 8s; }
+.effect-sail .chapter-world-sprite { bottom: auto; top: 2%; left: 38%; width: clamp(100px, 13vw, 160px); animation: chapter-airship-sail 18s ease-in-out infinite alternate; }
+.effect-sail .sprite-1 { left: 76%; top: 7%; width: 75px; animation-delay: -9s; }
+.chapter-world-motion-toggle { position: absolute; right: 12px; bottom: 10px; z-index: 5; border: 1px solid #ffffffaa; border-radius: 16px; padding: 8px 12px; min-height: 36px; color: #fff; background: #153e5be8; font: inherit; font-size: 12px; cursor: pointer; }
+.chapter-world-motion-toggle:focus-visible { outline: 3px solid #ffc534; outline-offset: 3px; }
+.chapter-world.is-paused * { animation-play-state: paused !important; }
+@keyframes chapter-prop-travel { from { transform: translateX(-20px); } to { transform: translateX(65px); } }
+@keyframes chapter-prop-bob { from { transform: translateY(8px) rotate(-7deg); } to { transform: translateY(-18px) rotate(7deg); } }
+@keyframes chapter-prop-flutter { from { transform: translateY(10px) rotate(-12deg) scaleX(.82); } to { transform: translateY(-20px) rotate(10deg) scaleX(1); } }
+@keyframes chapter-leaf-drift { 0% { transform: translate(-30px, -35px) rotate(-25deg); opacity: 0; } 15%,80% { opacity: .9; } 100% { transform: translate(90px, 150px) rotate(120deg); opacity: 0; } }
+@keyframes chapter-airship-sail { from { transform: translateX(-90px); } to { transform: translateX(120px); } }
+@media (max-width: 600px) { .chapter-world-sprite.sprite-2, .effect-sail .sprite-1 { display: none; } .chapter-world-motion-toggle { font-size: 11px; bottom: 6px; right: 6px; } .effect-sail .sprite-0 { left: 25%; } }
+@media (prefers-reduced-motion: reduce) { .chapter-world-decorations * { animation: none !important; } .chapter-world-motion-toggle { display: none; } }
+
+/* Each chapter frames its own landmarks within the shared route viewport. */
+.qm-adventure-map {
+  --world-control-ink: #f7fbff;
+  --world-control-surface: #123b42;
+  --world-control-edge: #dba846;
+  --world-horizon: 35%;
+}
+
+.qm-adventure-map[data-chapter="2"] {
+  --world-control-surface: #173c31;
+  --world-control-edge: #b8c97d;
+  --world-horizon: 48%;
+}
+
+.qm-adventure-map[data-chapter="3"] {
+  --world-control-surface: #263d66;
+  --world-control-edge: #d7bb76;
+  --world-horizon: 27%;
+}
+
+.qm-adventure-map[data-chapter="4"] {
+  --world-control-surface: #164661;
+  --world-control-edge: #a5e8fa;
+  --world-horizon: 28%;
+}
+
+.qm-adventure-map[data-chapter="5"] {
+  --world-control-surface: #332655;
+  --world-control-edge: #d0b9f9;
+  --world-horizon: 18%;
+}
+
+.qm-map-viewport .chapter-world.follows-route {
+  --chapter-world-offset: 0px;
+  --chapter-world-travel: 0px;
+}
+
+.follows-route .chapter-world-art {
+  right: auto;
+  width: calc(100% + var(--chapter-world-travel));
+  background-position: center var(--world-horizon, 35%);
+  transform: translateX(var(--chapter-world-offset));
+}
+
+.chapter-world.follows-route.is-valley .chapter-world-atmosphere {
+  background: linear-gradient(180deg, transparent 24%, #123b4233 88%, #1b718724);
+}
+
+.chapter-valley-water {
+  position: absolute;
+  top: var(--world-horizon, 35%);
+  width: 100%;
+  aspect-ratio: 2;
+  transform: translateY(calc(-1 * var(--world-horizon, 35%)));
+}
+
+.chapter-valley-water i {
+  position: absolute;
+  left: 39.5%;
+  top: 70%;
+  width: 4%;
+  height: 1%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, #e2ffffd9, #8eeaff50 40%, transparent 72%);
+  animation: chapter-valley-ripple 7s ease-in-out infinite;
+}
+
+.chapter-valley-water i + i { left: 48%; top: 42%; animation-delay: -3s; }
+
+.chapter-valley-clouds,
+.chapter-valley-foliage { position: absolute; inset: 0; }
+
+.chapter-valley-clouds {
+  transform: translateX(calc(var(--chapter-world-offset, 0px) * .04));
+}
+
+.chapter-valley-clouds i {
+  position: absolute;
+  top: 4%;
+  left: 24%;
+  width: clamp(112px, 20%, 300px);
+  height: 30px;
+  background: radial-gradient(ellipse at 45% 60%, #f4fbffe0, transparent 65%);
+  animation: chapter-valley-cloud 29s ease-in-out infinite alternate;
+}
+
+.chapter-valley-clouds i + i { left: 70%; top: 10%; animation-delay: -15s; }
+
+.chapter-valley-foliage img {
+  position: absolute;
+  top: 8%;
+  left: 5%;
+  width: clamp(20px, 3vw, 38px);
+  opacity: 0;
+  animation: chapter-valley-leaf 14s ease-in-out -4s infinite;
+}
+
+@keyframes chapter-valley-cloud {
+  from { transform: translateX(-26px); opacity: .23; }
+  to { transform: translateX(42px); opacity: .56; }
+}
+
+@keyframes chapter-valley-ripple {
+  0%, 100% { transform: translate(-10%, -20%) scaleX(.65); opacity: .08; }
+  45% { transform: translate(9%, 15%) scaleX(1); opacity: .72; }
+  75% { transform: translate(22%, 35%) scaleX(1.15); opacity: .2; }
+}
+
+@keyframes chapter-valley-leaf {
+  0%, 100% { transform: translate(0, -12px) rotate(-20deg); opacity: 0; }
+  18% { opacity: .7; }
+  58% { opacity: .55; }
+  75%, 99% { transform: translate(38px, 65px) rotate(38deg); opacity: 0; }
+}
+
+/* Ambient keyframes stay on the sprites, independent of their layer's drift. */
+.follows-route .chapter-world-decorations {
+  transform: translateX(calc(var(--chapter-world-offset) * 0.1));
+}
+
+.follows-route .chapter-world-particles {
+  transform: translateX(calc(var(--chapter-world-offset) * 0.04));
+}
+
+.follows-route.is-valley .chapter-world-sprite {
+  width: clamp(29px, 4vw, 50px);
+  bottom: 10%;
+  animation-duration: 9s;
+}
+
+.follows-route.is-valley .chapter-world-sprite.sprite-2 {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .chapter-valley-clouds i + i,
+  .chapter-valley-water i + i,
+  .follows-route.is-valley .chapter-world-sprite.sprite-1 { display: none; }
+}
+
+.follows-route.is-sky .chapter-world-sprite.sprite-1 {
+  display: none;
+}
+
+.follows-route + .chapter-world-motion-toggle {
+  color: var(--world-control-ink, #f7fbff);
+  background: var(--world-control-surface, #123b42);
+  border-color: var(--world-control-edge, #dba846);
+  min-height: 44px;
+}
+
+.follows-route.is-paused .chapter-world-decorations,
+.follows-route.is-paused .chapter-world-particles,
+.follows-route.is-paused .chapter-valley-clouds {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .follows-route .chapter-world-decorations,
+  .follows-route .chapter-world-particles,
+  .chapter-valley-clouds {
+    transform: none;
+  }
+  .chapter-valley-foliage, .chapter-valley-clouds, .chapter-valley-water { display: none; }
+}

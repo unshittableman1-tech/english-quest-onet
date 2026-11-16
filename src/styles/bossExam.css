@@ -1,0 +1,31 @@
+.boss-exam-page .quiz-content { max-width: 840px; padding: 28px 24px 48px; }
+.boss-question-card { padding: 28px; background: #fff; border: 1px solid #d4e3ee; border-radius: 22px; box-shadow: 0 12px 32px #17395812; }
+.boss-question-meta { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: center; color: #59718a; font-size: 13px; }
+.boss-question-meta > span:first-child { background: #edf6ff; color: #185b88; border-radius: 20px; padding: 6px 12px; font-weight: 800; }
+.boss-question-meta > span:last-child { display: inline-flex; align-items: center; gap: 6px; }
+.boss-question-title { margin: 22px 0 16px; font-size: 18px; font-weight: 800; color: #173958; }
+.boss-dialogue { padding: 20px; background: #f2f7fc; border-left: 4px solid #67b5df; border-radius: 12px; margin-bottom: 24px; font-family: Arial, sans-serif; color: #20364e; font-size: 19px; line-height: 1.75; overflow-wrap: anywhere; }
+.boss-dialogue p { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 0 0 12px; white-space: pre-wrap; }
+.boss-dialogue p:last-child { margin-bottom: 0; }
+.boss-speaker { color: #185b88; font-weight: 700; }
+.boss-speaker::after { content: ':'; }
+.boss-dialogue p > span { flex: 1 1 200px; }
+.boss-answer-list { display: grid; gap: 12px; }
+.boss-exam-page .answer-option { width: 100%; display: flex; align-items: center; gap: 14px; padding: 16px; min-height: 68px; background: #fff; border: 2px solid #dbe6ef; border-radius: 14px; text-align: left; color: #243c54; cursor: pointer; font-family: Arial, sans-serif; font-size: 17px; line-height: 1.55; transition: border-color .15s, background .15s; }
+.boss-exam-page .answer-option > span[lang] { flex: 1; overflow-wrap: anywhere; }
+.boss-exam-page .answer-letter { flex: 0 0 36px; width: 36px; height: 36px; display: grid; place-items: center; background: #f0f5fa; color: #526c83; border-radius: 10px; font-weight: 700; }
+.boss-exam-page .answer-option:hover:not(:disabled) { border-color: #81b8df; background: #f7fbff; }
+.boss-exam-page .answer-option.selected { border-color: #1685c4; background: #edf8ff; }
+.boss-exam-page .answer-option.selected .answer-letter { background: #1685c4; color: #fff; }
+.boss-choice-indicator { flex: 0 0 21px; width: 21px; color: #1685c4; }
+.boss-exam-page .answer-option:focus-visible { outline: 3px solid #e4a51b; outline-offset: 3px; }
+.boss-confirm { display: flex; justify-content: center; width: 100%; min-height: 54px; margin-top: 24px; }
+.boss-exam-page .answer-option:disabled { cursor: default; opacity: .7; }
+.boss-confirm:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+@media (max-width: 600px) {
+  .boss-exam-page .quiz-content { padding: 18px 12px 32px; }
+  .boss-question-card { padding: 18px 14px; border-radius: 16px; }
+  .boss-dialogue { padding: 16px 12px; font-size: 17px; }
+  .boss-exam-page .answer-option { padding: 12px; gap: 10px; font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .boss-exam-page .answer-option { transition: none; } }

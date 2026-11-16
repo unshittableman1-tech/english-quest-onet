@@ -1,0 +1,45 @@
+.assessment-document {
+  --assessment-accent:#175b78;
+  color:#183e53; background:#fff; margin:20px auto; width:100%; max-width:620px;
+  border:1px solid #b6cad4; border-radius:12px; overflow:hidden;
+  font-family:'Trebuchet MS',Tahoma,Arial,sans-serif;
+}
+.assessment-document .assessment-document-heading {display:flex;align-items:center;gap:18px;padding:22px 26px;margin:0;border:0;background:transparent;color:var(--assessment-accent);border-radius:0}
+.assessment-document .assessment-document-heading h3 {font:700 clamp(22px,3vw,30px)/1.3 'Trebuchet MS',Tahoma,Arial,sans-serif;margin:0;color:inherit;overflow-wrap:anywhere;white-space:pre-wrap}
+.assessment-pictogram {width:48px;height:48px;flex:0 0 48px}
+.assessment-prohibition {stroke:#a52b38}
+.assessment-document--sign .assessment-pictogram--camera {background:#fff;color:#175b78;border-radius:50%;padding:4px}
+.assessment-document-copy {padding:4px 26px 24px}
+.assessment-document .assessment-document-copy p {font:400 20px/1.65 'Trebuchet MS',Tahoma,Arial,sans-serif;margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere;color:#183e53}
+.assessment-document--sign {border:2px solid #175b78;border-radius:8px}
+.assessment-document--sign .assessment-document-heading {background:#175b78;color:white}
+.assessment-document--sign .assessment-document-copy {padding-top:12px}
+.assessment-document--invitation {border:1px solid #c6b5d7;outline:1px solid #e3d8ec;outline-offset:-8px;text-align:center;box-shadow:0 5px 0 #ece7f2;background:radial-gradient(ellipse at 50% 0,#f5edfc 0,white 70%)}
+.assessment-document--invitation .assessment-document-heading {justify-content:center;padding-top:34px}
+.assessment-document--invitation .assessment-document-heading h3 {font-family:Georgia,'Times New Roman',serif;font-size:32px;line-height:1.3}
+.assessment-document--invitation .assessment-document-copy {padding-bottom:30px}
+.assessment-document--invitation .assessment-document-copy p:last-child {font-weight:700;color:#694689;border-top:1px solid #e0d6e9;padding-top:16px;margin-top:18px}
+.assessment-document--label {border:1px solid #819b88;border-top:8px solid #28624f;border-radius:5px 5px 16px 16px;background:linear-gradient(90deg,#f1f5e9 0 13px,white 13px);box-shadow:0 4px 0 #e1e7da}
+.assessment-document--label .assessment-document-copy p:first-child {font-weight:700}
+.assessment-document--weather {border:1px solid #a8c8dc;background:linear-gradient(120deg,#e8f2fa,white 65%)}
+.assessment-document--weather .assessment-document-heading {border-bottom:1px solid #c9deea}
+.assessment-document--weather .assessment-document-copy p:first-child {font-size:24px;font-weight:700;padding-top:10px}
+.assessment-document--information {border:0;border-left:4px solid #28624f;border-radius:0;background:#f6f8f5}
+.assessment-document--information .assessment-document-heading {padding-bottom:10px}
+.assessment-document--notice {border:1px solid #b6cad4;border-top:5px solid #175b78;border-radius:3px 3px 10px 10px}
+.assessment-document--notice .assessment-document-heading {padding-bottom:10px}
+.assessment-document--process {border:0;background:transparent;max-width:580px}
+.assessment-document--process .assessment-document-heading {padding:10px 0 20px}
+.assessment-process-steps {list-style:none;margin:0;padding:0 0 6px;counter-reset:assessment-step}
+.assessment-process-steps li {position:relative;display:flex;align-items:center;gap:16px;min-height:60px;padding:12px 18px;margin:0 0 28px;background:#f2f7f4;border:1px solid #bdd3c7;border-radius:9px;font-size:20px;line-height:1.45;overflow-wrap:anywhere}
+.assessment-process-steps li:not(:last-child)::after {content:'↓';position:absolute;left:31px;bottom:-26px;line-height:24px;color:#28624f;font-size:23px}
+.assessment-step-number {display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:50%;color:white;background:#28624f;font:700 17px/1 Arial,sans-serif}
+.assessment-document .assessment-expand {display:block;width:auto;min-height:44px;margin:0 20px 12px auto;padding:8px 12px;border:0;background:transparent;color:#175b78;text-decoration:underline;text-underline-offset:3px;font:400 14px/1.4 Tahoma,Arial,sans-serif;border-radius:5px;cursor:pointer}
+.assessment-document .assessment-expand:focus-visible {outline:3px solid #b68a32;outline-offset:2px}
+@media(max-width:480px){.assessment-document .assessment-document-heading{padding:20px 18px;gap:12px}.assessment-document .assessment-document-heading h3{font-size:24px}.assessment-document-copy{padding:0 18px 18px}.assessment-document .assessment-document-copy p{font-size:18px}.assessment-document--invitation .assessment-document-heading{padding-top:28px}.assessment-document--invitation .assessment-document-heading h3{font-size:29px}.assessment-document--weather .assessment-document-copy p:first-child{font-size:21px}.assessment-pictogram{width:40px;height:40px;flex-basis:40px}.assessment-process-steps li{font-size:18px;padding:12px;gap:12px}.assessment-document--process .assessment-document-heading{padding-left:0}.assessment-document{margin:16px auto}}
+@media print{.assessment-document .assessment-expand{display:none}.assessment-document{break-inside:avoid;box-shadow:none}.assessment-document--invitation{background:#fff}}
+
+.assessment-document.assessment-physical{border:0;border-radius:0;overflow:visible;background:transparent;box-shadow:none;outline:0;max-width:660px}
+.assessment-physical>div{min-width:0;width:100%}
+.assessment-physical svg{display:block;width:100%;height:auto}
+.assessment-physical--gate{max-width:620px!important}

@@ -18,16 +18,16 @@ test('every Vocab Drill category uses an existing illustrated PNG thumbnail', as
     await access(fileURLToPath(new URL(`../public${artwork}`, import.meta.url)));
   }
 });
-test('23 vocab categories resolve exact decks without an unrelated mission fallback', () => {
-  assert.equal(VOCAB_CATEGORIES.length, 23);
-  assert.equal(new Set(VOCAB_CATEGORIES.map(c => c.id)).size, 23);
+test('54 vocab categories resolve exact decks without an unrelated mission fallback', () => {
+  assert.equal(VOCAB_CATEGORIES.length, 54);
+  assert.equal(new Set(VOCAB_CATEGORIES.map(c => c.id)).size, 54);
   for (const cat of VOCAB_CATEGORIES) {
     assert.ok(VOCAB_GROUPS.some(g => g.id === cat.group));
     const mission = getDrillMission(cat);
     assert.ok(mission, cat.id);
     if (!cat.deckId) assert.equal(mission.id, cat.missionId);
     const cards = getDrillCards(cat);
-    assert.ok(cards.length >= 10, `${cat.id} must contain at least 10 words`);
+    assert.ok(cards.length >= 2, `${cat.id} must contain at least 2 cards for game choices`);
     assert.equal(new Set(cards.map(c => c.id)).size, cards.length, cat.id);
     for (const c of cards) assert.ok((c.frontLabel || c.back) && c.back && c.backThai, `${cat.id}: ${c.id}`);
   }
@@ -235,15 +235,19 @@ test('pronoun deck uses the dedicated transparent cartoon PNG set', async () => 
 
   await Promise.all(cards.map(card => access(fileURLToPath(new URL(`../public${card.image}`, import.meta.url)))));
 });
-test('every Vocab Adventure card has an existing visual and accessible description', async () => {
+test('illustrated cards retain their visuals and explicit text decks have accessible word labels', async () => {
   let total = 0;
   for (const category of VOCAB_CATEGORIES) {
     const cards = getDrillCards(category);
     total += cards.length;
+    if (category.presentation === 'text') {
+      assert.ok(cards.every(card => card.frontType === 'text' && card.frontLabel && card.backThai));
+      continue;
+    }
     assert.ok(cards.every(card => card.image && card.imageAlt), `${category.id} must not contain text-only cards`);
     await Promise.all(cards.map(card => access(fileURLToPath(new URL(`../public${card.image}`, import.meta.url)))));
   }
-  assert.equal(total, 257);
+  assert.equal(total, 861);
 });
 test('cleanSpeechText sanitizes emojis, flags, arrows and glosses for speech output', async () => {
   const { cleanSpeechText } = await import('../src/utils/useSpeech.js');

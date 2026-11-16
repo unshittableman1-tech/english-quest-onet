@@ -4,11 +4,11 @@ import confetti from 'canvas-confetti';
 import { playCorrectSound, playWrongSound } from '../../utils/audio';
 import { useSpeech } from '../../utils/useSpeech';
 
-export default function VocabDuelGame({ cards, title, onBack, onComplete }) {
+export default function VocabDuelGame({ cards, title, onBack, onComplete, onPracticed, choiceCards = cards }) {
   const { speak } = useSpeech();
   const [p1Score, setP1Score] = useState(0);
   const [p2Score, setP2Score] = useState(0);
-  const targetScore = 10;
+  const targetScore = Math.min(10, cards.length);
 
   const [qIndex, setQIndex] = useState(0);
   const [currentCard, setCurrentCard] = useState(null);
@@ -32,7 +32,7 @@ export default function VocabDuelGame({ cards, title, onBack, onComplete }) {
     setCurrentCard(card);
 
     // สร้างตัวเลือก 4 ช้อยส์ (1 ถูก, 3 ผิด)
-    const otherCards = cards.filter(c => c.id !== card.id);
+    const otherCards = choiceCards.filter(c => c.id !== card.id);
     const shuffledOthers = [...otherCards].sort(() => Math.random() - 0.5).slice(0, 3);
     const allChoices = [card, ...shuffledOthers].sort(() => Math.random() - 0.5);
 
@@ -103,6 +103,7 @@ export default function VocabDuelGame({ cards, title, onBack, onComplete }) {
   };
 
   const advanceRound = (firstScore, secondScore) => {
+    onPracticed?.(currentCard);
     if (qIndex + 1 < targetScore) {
       setQIndex(prev => prev + 1);
       return;
@@ -127,7 +128,7 @@ export default function VocabDuelGame({ cards, title, onBack, onComplete }) {
         </button>
         <div className="text-center">
           <span className="text-amber-400 font-black text-sm"><UIIcon value={"⚔️"} /> 1v1 Vocab Duel: {title}</span>
-          <p className="text-[10px] text-slate-400">ข้อ {qIndex + 1}/{targetScore} · เล่นครบ 10 ข้อ ผู้ได้คะแนนมากกว่าชนะ (ตอบผิดจะโดนล็อกรอบนี้)</p>
+          <p className="text-[10px] text-slate-400">ข้อ {qIndex + 1}/{targetScore} · เล่นครบ {targetScore} ข้อ ผู้ได้คะแนนมากกว่าชนะ (ตอบผิดจะโดนล็อกรอบนี้)</p>
         </div>
         <button onClick={() => speak(currentCard.frontLabel || currentCard.back)} className="text-xs bg-amber-500/20 text-amber-300 px-2 py-1 rounded-lg">
           <UIIcon value={"🔊"} /> ฟังเสียง
@@ -252,7 +253,7 @@ export default function VocabDuelGame({ cards, title, onBack, onComplete }) {
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
           <div className="bg-slate-900 border-2 border-amber-400 rounded-3xl p-6 text-center max-w-sm w-full animate-bounce-in shadow-2xl space-y-4">
             <div className="text-6xl"><UIIcon value={"🏆"} /></div>
-            <h2 className="text-2xl font-black text-amber-400">จบการดวล 10 ข้อ!</h2>
+            <h2 className="text-2xl font-black text-amber-400">จบการดวล {targetScore} ข้อ!</h2>
             <p className="text-lg font-bold text-white">{winner}</p>
             <p className="text-xs text-slate-400">ผู้เล่น 1: {p1Score} แต้ม · ผู้เล่น 2: {p2Score} แต้ม</p>
             <div className="flex gap-2 pt-2">

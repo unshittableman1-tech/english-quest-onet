@@ -1,7 +1,8 @@
+import ArenaDeliveryStatus from './report/ArenaDeliveryStatus';
 import UIIcon, { UIIconText } from './UIIcon';
 import React, { useState } from 'react';
 
-export default function ExamReport({ attempt, onBackToArena }) {
+export default function ExamReport({ attempt, student, onBackToArena }) {
   const [reviewMode, setReviewMode] = useState(false);
 
   const formatTime = (seconds) => {
@@ -100,6 +101,7 @@ export default function ExamReport({ attempt, onBackToArena }) {
 
   return (
     <div className="min-h-screen pb-20 relative overflow-hidden flex flex-col items-center pt-10 px-4">
+      <ArenaDeliveryStatus student={student} attemptId={attempt.attemptId} />
       <div className="w-full max-w-xl relative z-10">
         <div className="flex items-center justify-center gap-2 mb-8">
           <span className="text-3xl"><UIIcon value={"📊"} /></span>

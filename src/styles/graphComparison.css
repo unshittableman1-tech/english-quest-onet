@@ -1,0 +1,71 @@
+.graph-challenge { width: min(1180px, 100%); margin: 0 auto; padding: 28px; border: 2px solid #d9ae53; border-radius: 26px; background: linear-gradient(120deg, #fffef8f7, #f3fafff7); color: #1a3d60; box-shadow: 0 8px 0 #95651c30, 0 22px 50px #163e6333; }
+.graph-challenge button { min-height: 46px; padding: 10px 14px; border: 2px solid #aecbdc; border-radius: 13px; background: #fff; color: #214d72; font-size: 16px; font-weight: 800; }
+.graph-challenge button:focus-visible, .graph-challenge summary:focus-visible, .graph-challenge [tabindex]:focus-visible { outline: 4px solid #06779e; outline-offset: 4px; }
+.graph-challenge button:disabled { cursor: default; }
+.graph-game-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 18px; }
+.graph-game-header > button { flex: 0 0 48px; padding: 10px; }
+.graph-game-header > div { min-width: 0; }
+.graph-game-header h1 { font-size: 28px; font-weight: 900; line-height: 1.35; }
+.graph-game-header span { display: inline-flex; align-items: center; gap: 6px; color: #127d99; font-size: 12px; font-weight: 900; letter-spacing: .05em; }
+.graph-game-header span svg { width: 18px; height: 18px; }
+.graph-game-header p { margin-top: 7px; }
+.graph-preview-note { padding: 12px 16px; border: 1px solid #d4b979; border-radius: 13px; background: #fff3d7; color: #78541c; font-size: 14px; line-height: 1.6; }
+.graph-activities { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 18px 0 12px; }
+.graph-activities > span { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; padding: 13px 15px; border: 1px solid #bad1de; border-radius: 13px; background: #edf3f5; font-weight: 800; }
+.graph-activities > .is-active { border: 2px solid #258da9; background: #dcf5ff; color: #0b6085; }
+.graph-challenge > progress { width: 100%; height: 12px; accent-color: #218e79; margin-bottom: 22px; }
+.graph-play-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.graph-world { min-width: 0; padding: 16px; border: 1px solid #97c6dc; border-radius: 22px; background: linear-gradient(#e7f6ff, #fffdf2); box-shadow: 0 6px 12px #1e567315; }
+.graph-challenge .question-stimulus-chart { border: 0; padding: 8px; background: #ffffffed; border-radius: 15px; }
+.graph-challenge .question-stimulus-chart figcaption { font-size: 19px; font-weight: 900; color: #194469; line-height: 1.5; }
+.graph-challenge .question-chart-scroll svg { min-width: 0; width: 100%; font-size: 18px; }
+.graph-challenge .question-chart-data table { font-size: 14px; }
+.graph-challenge .question-chart-data summary { min-height: 46px; color: #125f84; font-size: 15px; font-weight: 800; }
+.graph-inspector { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 10px; }
+.graph-inspector button { font-size: 14px; padding: 8px 12px; }
+.graph-inspector button[aria-pressed='true'] { background: #d6f2ff; border-color: #1282a2; }
+.graph-world > p { min-height: 26px; font-size: 14px; line-height: 1.6; }
+.graph-question { min-width: 0; padding: 20px; border: 1px solid #dfc891; border-radius: 22px; background: linear-gradient(120deg, #fffefa, #fff4d8); }
+.graph-question-activity { display: inline-flex; align-items: center; gap: 6px; color: #147c91; font-size: 13px; font-weight: 900; }
+.graph-question-activity svg { width: 18px; height: 18px; }
+.graph-question h2 { margin: 10px 0; font-size: 22px; font-weight: 900; line-height: 1.5; }
+.graph-question > p { color: #506a7d; font-size: 14px; line-height: 1.6; }
+.graph-question .graph-instructions { margin: 12px 0 18px; color: #415d74; font-size: 15px; }
+.graph-options { display: grid; gap: 12px; margin-bottom: 20px; }
+.graph-options button { width: 100%; min-height: 55px; text-align: left; font-weight: 700; line-height: 1.6; box-shadow: 0 3px 0 #1f527016; }
+.graph-options button[aria-pressed='true'] { border-color: #087aab; background: #e0f5ff; box-shadow: 0 0 0 2px #5fb3d9; }
+.graph-word-cards > section { margin-bottom: 16px; padding: 14px; border: 2px dashed #9fc9e0; border-radius: 14px; background: #ecf8ff; }
+.graph-word-cards > section + section { border-style: solid; border-color: #e1c982; background: #fff5da; }
+.graph-word-cards h3 { font-size: 15px; font-weight: 900; margin-bottom: 10px; }
+.graph-word-cards p { color: #566d7e; font-size: 14px; line-height: 1.6; }
+.graph-word-cards section > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.graph-word-cards button { box-shadow: 0 3px 0 #214b661a; }
+.graph-challenge .graph-primary { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 56px; margin-top: 16px; border-color: #c58a16; background: linear-gradient(#ffe89a, #ffbd2e); color: #704000; box-shadow: 0 4px 0 #c58a16; }
+.graph-challenge .graph-primary:disabled { background: #e8edf0; border-color: #aebdc8; color: #60727f; box-shadow: none; }
+.graph-feedback { padding: 16px; border: 1px solid #87bdab; border-radius: 15px; background: #e9f9ef; }
+.graph-feedback.is-incorrect { background: #fff0eb; border-color: #dca292; }
+.graph-feedback h3 { display: flex; align-items: flex-start; gap: 8px; font-size: 16px; font-weight: 900; line-height: 1.6; }
+.graph-feedback h3 svg { flex: 0 0 22px; margin-top: 3px; }
+.graph-feedback p { margin-top: 8px; line-height: 1.7; }
+.graph-error { margin-top: 18px; padding: 14px; border: 1px solid #c46f6b; border-radius: 12px; background: #fff0ec; color: #903c35; }
+.graph-summary { padding: 28px; border: 1px solid #9fc9b4; border-radius: 22px; background: #effaf3; text-align: center; }
+.graph-summary > svg { display: block; margin: 0 auto 16px; width: 60px; height: 60px; color: #108263; }
+.graph-summary h2 { font-size: 28px; font-weight: 900; margin-bottom: 16px; }
+.graph-summary p { margin-bottom: 12px; line-height: 1.6; }
+@media (max-width: 900px) { .graph-play-layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) {
+  .graph-challenge { padding: 18px 12px; border-radius: 20px; }
+  .graph-game-header { gap: 10px; }
+  .graph-game-header h1 { font-size: 21px; }
+  .graph-game-header p { font-size: 14px; line-height: 1.6; }
+  .graph-activities { gap: 8px; }
+  .graph-activities > span { padding: 10px; font-size: 13px; }
+  .graph-preview-note { font-size: 12px; padding: 10px; }
+  .graph-world, .graph-question { padding: 12px; }
+  .graph-challenge .question-stimulus-chart { padding: 4px; }
+  .graph-challenge .question-chart-scroll svg { font-size: 24px; }
+  .graph-challenge .question-chart-data table { font-size: 13px; }
+  .graph-question h2 { font-size: 21px; }
+  .graph-summary { padding: 20px 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .graph-challenge * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }

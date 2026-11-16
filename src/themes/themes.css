@@ -1,0 +1,47 @@
+/* Classic has no visual overrides. Every product skin below is Fantasy-scoped. */
+html[data-onex-theme="onex_fantasy"] { --ink:var(--onex-text,#142c50); --blue:var(--onex-primary,#0b3d91); --gold:var(--onex-accent,#f4c86b); }
+html[data-onex-theme="onex_fantasy"] .eq-shell-bg { background:linear-gradient(110deg,#07295380,#164a8120),var(--onex-background) center/cover no-repeat; }
+html[data-onex-theme="onex_fantasy"] .eq-home .eq-shell-bg { background:linear-gradient(#08234733,#0b3d9133),var(--onex-background) center/cover no-repeat; }
+html[data-onex-theme="onex_fantasy"] .eq-header { background:#f4f8fff5; border:1px solid var(--onex-border); box-shadow:0 4px 0 #0c2d53,0 0 24px #00c2ff30; }
+html[data-onex-theme="onex_fantasy"] :is(.eq-card,.glass-card) { border-color:#c7a65e; box-shadow:0 4px 0 #18396828,0 14px 30px #0b3d9120; }
+html[data-onex-theme="onex_fantasy"] :is(.btn-primary,.eq-btn:not(.ghost)) { background:linear-gradient(#ffe6a3,#f4c86b 55%,#e6ad3f); color:#402b10; border-color:#c58b24; box-shadow:0 3px 0 #91621c,0 0 18px #f4c86b22; }
+html[data-onex-theme="onex_fantasy"] .nav-bottom { background:#0a2d58f5; border-top:2px solid #f4c86b; box-shadow:0 -5px 24px #06233f38; }
+html[data-onex-theme="onex_fantasy"] .nav-bottom .nav-label { color:#e8eef7; }
+html[data-onex-theme="onex_fantasy"] .nav-bottom .nav-btn.active { background:#f4c86b; --nav-ink:#163453; }
+html[data-onex-theme="onex_fantasy"] .nav-bottom .nav-btn.active .nav-label { color:#163453; }
+html[data-onex-theme="onex_fantasy"] :is(.qm-adventure-banner,.report-hero-card) { border:1px solid #f4c86b; background:linear-gradient(120deg,#0a2859,#0b3d91); }
+html[data-onex-theme="onex_fantasy"] .qm-adventure-banner { box-shadow:0 4px 0 #0c294e,0 0 25px #00c2ff20; }
+html[data-onex-theme="onex_fantasy"] .vocab-hub { border:1px solid #c7a65e; background:#eff6fff5; }
+html[data-onex-theme="onex_fantasy"] .vocab-category { box-shadow:0 3px 0 #12356220; border-color:#c7a65e; }
+html[data-onex-theme="onex_fantasy"] .onex-arena-entry > .glass-card { border-color:#c7a65e; }
+html[data-onex-theme="onex_fantasy"] :is(.report-section,.overview-metric-card) { border-color:#d7bd7a; }
+html[data-onex-theme="onex_fantasy"] .glass-card-dark { border-color:#f4c86b44; } /* dashboards remain restrained */
+.theme-manager { --tm-ink:#173555; color:var(--tm-ink); background:#f7f9fc; border:1px solid #ced9e5; border-radius:22px; padding:clamp(18px,3vw,32px); max-width:1240px; margin:auto; font-family:'Sarabun',sans-serif; }
+.theme-manager header { display:flex; justify-content:space-between; align-items:center; gap:18px; flex-wrap:wrap; }
+.theme-manager h2 { display:flex; align-items:center; gap:10px; font-size:clamp(24px,3vw,32px); font-weight:800; margin:8px 0; }
+.theme-manager h3 { font-size:20px; font-weight:800; margin:0 0 8px; }
+.theme-manager p { line-height:1.7; }
+.theme-manager-kicker { display:flex; align-items:center; gap:7px; color:#536a81; font-size:13px; }
+.theme-local-notice { margin:22px 0; padding:12px 16px; border-left:4px solid #bc8b2f; background:#fff4d9; color:#62451a; border-radius:0 8px 8px 0; }
+.theme-manager-current { display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+.theme-manager-current strong { color:#0b3d91; font-size:20px; }.theme-manager-current span { margin-left:auto; font-size:13px; color:#536a81; }
+.theme-choice-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; }
+.theme-choice { background:white; border:1px solid #cbd8e5; border-radius:16px; overflow:hidden; min-width:0; }
+.theme-choice.selected { outline:3px solid #bd8a2e; outline-offset:3px; }
+.theme-choice-art { position:relative; height:195px; background:linear-gradient(#f4fbff88,#bfe6ff55),url('/assets/adventure-hero-v2.png') center 45%/cover; display:flex; align-items:center; justify-content:center; }
+.theme-choice-art > img { position:relative; z-index:1; max-width:70%; height:120px; object-fit:contain; filter:drop-shadow(0 3px 8px #09244a40); }
+.theme-choice.onex_fantasy .theme-choice-art { background:linear-gradient(#09265130,#0b3d9144),url('/assets/lesson-world/atlas-overlook.webp') center/cover; }
+.theme-choice-art > span { position:absolute; z-index:2; top:12px; right:12px; background:#fff3cd; color:#674108; padding:5px 10px; border-radius:30px; display:flex; align-items:center; gap:4px; font-size:12px; font-weight:700; }
+.theme-choice-body { padding:22px; }.theme-choice-body p { min-height:48px; color:#4b6278; font-size:14px; }.theme-choice-body .theme-availability { min-height:0; color:#72531a; margin:12px 0; }
+.theme-choice-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.theme-manager button { min-height:44px; border:1px solid #b6c8dc; padding:9px 13px; border-radius:10px; font-size:13px; font-weight:700; color:#173555; background:white; }
+.theme-manager .theme-choice-actions button:first-child { background:#0b3d91; color:white; border-color:#0b3d91; }
+.theme-manager button:disabled { opacity:.45; cursor:not-allowed; }.theme-manager button:focus-visible { outline:3px solid #0072b8; outline-offset:3px; }
+.theme-action { display:flex; align-items:center; gap:7px; }
+.theme-history { margin-top:30px; border-top:1px solid #d5dfe9; padding-top:22px; }.theme-history ol { list-style:none; padding:0; }.theme-history li { display:flex; gap:16px; flex-wrap:wrap; padding:12px 0; border-bottom:1px solid #e4eaf1; font-size:14px; }.theme-history small { margin-left:auto; color:#60758b; overflow-wrap:anywhere; }
+.theme-manager-footnote { font-size:13px; color:#536a81; margin:18px 0 0; }
+.theme-review { min-height:100svh; background:#e6edf5; padding:24px; }.theme-review-banner { max-width:1240px; margin:0 auto 20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; color:#233f59; font-size:14px; }.theme-review-banner select { border:1px solid #9aafc5; border-radius:8px; padding:8px; background:white; min-height:44px; }.theme-review .theme-review-links { display:flex; gap:12px; flex-wrap:wrap; margin:20px auto; max-width:1240px; }.theme-review-links button { padding:12px 18px; border-radius:10px; background:#0b3d91; color:white; min-height:44px; }.theme-review-stage { max-width:1240px; margin:20px auto; padding:24px; border:1px solid #b5c8dc; border-radius:18px; background:#fff; }
+@media(max-width:640px){.theme-choice-grid{grid-template-columns:1fr;gap:20px}.theme-review{padding:12px}.theme-manager-current span{margin-left:0}.theme-choice-art{height:165px}.theme-history small{margin-left:0}.theme-review-stage{padding:12px}.theme-choice-body{padding:18px}}
+@media(prefers-reduced-motion:reduce){html[data-onex-theme="onex_fantasy"] :is(.eq-btn,.btn-primary){transition:none}}
+.theme-review-banner,.theme-review-links { position:relative; z-index:60; }
+.theme-review .eq-shell-bg { pointer-events:none; }

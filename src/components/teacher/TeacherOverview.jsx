@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { Users, ChartNoAxesCombined, ClipboardCheck, TriangleAlert, ArrowRight, Download, BookOpenCheck, X } from 'lucide-react';
+import { Users, ChartNoAxesCombined, ClipboardCheck, TriangleAlert, ArrowRight, Download, BookOpenCheck, X, FileText } from 'lucide-react';
 import { getTeacherOverview, getReviewTasks, getLatestLearningActivities } from '../../utils/teacherAnalytics';
 import { getStudentCurrentPercent, getStudentPreTestPercent, getClassGrowth } from '../../utils/scoring';
 
@@ -18,7 +18,7 @@ export function exportRiskStudents(students) {
   downloadFile('early-warning.csv', csv, 'text/csv;charset=utf-8');
 }
 
-export default function TeacherOverview({ students, preTestAvg, currentAvg, riskStudents, Chart, onWarning, onExam, onStudent, onWeakQuest }) {
+export default function TeacherOverview({ students, preTestAvg, currentAvg, riskStudents, Chart, onExportExecutivePDF, onWarning, onExam, onStudent, onWeakQuest }) {
   const summary = useMemo(() => getTeacherOverview(students), [students]);
   const latestActivities = useMemo(() => getLatestLearningActivities(students), [students]);
   const reviewDialog = useRef(null);
@@ -61,6 +61,16 @@ export default function TeacherOverview({ students, preTestAvg, currentAvg, risk
           <p className="mt-1 text-[11px] text-slate-500">ข้อเสนอจากกฎผลการเรียนที่ตรวจสอบได้ ไม่ใช่คำแนะนำจากโมเดล AI</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {onExportExecutivePDF && (
+            <button
+              onClick={onExportExecutivePDF}
+              className="teacher-action inline-flex min-h-11 items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 px-3.5 text-xs font-black text-slate-950 shadow-md transition-all cursor-pointer"
+              title="พิมพ์รายงานวิเคราะห์สมรรถนะ O-NET สำหรับเสนอผู้บริหาร / ผอ."
+            >
+              <FileText size={16} aria-hidden="true" />
+              รายงานเสนอ ผอ. (PDF)
+            </button>
+          )}
           {summary.weakQuests[0] ? <button onClick={() => onWeakQuest(summary.weakQuests[0])} className="teacher-action inline-flex min-h-11 items-center gap-2 rounded-lg bg-sky-700 px-4 text-sm font-semibold text-white">ดูรายละเอียดทักษะ <ArrowRight size={16} aria-hidden="true" /></button> : <button onClick={onWarning} className="teacher-action inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-600 px-4 text-sm font-semibold text-slate-200">ดูรายชื่อ <ArrowRight size={16} aria-hidden="true" /></button>}
           <button disabled={!riskStudents.length} onClick={() => reviewDialog.current.showModal()} className="teacher-action inline-flex min-h-10 items-center gap-2 rounded-lg border border-slate-600 px-3 text-sm font-semibold text-slate-200 disabled:opacity-40"><BookOpenCheck size={16} aria-hidden="true" />สร้างแผนทบทวน</button>
           <button disabled={!riskStudents.length} onClick={() => exportRiskStudents(riskStudents)} className="teacher-action inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-600 text-slate-200 disabled:opacity-40" title="ส่งออกรายชื่อนักเรียนที่ต้องติดตาม" aria-label="ส่งออกรายชื่อนักเรียนที่ต้องติดตาม"><Download size={17} /></button>

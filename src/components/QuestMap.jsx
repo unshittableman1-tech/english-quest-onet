@@ -284,7 +284,7 @@ export default function QuestMap({initialView='lessons'}) {
             </p>
             <h2 id="qm-next-title">
               {view === 'skills'
-                ? 'สูตรลัด 6 Part & คลังศัพท์ 16 หมวด'
+                ? 'สูตรลัด 13 Part & คลังศัพท์ 33 หมวด'
                 : next.kind === 'quest' ? 'พร้อมเดินทางต่อ'
                 : next.kind === 'review' ? `ทบทวนข้อผิดในบท ${next.chapter}`
                 : next.kind === 'complete' ? 'พร้อมท้าทายสนามสอบ' : 'ตรวจสอบเส้นทางการเรียน'}
@@ -417,6 +417,23 @@ export default function QuestMap({initialView='lessons'}) {
               </div>
               <button className="qm-primary qm-btn-enter-arena" onClick={() => navigate('arena')}>
                 เข้าสู่ O-NET Arena<ArrowRight size={16} />
+              </button>
+            </article>
+
+            <article className="qm-exam-item qm-exam-indicator-card">
+              <div className="qm-exam-card-head">
+                <ExamArt art="journal" className="qm-exam-art" />
+                <span className="qm-exam-badge arena">13 ตัวชี้วัด สทศ.</span>
+              </div>
+              <h3>คลังข้อสอบจำลอง 13 ตัวชี้วัด</h3>
+              <p>275 ข้อมาตรฐาน · เจาะลึกรายตัวชี้วัด ป.6 ครบชุด 1 ถึง 13</p>
+              <div className="qm-exam-features-list">
+                <span className="qm-feature-pill">ครบ 13 ชุดตัวชี้วัด</span>
+                <span className="qm-feature-pill">เฉลยพร้อมทริคตอบไว</span>
+                <span className="qm-feature-pill">คำชี้ขาด &amp; ตัดช้อยส์</span>
+              </div>
+              <button className="qm-primary qm-btn-enter-indicator" onClick={() => navigate('indicator-bank', 1)}>
+                เข้าทำข้อสอบ 13 ตัวชี้วัด<ArrowRight size={16} />
               </button>
             </article>
 

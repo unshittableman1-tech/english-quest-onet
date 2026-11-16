@@ -1,0 +1,99 @@
+.qm-quest-detail.qm-mission-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 16px 20px;
+  padding: 24px;
+  border-top: 3px solid #dfb55c;
+  background: radial-gradient(ellipse at 8% 0, #eaf7ff80, transparent 48%), linear-gradient(110deg, #fffdf4, #fff 45%, #fff4e0);
+  color: #173958;
+  box-shadow: inset 0 3px 0 #fff, inset 0 -7px 18px #b98a2520;
+}
+.qm-mission-main { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.qm-mission-intro { display: grid; grid-template-columns: 108px minmax(0, 1fr); align-items: start; gap: 18px; }
+.qm-mission-sidebar { display: flex; flex-direction: column; justify-content: space-between; gap: 20px; min-width: 0; padding: 20px; border: 1px solid #dfc99c; border-radius: 18px; background: linear-gradient(145deg, #fff9eb, #faefd8); }
+.qm-mission-art { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 1; padding: 10px; border: 4px solid #fff; border-radius: 22px; background: radial-gradient(ellipse at 28% 20%, #fff 0 6%, transparent 29%), linear-gradient(165deg, #8ad5fa, #ddf4ff 65%, #cbdece); box-shadow: 0 0 0 1px #aac4d6, 0 8px 16px #17395840; }
+.qm-mission-art > img { width: 100%; height: 100%; min-height: 0; object-fit: contain; filter: drop-shadow(0 6px 4px #24445a38); }
+.qm-mission-art.is-scene { padding: 0; }
+.qm-mission-art.is-scene > img { position: absolute; inset: 0; border-radius: 17px; object-fit: cover; filter: none; }
+.qm-mission-art > svg { width: 70px; height: 70px; color: #287ba0; }
+.qm-mission-art > span { position: absolute; z-index: 1; top: -12px; left: -10px; display: grid; place-items: center; width: 49px; height: 49px; border: 4px solid #fff; border-radius: 50%; background: linear-gradient(#ffe47b, #eb9a05); color: #6e4000; font-size: 25px; font-weight: 900; box-shadow: 0 4px 8px #7d520f66; }
+.qm-mission-info { min-width: 0; }
+.qm-mission-panel .qm-mission-title { display: flex; flex-wrap: wrap; align-items: center; gap: 9px 12px; margin: 0 0 12px; }
+.qm-mission-panel .qm-mission-title h4 { margin: 0; font-size: clamp(26px, 2.1vw, 32px); font-weight: 900; line-height: 1.2; color: #123866; }
+.qm-mission-title em { display: inline-block; padding: 6px 12px; border-radius: 999px; background: #dff4e8; color: #09694f; font-size: 14px; font-style: normal; font-weight: 800; }
+.is-locked .qm-mission-title em { color: #546478; background: #e8edf2; }
+.is-unfinished .qm-mission-title em { color: #805000; background: #ffe7a1; }
+.qm-mission-panel .qm-mission-info > p { margin: 0; font-size: 16px; line-height: 1.75; color: #365774; }
+.qm-mission-skills { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 10px; padding: 0; list-style: none; }
+.qm-mission-skills li { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 6px 10px; border: 1px solid #b4d4e7; border-radius: 999px; background: #eef8ff; color: #215779; font-size: 13px; font-weight: 700; box-shadow: 0 2px 3px #1739580a; }
+.qm-mission-skills li:nth-child(2) { border-color: #dbc5ea; background: #f8f1ff; color: #69428b; }
+.qm-mission-skills li:nth-child(3) { border-color: #b9dfcf; background: #edf9f1; color: #21705a; }
+.qm-mission-skills svg { width: 17px; height: 17px; }
+.qm-mission-reward-card > .qm-mission-score { display: inline-block; max-width: 100%; margin-top: 6px; padding: 6px 10px; border: 1px solid #ead2a4; border-radius: 12px; color: #72501b; background: #fff1cf; font-size: .875rem; font-weight: 700; line-height: 1.65; }
+.qm-required-vocabulary { margin: 0; padding: 14px; border: 1px solid #b9dcec; border-radius: 15px; background: #f2fbff; }
+.qm-required-vocabulary-heading { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 8px 16px; }
+.qm-required-vocabulary-heading > strong { display: flex; align-items: center; gap: 7px; color: #155779; font-size: 14px; }
+.qm-required-vocabulary-heading > strong svg { width: 17px; height: 17px; flex-shrink: 0; }
+.qm-required-vocabulary .qm-required-vocabulary-heading > small { flex: 1 1 220px; min-width: 0; margin: 0; color: #425f72; font-size: .8125rem; line-height: 1.6; text-align: right; }
+.qm-required-vocabulary ul { display: flex; flex-wrap: wrap; gap: 6px; margin: 9px 0; padding: 0; list-style: none; }
+.qm-required-vocabulary li { padding: 4px 9px; border-radius: 999px; background: #dff4ff; color: #234f68; font-size: 12px; font-weight: 800; }
+.qm-required-vocabulary button { min-height: 44px; max-width: 100%; padding: 6px 11px; border: 1px solid #1685af; border-radius: 10px; background: #fff; color: #126083; font-size: 13px; font-weight: 900; }
+.qm-required-vocabulary small { display: block; margin-top: 7px; color: #5d7482; font-size: 11px; }
+.qm-required-vocabulary-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding-top: 10px; border-top: 1px solid #d6e8f0; }
+.qm-required-vocabulary .qm-required-vocabulary-actions > small { flex: 1 1 180px; min-width: 0; margin: 0; color: #425f72; font-size: .8125rem; line-height: 1.6; }
+.qm-mission-objectives { margin-top: 0; padding: 18px; border: 1px solid #e5d2a6; border-radius: 17px; background: linear-gradient(110deg, #fff0cd, #fffdf6); box-shadow: inset 0 2px #fff9; }
+.qm-mission-panel h5 { margin: 0 0 14px; color: #163c67; font-size: 20px; font-weight: 900; line-height: 1.4; }
+.qm-mission-objectives h5 { display: flex; align-items: center; gap: 8px; }
+.qm-mission-objectives h5 svg { width: 25px; height: 25px; color: #1379b3; }
+.qm-mission-objectives ol { display: grid; gap: 11px; margin: 0; padding: 0; list-style: none; counter-reset: mission-step; }
+.qm-mission-objectives li { display: flex; align-items: flex-start; gap: 9px; color: #2d506d; font-size: 16px; line-height: 1.75; counter-increment: mission-step; }
+.qm-mission-objectives li::before { content: counter(mission-step); display: grid; place-items: center; flex: 0 0 25px; height: 25px; border-radius: 50%; background: #1685af; color: white; font-size: 14px; font-weight: 900; box-shadow: 0 2px 4px #12395c26; }
+.qm-mission-objectives li:nth-child(2)::before { background: #8d58b1; }
+.qm-mission-objectives li:nth-child(3)::before { background: #288c72; }
+.qm-mission-objectives small { display: block; margin-top: 14px; font-size: 14px; line-height: 1.7; color: #786545; }
+.qm-mission-objectives > p { font-size: 15px; line-height: 1.6; }
+.qm-mission-rewards { display: flex; flex: 1; flex-direction: column; justify-content: center; align-items: stretch; padding: 0; }
+.qm-mission-rewards h5 { align-self: center; text-align: center; }
+.qm-mission-reward-card { display: grid; justify-items: center; gap: 10px; width: 100%; padding: 22px 16px; border: 1px solid #e3c991; border-radius: 18px; background: radial-gradient(circle at 50% 20%, #fff5cb, transparent 58%), linear-gradient(#fffef9, #fff3d6); text-align: center; box-shadow: inset 0 3px #fff, 0 6px 12px #9f742e24; }
+.qm-mission-reward-card > svg { width: 52px; height: 52px; fill: #ffd23e; color: #c27b00; stroke-width: 1.4; filter: drop-shadow(0 4px 2px #9e650566); }
+.qm-mission-reward-card.is-empty > svg { fill: #fff8e4; color: #8a754c; filter: none; }
+.qm-mission-reward-card.is-unrecorded > strong { font-size: 20px; line-height: 1.6; color: #4b5b6a; }
+.qm-mission-reward-card > span { color: #4b5b6a; font-size: 14px; }
+.qm-mission-reward-card > strong { color: #a66800; font-size: 32px; line-height: 1.2; font-weight: 900; }
+.qm-mission-rewards small { display: block; color: #6b685e; font-size: 14px; line-height: 1.7; }
+.qm-mission-rewards > p { color: #6b685e; font-size: 15px; }
+.qm-mission-action { min-width: 0; }
+.qm-mission-action .qm-detail-action { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-width: 0; min-height: 64px; padding: 14px 12px; border: 2px solid #d8920b; border-radius: 18px; background: linear-gradient(#ffe889, #ffbe32 55%, #ffab16); color: #734000; font-size: 21px; font-weight: 900; white-space: normal; box-shadow: inset 0 3px #fff5c7, 0 6px 0 #b97808, 0 12px 20px #84531945; }
+.qm-mission-action .qm-detail-action > svg { width: 31px; height: 31px; flex: 0 0 31px; fill: none; stroke-width: 2; }
+.qm-mission-action .qm-detail-action > svg.lucide-play { fill: #a86b0a; }
+.qm-detail-conditions { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 82px; width: 100%; padding: 14px; border: 1px solid #a4b7c4; border-radius: 19px; background: #edf3f7; color: #3c576b; font-size: 15px; font-weight: 800; }
+.qm-detail-conditions svg { width: 22px; height: 22px; flex: 0 0 auto; }
+.qm-mission-panel .qm-detail-locked { margin-top: 14px; font-size: 13px; line-height: 1.6; }
+.qm-mission-panel [hidden] { display: none; }
+.qm-mission-panel button:focus-visible { outline: 3px solid #1684b1; outline-offset: 4px; }
+.qm-mission-panel .qm-mission-title h4 { line-height: 1.45; overflow-wrap: anywhere; }
+.qm-mission-art { max-width: 220px; justify-self: center; }
+.qm-mission-panel :is(p, li, small, strong, button) { overflow-wrap: anywhere; }
+@media (max-width: 699px) {
+  .qm-quest-detail.qm-mission-panel { grid-template-columns: minmax(0, 1fr); gap: 22px; padding: 24px 16px; }
+  .qm-mission-intro { grid-template-columns: 76px minmax(0, 1fr); gap: 14px; }
+  .qm-mission-sidebar { padding: 18px; }
+  .qm-required-vocabulary-heading { flex-direction: column; }
+  .qm-required-vocabulary .qm-required-vocabulary-heading > small { flex-basis: auto; text-align: left; }
+  .qm-mission-art > span { width: 44px; height: 44px; font-size: 22px; top: -10px; left: -8px; }
+  .qm-mission-panel .qm-mission-title h4 { font-size: 26px; }
+  .qm-mission-skills li { font-size: 13px; }
+  .qm-mission-objectives { padding: 16px 14px; }
+  .qm-mission-rewards { align-items: stretch; }
+  .qm-mission-rewards h5 { align-self: flex-start; }
+  .qm-mission-reward-card { max-width: none; grid-template-columns: 66px minmax(0, 1fr); justify-items: start; text-align: left; gap: 6px 12px; padding: 18px; }
+  .qm-mission-reward-card > svg { width: 52px; height: 52px; grid-row: 1 / 3; align-self: center; }
+  .qm-mission-reward-card > :is(span, strong, small) { grid-column: 2; }
+  .qm-mission-reward-card > small { grid-column: 1 / -1; }
+  .qm-mission-reward-card > .qm-mission-score { grid-column: 1 / -1; }
+  .qm-mission-action .qm-detail-action { min-height: 60px; font-size: 21px; }
+}
+@media (min-width: 1024px) {
+  .qm-quest-detail.qm-mission-panel { grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr); }
+}

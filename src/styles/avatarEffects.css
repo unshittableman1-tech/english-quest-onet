@@ -1,0 +1,17 @@
+.avatar-v3 > .avatar-cosmetic-effect { position:absolute; inset:0; pointer-events:none; z-index:0; overflow:visible; }
+.avatar-cosmetic-effect .cosmetic-part { position:absolute; display:block; }
+.cosmetic-glow .cosmetic-part { inset:10% 5% 0; border-radius:50%; background:radial-gradient(ellipse,#ffdb8255,transparent 68%); box-shadow:0 0 9px #ffcf6d66; }
+.cosmetic-sparkles .cosmetic-part { left:calc(2% + var(--i)*22%); top:calc(65% + var(--i)*5%); width:9%; aspect-ratio:1; background:#ffe493; clip-path:polygon(50% 0,61% 38%,100% 50%,61% 61%,50% 100%,38% 61%,0 50%,38% 38%); filter:drop-shadow(0 0 2px #e6a02b); }
+.cosmetic-waves .cosmetic-part { left:2%; right:2%; top:calc(70% + var(--i)*5%); height:12%; border-bottom:2px solid #61d5ee; border-radius:0 0 50% 50%; transform:rotate(calc(-8deg + var(--i)*4deg)); opacity:.7; }
+.cosmetic-leaves .cosmetic-part { width:9%; height:13%; left:calc(2% + var(--i)*21%); top:calc(59% + var(--i)*7%); background:linear-gradient(120deg,#bde99a,#4da784); border:1px solid #32896f; border-radius:100% 0 100% 0; transform:rotate(calc(var(--i)*32deg)); }
+.cosmetic-orbit .cosmetic-part { left:calc(3% + var(--i)*2%); right:calc(3% + var(--i)*2%); top:calc(74% + var(--i)*2%); height:18%; border:1px solid #c8b2ff; border-radius:50%; transform:rotate(calc(-15deg + var(--i)*7deg)); opacity:.75; }
+.cosmetic-rays .cosmetic-part { width:5%; height:28%; left:calc(3% + var(--i)*22%); top:calc(47% + var(--i)*6%); border-radius:50%; background:linear-gradient(transparent,#fff0adba,transparent); transform:rotate(calc(-35deg + var(--i)*17deg)); box-shadow:0 0 6px #ffd26877; }
+.cosmetic-comets .cosmetic-part { width:19%; height:3%; left:calc(1% + var(--i)*18%); top:calc(68% + var(--i)*6%); border-radius:50%; background:linear-gradient(90deg,transparent,#f7b548); transform:rotate(-25deg); }
+.cosmetic-aura .cosmetic-part { inset:calc(19% + var(--i)*8%) calc(1% + var(--i)*6%) 0; border:1px solid #8db8ef88; border-radius:45% 45% 50% 50%; box-shadow:0 0 5px #5b97d540; }
+.cosmetic-constellation svg { width:100%; height:100%; overflow:visible; fill:#ffe7a3; stroke:#b9d1ff; stroke-width:1; }
+.cosmetic-constellation polyline { fill:none; }
+.avatar-cosmetic-effect.is-animated .cosmetic-part { animation:cosmetic-drift 4s ease-in-out infinite; animation-delay:calc(var(--i)*-.45s); }
+.avatar-cosmetic-effect.is-animated.cosmetic-glow .cosmetic-part,.avatar-cosmetic-effect.is-animated.cosmetic-aura .cosmetic-part { animation:cosmetic-light 5s ease-in-out infinite; }
+@keyframes cosmetic-drift { 50% { translate:0 -3px; } }
+@keyframes cosmetic-light { 50% { opacity:.6; } }
+@media(prefers-reduced-motion:reduce) { .avatar-cosmetic-effect .cosmetic-part { animation:none!important; translate:none!important; } }

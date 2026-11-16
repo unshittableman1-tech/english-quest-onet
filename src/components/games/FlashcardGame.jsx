@@ -10,7 +10,7 @@ import VocabTooltip from '../VocabTooltip';
 //   onComplete: (xpEarned) => void
 //   onBack: () => void
 
-export default function FlashcardGame({ mission, techniqueCard, onComplete, onBack, onEvidence, showXP = true, completionLabel = 'รับ XP แล้วไปต่อ!' }) {
+export default function FlashcardGame({ mission, techniqueCard, onComplete, onBack, onEvidence, onPracticed, showXP = true, completionLabel = 'รับ XP แล้วไปต่อ!' }) {
   const [showTechnique, setShowTechnique] = useState(!!techniqueCard);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -37,6 +37,7 @@ export default function FlashcardGame({ mission, techniqueCard, onComplete, onBa
 
   function handleResponse(knew) {
     if (flipped && !canAnswer && knew) return; // Prevent fast-click spamming
+    onPracticed?.(currentCard);
     onEvidence?.({ card: currentCard, mode: 'study', correct: null, assisted: true, selfReported: knew, observationId: `${phase}:${currentIdx}` });
 
     const newResults = [...results, { card: currentCard, knew }];
@@ -204,7 +205,7 @@ export default function FlashcardGame({ mission, techniqueCard, onComplete, onBa
           >
             {/* Front */}
             <div
-              className="absolute inset-0 bg-white border-2 border-amber-300 p-8 flex flex-col items-center justify-center text-center rounded-3xl shadow-lg relative"
+              className={`absolute inset-0 bg-white border-2 border-amber-300 p-8 ${String(currentCard?.front || '').length > 35 ? 'pt-16' : ''} flex flex-col items-center justify-center text-center rounded-3xl shadow-lg relative`}
               style={{ backfaceVisibility: 'hidden' }}
             >
               {speakText && (
@@ -214,7 +215,7 @@ export default function FlashcardGame({ mission, techniqueCard, onComplete, onBa
               )}
               {showCardImage && <img src={currentCard.image} alt={currentCard.imageAlt || ''} className="vocab-action-image" onError={() => setFailedImageId(currentCard.id)} />}
               {currentCard?.frontCaption && <p className="text-sm font-semibold text-slate-600 mb-2">{currentCard.frontCaption}</p>}
-              {!showCardImage && <div className={`vocab-card-symbol ${currentCard?.frontType === 'text' ? 'text-3xl font-black break-words max-w-full mb-4' : 'text-7xl mb-4'}`}>{currentCard?.front}</div>}
+              {!showCardImage && <div className={`vocab-card-symbol ${currentCard?.frontType === 'text' ? `${String(currentCard?.front || '').length > 35 ? 'text-xl leading-snug' : 'text-3xl'} font-black break-words max-w-full mb-4` : 'text-7xl mb-4'}`}>{currentCard?.front}</div>}
               {frontText && (showCardImage || currentCard?.frontType !== 'text') && (
                 <div className="vocab-flashcard-copy w-full min-w-0">
                   <p className="text-slate-800 text-xl font-black whitespace-pre-line break-words">

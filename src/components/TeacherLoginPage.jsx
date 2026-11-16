@@ -78,13 +78,21 @@ export default function TeacherLoginPage() {
 
       <div className="relative z-10 w-full max-w-sm">
 
-        {/* Back */}
+        {/* Back & Switch */}
         <div className="flex items-center justify-between mb-6">
           <button
-            className="btn-ghost flex items-center gap-2 text-sm font-semibold px-4 py-2"
+            className="btn-ghost flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5"
             onClick={() => navigate('landing')}
           >
             <UIIcon value={"←"} /> กลับหน้าหลัก
+          </button>
+          <button
+            type="button"
+            className="btn-ghost flex items-center gap-1.5 text-xs font-bold text-sky-800 bg-sky-100/80 hover:bg-sky-200/90 px-3 py-1.5 rounded-xl transition-all cursor-pointer shadow-sm"
+            onClick={() => navigate('student-login')}
+          >
+            <span>🎒</span>
+            <span>เข้าสู่ระบบนักเรียน</span>
           </button>
         </div>
 

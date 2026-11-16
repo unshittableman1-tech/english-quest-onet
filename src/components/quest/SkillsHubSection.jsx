@@ -4,6 +4,7 @@ import { ALL_TECHNIQUES } from '../TechniqueHub';
 import { VOCAB_CATEGORIES } from '../../data/vocabDrill';
 import { readVocabPractice } from '../../utils/vocabPractice';
 import { getPendingQuestReviews } from '../../utils/questReviewGate';
+import SpeakButton from '../SpeakButton';
 import ResilientArtwork from '../ResilientArtwork';
 import '../../styles/skillsHub.css';
 
@@ -38,8 +39,8 @@ export default function SkillsHubSection({ student, onNavigate }) {
           <div className="skills-metric-card">
             <span className="skills-metric-icon tech"><Lightbulb size={20} /></span>
             <div>
-              <strong>6 หมวดสูตรลัด</strong>
-              <span>ครอบคลุมทุกพาร์ท O-NET</span>
+              <strong>{ALL_TECHNIQUES.length} หมวดสูตรลัด</strong>
+              <span>ครอบคลุม 13 ตัวชี้วัด O-NET</span>
             </div>
           </div>
           <div className="skills-metric-card">
@@ -68,13 +69,13 @@ export default function SkillsHubSection({ student, onNavigate }) {
               <Lightbulb size={28} />
             </div>
             <div>
-              <span className="skills-card-tag tech">เสาหลักที่ 1 · เรียนเทคนิค</span>
+              <span className="skills-card-tag tech">เสาหลักที่ 1 · เรียนเทคนิค (ครบ {ALL_TECHNIQUES.length} หมวด 13 ตัวชี้วัด)</span>
               <h3>Technique Hub (สูตรลัด &amp; ตัดช้อยส์)</h3>
             </div>
           </div>
 
           <p className="skills-card-desc">
-            สรุปหัวใจสำคัญของข้อสอบภาษาอังกฤษ ป.6 เคล็ดลับการตัดตัวเลือกหลอก เทคนิคบทสนทนา และป้ายสัญลักษณ์
+            สรุปหัวใจสำคัญของข้อสอบภาษาอังกฤษ ป.6 ครบ 13 ตัวชี้วัด เคล็ดลับการตัดตัวเลือกหลอก เทคนิคบทสนทนา ป้ายสัญลักษณ์ แผนที่ กราฟ และวัฒนธรรม
           </p>
 
           {/* Part Selection Pills */}
@@ -85,6 +86,7 @@ export default function SkillsHubSection({ student, onNavigate }) {
                 type="button"
                 className={`skills-part-pill ${idx === selectedTechIdx ? 'active' : ''}`}
                 onClick={() => setSelectedTechIdx(idx)}
+                title={tech.title}
               >
                 <span>{tech.part}</span>
               </button>
@@ -99,22 +101,76 @@ export default function SkillsHubSection({ student, onNavigate }) {
             </div>
             <p className="skills-preview-desc">{currentTech.description}</p>
             
-            {/* Sample Rules Showcase */}
+            {/* Rules Header with count */}
+            <div className="skills-rules-header">
+              <span className="skills-rules-count-badge">
+                💡 สรุปหัวใจสำคัญ (ครบทั้ง {currentTech.rules?.length || 0} สูตรในหมวดนี้)
+              </span>
+              <div className="skills-header-actions">
+                <button
+                  type="button"
+                  className="skills-enter-pill-btn"
+                  onClick={() => onNavigate('technique-practice', currentTech.id)}
+                  title={`เข้าสู่สนามฝึกทำโจทย์ ${currentTech.part} ทันที`}
+                >
+                  <span>🎯 เข้าฝึกโจทย์</span>
+                  <ArrowRight size={13} />
+                </button>
+                <button
+                  type="button"
+                  className="skills-fullscreen-btn"
+                  onClick={() => onNavigate('technique-hub', currentTech.id)}
+                  title="เปิดสูตรลัดหมวดนี้แบบเต็มจอ"
+                >
+                  <span>เต็มจอ</span>
+                  <ArrowRight size={13} />
+                </button>
+              </div>
+            </div>
+
+            {/* Complete Rules Showcase List */}
             {currentTech.rules && currentTech.rules.length > 0 && (
-              <div className="skills-sample-rule">
-                <div className="sample-q">
-                  <span className="sample-bullet">📌 คีย์สำคัญ:</span>
-                  <strong>{currentTech.rules[0].q}</strong>
-                  {currentTech.rules[0].qTh && <small className="sample-trans">({currentTech.rules[0].qTh})</small>}
-                </div>
-                <div className="sample-a">
-                  <span>👉 {currentTech.rules[0].a}</span>
-                </div>
-                {currentTech.rules[0].note && (
-                  <div className="sample-note">
-                    <Zap size={14} /> {currentTech.rules[0].note}
+              <div className="skills-sample-rule-list" role="list" aria-label={`สูตรสำคัญหมวด ${currentTech.part}`}>
+                {currentTech.rules.map((rule, rIdx) => (
+                  <div key={rIdx} className="skills-sample-rule" role="listitem">
+                    <div className="sample-q-header">
+                      <span className="sample-rule-num">#{rIdx + 1}</span>
+                      <div className="sample-q-body">
+                        <div className="sample-q-main">
+                          <strong>{rule.q}</strong>
+                          {/[a-zA-Z]/.test(rule.q) && (
+                            <SpeakButton text={rule.q} className="sample-speak-btn" label={`ฟังเสียง ${rule.q}`} />
+                          )}
+                        </div>
+                        {rule.qTh && (
+                          <div className="sample-trans">
+                            <span className="sample-trans-tag">แปล</span>
+                            <span>{rule.qTh}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="sample-a">
+                      <span className="sample-a-icon">👉</span>
+                      <div className="sample-a-body">
+                        <div className="sample-a-text">{rule.a}</div>
+                        {rule.aTh && (
+                          <div className="sample-a-sub">
+                            <span className="sample-sub-tag">ตัวอย่าง/คำแปล:</span> {rule.aTh}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {rule.note && (
+                      <div className="sample-note">
+                        <Zap size={13} className="shrink-0" />
+                        <span>{rule.note}</span>
+                      </div>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
             )}
           </div>
@@ -124,11 +180,30 @@ export default function SkillsHubSection({ student, onNavigate }) {
             <button
               type="button"
               className="skills-primary-btn tech"
-              onClick={() => onNavigate('technique-hub')}
+              onClick={() => onNavigate('technique-practice', currentTech.id)}
             >
-              <span>เปิดสูตรลัดทั้งหมด (Technique Hub)</span>
+              <span>🚀 เข้าฝึกทำโจทย์ {currentTech.part} ทันที</span>
               <ArrowRight size={18} />
             </button>
+
+            <div className="skills-sub-actions">
+              <button
+                type="button"
+                className="skills-sub-btn"
+                onClick={() => onNavigate('technique-hub', currentTech.id)}
+                title="เปิดอ่านสูตรและเคล็ดลับแบบเต็มหน้าจอ"
+              >
+                <span>📖 เข้าดูสูตรลัดเต็มจอ</span>
+              </button>
+              <button
+                type="button"
+                className="skills-sub-btn indicator"
+                onClick={() => onNavigate('indicator-bank', selectedTechIdx + 1)}
+                title="เข้าทำแนวข้อสอบ 13 ตัวชี้วัด สทศ."
+              >
+                <span>📝 คลังข้อสอบชุดที่ {selectedTechIdx + 1} (20 ข้อ)</span>
+              </button>
+            </div>
           </div>
         </article>
 
@@ -139,8 +214,8 @@ export default function SkillsHubSection({ student, onNavigate }) {
               <BookOpen size={28} />
             </div>
             <div>
-              <span className="skills-card-tag vocab">เสาหลักที่ 2 · ฝึกคำสำคัญ</span>
-              <h3>Vocab Drill (คลังคำศัพท์ 16 หมวด)</h3>
+              <span className="skills-card-tag vocab">เสาหลักที่ 2 · ฝึกคำสำคัญ ({VOCAB_CATEGORIES.length} หมวด)</span>
+              <h3>Vocab Drill (คลังคำศัพท์ {VOCAB_CATEGORIES.length} หมวด)</h3>
             </div>
           </div>
 
@@ -164,7 +239,7 @@ export default function SkillsHubSection({ student, onNavigate }) {
               <span>หมวดคำศัพท์ยอดนิยม ({practicedCategoriesCount}/{VOCAB_CATEGORIES.length} หมวดที่ฝึกแล้ว)</span>
             </div>
             <div className="skills-categories-grid">
-              {VOCAB_CATEGORIES.slice(0, 8).map(cat => (
+              {VOCAB_CATEGORIES.slice(0, 12).map(cat => (
                 <div key={cat.id} className="skills-cat-item">
                   <span className="skills-cat-icon">{cat.icon || '📖'}</span>
                   <span className="skills-cat-name">{cat.name.split(' (')[0]}</span>

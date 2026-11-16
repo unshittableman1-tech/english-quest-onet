@@ -1,0 +1,165 @@
+.eq-quest-page .qm-view-emblem img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  padding: 4px;
+  box-sizing: border-box;
+  object-fit: contain;
+  object-position: center;
+}
+
+.eq-exam-world {
+  --arena-ink: #142f46;
+  --arena-ocean: #123f5c;
+  --arena-mist: #daefed;
+  --arena-gold: #f5c36a;
+  --arena-paper: #f9faf2;
+  --arena-art: url('/assets/exam-world/coliseum.webp');
+}
+
+.eq-quest-page.eq-exam-world .eq-shell-bg {
+  background: linear-gradient(180deg, #b4d6dfcc, #daefedef 75%), var(--arena-art) 62% center / cover no-repeat;
+}
+
+.eq-exam-world .qm-arena-hero {
+  isolation: isolate;
+  display: grid;
+  align-items: center;
+  min-height: clamp(240px, 27vw, 340px);
+  padding: clamp(20px, 4vw, 52px);
+  border: 1px solid #d4b16d;
+  border-radius: 22px 22px 9px 9px;
+  background: linear-gradient(90deg, #0c2139 4%, #0c2139e8 27%, #0c213968 61%, transparent 92%), var(--arena-art) center 55% / cover no-repeat, var(--arena-ink);
+  box-shadow: 0 5px 0 #183e51;
+}
+
+.eq-exam-world .qm-arena-hero::after {
+  inset: 0 0 0 52%;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: radial-gradient(ellipse at 53% 52%, #82fff842, transparent 52%);
+  animation: arena-portal-light 1.8s ease-out 2 alternate both;
+}
+
+.eq-exam-world .qm-arena-hero-content {
+  z-index: 1;
+  max-width: 35rem;
+  padding-inline-end: 8%;
+}
+
+.eq-exam-world .qm-arena-hero-content h2 {
+  font-size: clamp(25px, 3.6vw, 46px);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.qm-arena-hero-content h2 span { display: inline-block; }
+
+.eq-exam-world .qm-arena-hero-content p {
+  max-width: 34ch;
+  color: #e1f2f7;
+  font-size: clamp(14px, 1.4vw, 17px);
+  line-height: 1.6;
+}
+
+.eq-exam-world #qm-exams .qm-chapter-heading {
+  padding-inline-start: 13px;
+  border-inline-start: 4px solid #956824;
+}
+
+.eq-exam-world .qm-exam-grid {
+  grid-template-columns: 1.16fr 1fr 1fr;
+  gap: clamp(12px, 1.8vw, 22px);
+}
+
+.eq-exam-world .qm-exam-item {
+  --card-edge: #aa792c;
+  --card-wash: #fff3d8;
+  min-width: 0;
+  border: 1px solid var(--card-edge);
+  border-top: 4px solid var(--card-edge);
+  border-radius: 8px 8px 20px 20px;
+  background: linear-gradient(165deg, var(--card-wash), var(--arena-paper) 66%);
+  box-shadow: 0 4px 0 #16334b18;
+  color: var(--arena-ink);
+}
+
+.eq-exam-world .qm-exam-onet-card { --card-edge: #357fa0; --card-wash: #e1f1f8; }
+.eq-exam-world .qm-exam-final-card { --card-edge: #36836e; --card-wash: #e3f4e9; }
+.eq-exam-world .qm-exam-card-head { gap: 6px; }
+.eq-exam-world .qm-exam-badge { white-space: normal; text-align: center; }
+.qm-exam-art {
+  width: clamp(64px, 7.4vw, 104px);
+  aspect-ratio: 1;
+  object-fit: contain;
+  filter: drop-shadow(0 7px 6px #17334b26);
+}
+
+.eq-exam-world .qm-exam-item:hover { transform: none; box-shadow: 0 4px 0 #16334b18; }
+.eq-exam-world .qm-exam-item:focus-within { border-color: var(--arena-ocean); }
+.eq-exam-world .qm-exam-item h3 { text-wrap: pretty; }
+.eq-exam-world .qm-sim-year-card {
+  border-radius: 8px 8px 16px 16px;
+  border-top: 3px solid #507e9a;
+  background: #f9fcfe;
+}
+.eq-exam-world .qm-sim-year-card.year-2566 { border-top-color: #507e9a; }
+.eq-exam-world .qm-sim-year-card.year-2567 { border-top-color: #76619f; }
+.eq-exam-world .qm-sim-year-card.year-2568 { border-top-color: #36836e; }
+.eq-exam-world .qm-sim-year-card.is-locked { opacity: 1; border-top-color: #8e7654; background: #f4f1e9; }
+.eq-exam-world .qm-sim-card-top { justify-content: flex-start; flex-wrap: wrap; }
+.eq-exam-world .qm-sim-status-badge { margin-inline-start: auto; }
+.qm-archive-art { width: 40px; aspect-ratio: 1; object-fit: contain; }
+.eq-exam-world .qm-sim-start-btn { background: var(--arena-ocean); border-color: #14364b; color: white; box-shadow: none; }
+.eq-exam-world .qm-sim-locked-btn { color: #586574; }
+.eq-exam-world #qm-exams button { min-height: 44px; }
+.eq-exam-world #qm-exams button:focus-visible { outline: 3px solid #105d7f; outline-offset: 3px; }
+.eq-exam-world #qm-exams .qm-sim-action button:hover { box-shadow: none; }
+
+.eq-exam-world .qm-simulator-box {
+  display: grid;
+  grid-template-columns: clamp(64px, 9vw, 120px) minmax(0, 1fr) max-content;
+  background: #f3f9f4;
+  border-color: #88a99e;
+  border-radius: 16px;
+}
+.qm-simulator-art { width: 100%; aspect-ratio: 1; object-fit: contain; }
+.eq-exam-world .qm-simulator-action-wrap { width: auto; flex-direction: column; }
+.eq-exam-world .qm-simulator-action-wrap button { white-space: normal; }
+
+@keyframes arena-portal-light {
+  from { opacity: .15; transform: scale(.97); }
+  to { opacity: .7; transform: scale(1.06); }
+}
+
+@media (max-width: 860px) {
+  .eq-exam-world .qm-exam-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .eq-exam-world .qm-exam-arena-card { grid-column: 1 / -1; }
+  .eq-exam-world .qm-simulator-box { grid-template-columns: 72px minmax(0, 1fr); align-items: start; }
+  .eq-exam-world .qm-simulator-action-wrap { grid-column: 1 / -1; }
+}
+
+@media (max-width: 580px) {
+  .eq-exam-world .qm-arena-hero {
+    align-items: end;
+    min-height: 265px;
+    background: linear-gradient(0deg, #0c2139 1%, #0c2139e6 31%, #0c21394a 64%, transparent 100%), var(--arena-art) 74% center / cover no-repeat, var(--arena-ink);
+  }
+  .eq-exam-world .qm-arena-hero-content { padding-inline-end: 0; }
+  .eq-exam-world .qm-arena-hero::after { inset: 0 0 35%; }
+  .eq-exam-world .qm-exam-grid { grid-template-columns: minmax(0, 1fr); }
+  .eq-exam-world .qm-simulator-box { padding: 16px; gap: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eq-exam-world .qm-arena-hero::after { animation: none; }
+  .eq-exam-world #qm-exams :is(.qm-exam-item, .qm-sim-year-card, button) { transition: none; transform: none; }
+}
+
+@media (forced-colors: active) {
+  .eq-exam-world .qm-arena-hero { background: Canvas; border-color: CanvasText; box-shadow: none; }
+  .eq-exam-world .qm-arena-hero-content :is(h2, p) { color: CanvasText; text-shadow: none; }
+  .eq-exam-world #qm-exams button:focus-visible { outline-color: Highlight; }
+}

@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 import { playCorrectSound, playWrongSound } from '../../utils/audio';
 import { useSpeech } from '../../utils/useSpeech';
 
-export default function SpeedRushGame({ cards, title, onBack, onComplete, onEvidence }) {
+export default function SpeedRushGame({ cards, title, onBack, onComplete, onEvidence, onPracticed }) {
   const { speak } = useSpeech();
   const [timeLeft, setTimeLeft] = useState(60);
   const [score, setScore] = useState(0);
@@ -16,6 +16,7 @@ export default function SpeedRushGame({ cards, title, onBack, onComplete, onEvid
   const [feedbackEffect, setFeedbackEffect] = useState(null); // 'correct' | 'wrong'
   const timerRef = useRef(null);
   const observationIndex = useRef(0);
+  const promptIndex = useRef(0);
   const choiceLocked = useRef(false);
 
   // High score key
@@ -53,7 +54,8 @@ export default function SpeedRushGame({ cards, title, onBack, onComplete, onEvid
     observationIndex.current += 1;
 
     // Pick 1 target card
-    const card = cards[Math.floor(Math.random() * cards.length)];
+    if (promptIndex.current >= cards.length) { clearInterval(timerRef.current); handleGameOver(); return; }
+    const card = cards[promptIndex.current++];
     const isTrue = Math.random() > 0.45; // 55% chance to be True
 
     let displayedThai = card.backThai || card.leftThai;
@@ -83,6 +85,7 @@ export default function SpeedRushGame({ cards, title, onBack, onComplete, onEvid
     choiceLocked.current = true;
 
     const correct = userSaidTrue === currentPrompt.isTrueAnswer;
+    onPracticed?.(currentPrompt.card);
     onEvidence?.({ card: currentPrompt.card, mode: 'speed', correct, assisted: false, observationId: String(observationIndex.current) });
 
     if (correct) {
@@ -118,6 +121,7 @@ export default function SpeedRushGame({ cards, title, onBack, onComplete, onEvid
   };
 
   const restartGame = () => {
+    promptIndex.current = 0;
     setTimeLeft(60);
     setScore(0);
     setStreak(0);
@@ -149,7 +153,7 @@ export default function SpeedRushGame({ cards, title, onBack, onComplete, onEvid
         </button>
         <div className="text-center">
           <span className="text-amber-400 font-black text-sm"><UIIcon value={"⏱️"} /> Speed Rush: {title}</span>
-          <p className="text-[10px] text-slate-400">สถิติสูงสุด: {highScore} คะแนน</p>
+          <p className="text-[10px] text-slate-400">คำที่ {Math.min(promptIndex.current, cards.length)}/{cards.length} · สถิติสูงสุด: {highScore} คะแนน</p>
         </div>
         <div className="text-right">
           <span className={`text-xl font-black font-mono px-3 py-1 rounded-xl border ${

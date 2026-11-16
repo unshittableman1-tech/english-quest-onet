@@ -1,4 +1,5 @@
 import UIIcon from './UIIcon';
+import { planVocabularyRound, recordVocabularyPractice, vocabularyCoverage, readVocabularyCoverage, saveVocabularyCoverage } from '../utils/vocabCoverage';
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Search, X } from 'lucide-react';
 import FlashcardGame from './games/FlashcardGame';
@@ -7,7 +8,7 @@ import MemoryMatchGame from './games/MemoryMatchGame';
 import SpeedRushGame from './games/SpeedRushGame';
 import AudioDetectiveGame from './games/AudioDetectiveGame';
 import HeadsUpCharades from './HeadsUpCharades';
-import { VOCAB_CATEGORIES, VOCAB_GROUPS, getDrillMission, getDrillCards } from '../data/vocabDrill';
+import { VOCAB_CATEGORIES, VOCAB_GROUPS, getDrillMission, getDrillCards, filterVocabCategories } from '../data/vocabDrill';
 import { getVocabCategoryArtwork } from '../data/vocabCategoryArtwork';
 import { QUEST_PALETTES } from '../utils/questPalette';
 import { useApp } from '../App';
@@ -62,7 +63,12 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
   const linkedCategoryId = getQuestVocabulary(initialQuestId)?.categoryId || null;
   const [selectedCategory, setSelectedCategory] = useState(() => VOCAB_CATEGORIES.find(category => category.id === linkedCategoryId) || null);
   const [activeMode, setActiveMode] = useState(null);
+  const [roundCards, setRoundCards] = useState([]);
+  const [coverageRevision, setCoverageRevision] = useState(0);
+  const coverageSession = useRef(null);
+  const guestCoverage = useRef({});
   const [query, setQuery] = useState('');
+  const [filterTab, setFilterTab] = useState('all');
   const [topThirtyOpen, setTopThirtyOpen] = useState(false);
   const topThirtyAvailable = import.meta.env.DEV && ['127.0.0.1', 'localhost', '[::1]'].includes(window.location.hostname);
   const dialog = useRef(null);
@@ -119,7 +125,28 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
     setWordHistory(next);
     if (!saveWordEvidence(owner, next)) setHistorySaveFailed(true);
   };
-  const startMode = (mode, focused = false) => { evidenceSession.current = crypto.randomUUID(); completionRecorded.current = false; setQuestWordsOnly(focused); setActiveMode(mode); };
+  const coverageScope = (focused = false) => focused ? `${selectedCategory.id}:quest:${initialQuestId}` : selectedCategory.id;
+  const coverageFor = (scope) => guestCoverage.current[scope] || (owner ? readVocabularyCoverage(owner, scope) : {});
+  const handlePracticed = (card, session) => {
+    if (!session || session !== coverageSession.current || session.owner !== owner || !card) return;
+    // Each word is consumed only after an interaction, not merely by opening a game.
+    if (session.recorded.has(card.id)) return;
+    session.recorded.add(card.id);
+    const current = coverageFor(session.scope);
+    const next = recordVocabularyPractice(current, session.mode, card);
+    guestCoverage.current[session.scope] = next;
+    if (!saveVocabularyCoverage(owner, session.scope, next)) setHistorySaveFailed(true);
+    setCoverageRevision(value => value + 1);
+  };
+  const startMode = (mode, focused = false) => {
+    evidenceSession.current = crypto.randomUUID(); completionRecorded.current = false;
+    const scope = coverageScope(focused);
+    const source = focused && linkedDeck?.cards.length ? linkedDeck.cards : getDrillCards(selectedCategory);
+    coverageSession.current = { owner, scope, mode, recorded: new Set() };
+    setRoundCards(mode === 'quick_check' ? source : planVocabularyRound(source, coverageFor(scope), mode));
+    setQuestWordsOnly(focused); setActiveMode(mode);
+  };
+  useEffect(() => { setActiveMode(null); coverageSession.current = null; guestCoverage.current = {}; }, [owner]);
   const closeSelection = () => { dialog.current?.close(); setSelectedCategory(null); selectionTrigger.current?.focus(); };
   useEffect(() => {
     if (selectedCategory && !activeMode && !creditSetId && !creditPilotOpen) dialog.current?.showModal();
@@ -139,7 +166,7 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
     localStorage.setItem('onet_vocab_drill_daily_v2', JSON.stringify(data));
     const updatedHistory = nextVocabPractice(history, catId, activeMode);
     setHistory(updatedHistory);
-    setHistorySaveFailed(!saveVocabPractice(practiceId, updatedHistory));
+    if (!saveVocabPractice(practiceId, updatedHistory)) setHistorySaveFailed(true);
     setActiveMode(null);
   };
   if (creditSetId && creditPilotAvailable) return <Suspense fallback={<p role="status">กำลังเปิดชุดฝึกเดิม…</p>}><VocabularyCreditTraining setId={creditSetId} initialStep={creditInitialStep} onEvidence={handleEvidence} onBack={() => setCreditSetId(null)} /></Suspense>;
@@ -147,19 +174,172 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
   if (topThirtyOpen && topThirtyAvailable) return <TopThirtyPractice learnerId={student?.id} onBack={() => setTopThirtyOpen(false)} />;
   if (selectedCategory && activeMode) {
     const mission = getDrillMission(selectedCategory);
-    const cards = selectedCards;
+    const cards = roundCards;
     if (!mission || !cards.length) return <main className="vocab-hub"><p role="alert">หมวดนี้ยังไม่มีชุดคำศัพท์พร้อมใช้</p><button onClick={() => { setActiveMode(null); setSelectedCategory(null); }}>กลับไปเลือกหมวด</button></main>;
-    const props = { cards, title: questWordsOnly ? 'คำศัพท์จำเป็นของด่าน' : selectedCategory.name, onBack: () => setActiveMode(null), onComplete: handleGameComplete, onEvidence: handleEvidence };
+    const session = coverageSession.current;
+    const onPracticed = card => handlePracticed(card, session);
+    const completeGame = xp => { if (coverageSession.current === session) handleGameComplete(xp); };
+    const leaveGame = () => { coverageSession.current = null; setActiveMode(null); };
+    const props = { cards, coveragePlanned: true, choiceCards: selectedCards, onPracticed, title: questWordsOnly ? 'คำศัพท์จำเป็นของด่าน' : selectedCategory.name, onBack: leaveGame, onComplete: completeGame, onEvidence: handleEvidence };
     if (activeMode === 'quick_check') return <VocabularyQuickCheck {...props} />;
     if (activeMode === 'headsup') return <HeadsUpCharades {...props} />;
     if (activeMode === 'duel') return <VocabDuelGame {...props} />;
     if (activeMode === 'memory') return <MemoryMatchGame {...props} />;
     if (activeMode === 'speed') return <SpeedRushGame {...props} />;
     if (activeMode === 'audio') return <AudioDetectiveGame {...props} />;
-    return <FlashcardGame mission={{ ...mission, cards, title: props.title, subtitle: 'ทบทวนคำศัพท์' }} onEvidence={handleEvidence} onComplete={handleGameComplete} onBack={() => setActiveMode(null)} />;
+    return <FlashcardGame mission={{ ...mission, cards, title: props.title, subtitle: 'ทบทวนคำศัพท์' }} onEvidence={handleEvidence} onPracticed={onPracticed} onComplete={completeGame} onBack={leaveGame} />;
   }
-  const categories = VOCAB_CATEGORIES.filter(cat => cat.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
+
+  const daysSince = isoString => {
+    if (!isoString) return 999;
+    return Math.max(0, Math.floor((Date.now() - new Date(isoString).getTime()) / (1000 * 60 * 60 * 24)));
+  };
+
+  const weakWordsMap = useMemo(() => {
+    const map = {};
+    for (const cat of VOCAB_CATEGORIES) {
+      const cards = getDrillCards(cat);
+      let weak = 0;
+      for (const card of cards) {
+        if (wordStatus(wordHistory, card).status === 'practice') weak++;
+      }
+      map[cat.id] = weak;
+    }
+    return map;
+  }, [wordHistory]);
+
+  const recommendations = useMemo(() => {
+    const recs = [];
+    const usedIds = new Set();
+
+    if (linkedCategoryId) {
+      const cat = VOCAB_CATEGORIES.find(c => c.id === linkedCategoryId);
+      if (cat) {
+        usedIds.add(cat.id);
+        recs.push({
+          category: cat,
+          tagClass: 'tag-quest',
+          tagLabel: '🎯 ตรงกับเควสต์',
+          reason: `คำศัพท์สำคัญของด่าน ${initialQuestId || ''} ฝึกให้คล่องก่อนลุยด่านต่อ`,
+        });
+      }
+    } else {
+      const practicedEntries = Object.entries(history.categories)
+        .sort((a, b) => new Date(b[1].lastPracticedAt) - new Date(a[1].lastPracticedAt));
+      const recentToContinue = practicedEntries.find(([id, data]) => data.sessions < 3);
+      if (recentToContinue) {
+        const cat = VOCAB_CATEGORIES.find(c => c.id === recentToContinue[0]);
+        if (cat) {
+          usedIds.add(cat.id);
+          recs.push({
+            category: cat,
+            tagClass: 'tag-quest',
+            tagLabel: '⚡ ลุยต่อจุดเดิม',
+            reason: `ฝึกไปแล้ว ${recentToContinue[1].sessions} รอบ ลุยต่ออีกรอบเพื่อรับดาว Mastery 🏆`,
+          });
+        }
+      }
+    }
+
+    const ONET_PRIORITY_IDS = ['signs', 'exam_commands', 'conversation', 'directions', 'school', 'family', 'feelings', 'culture'];
+    for (const pid of ONET_PRIORITY_IDS) {
+      if (usedIds.has(pid)) continue;
+      const cat = VOCAB_CATEGORIES.find(c => c.id === pid);
+      if (cat && (!history.categories[pid] || history.categories[pid].sessions === 0)) {
+        usedIds.add(pid);
+        recs.push({
+          category: cat,
+          tagClass: 'tag-hot',
+          tagLabel: '🔥 ออกสอบบ่อย O-NET',
+          reason: 'หมวดสำคัญที่พบในข้อสอบ O-NET ป.6 ทุกปี แนะนำให้ฝึกเป็นอันดับแรก',
+        });
+        break;
+      }
+    }
+    if (recs.length < 2) {
+      for (const pid of ONET_PRIORITY_IDS) {
+        if (usedIds.has(pid)) continue;
+        const cat = VOCAB_CATEGORIES.find(c => c.id === pid);
+        if (cat) {
+          usedIds.add(pid);
+          recs.push({
+            category: cat,
+            tagClass: 'tag-hot',
+            tagLabel: '🔥 ออกสอบบ่อย O-NET',
+            reason: 'หมวดหลักประจำสนามสอบ O-NET ฝึกซ้ำเพื่อความชำนาญสูงสุด',
+          });
+          break;
+        }
+      }
+    }
+
+    const weakCat = VOCAB_CATEGORIES.find(c => !usedIds.has(c.id) && weakWordsMap[c.id] > 0);
+    if (weakCat) {
+      usedIds.add(weakCat.id);
+      recs.push({
+        category: weakCat,
+        tagClass: 'tag-review',
+        tagLabel: '⚠️ มีคำต้องซ่อม',
+        reason: `พบ ${weakWordsMap[weakCat.id]} คำที่คุณเคยตอบผิด ทวนซ้ำหมวดนี้เพื่ออุดจุดอ่อน`,
+      });
+    } else {
+      const staleEntry = Object.entries(history.categories).find(([id, data]) => !usedIds.has(id) && daysSince(data.lastPracticedAt) >= 3);
+      if (staleEntry) {
+        const cat = VOCAB_CATEGORIES.find(c => c.id === staleEntry[0]);
+        if (cat) {
+          usedIds.add(cat.id);
+          const days = daysSince(staleEntry[1].lastPracticedAt);
+          recs.push({
+            category: cat,
+            tagClass: 'tag-review',
+            tagLabel: '⏰ ถึงเวลาทบทวน',
+            reason: `ฝึกไปเมื่อ ${days} วันก่อน ทวนซ้ำวันนี้เพื่อเปลี่ยนเป็นความจำระยะยาว`,
+          });
+        }
+      }
+    }
+
+    if (recs.length < 3) {
+      for (const cat of VOCAB_CATEGORIES) {
+        if (recs.length >= 3) break;
+        if (usedIds.has(cat.id)) continue;
+        if (!history.categories[cat.id]) {
+          usedIds.add(cat.id);
+          recs.push({
+            category: cat,
+            tagClass: 'tag-quest',
+            tagLabel: '✨ หมวดใหม่น่าลอง',
+            reason: 'เปิดโลกคำศัพท์ใหม่ เพิ่มคลังคำศัพท์ให้หลากหลายรอบด้าน',
+          });
+        }
+      }
+    }
+
+    return recs.slice(0, 3);
+  }, [linkedCategoryId, initialQuestId, history, weakWordsMap]);
+
+  const recCategoryIds = useMemo(() => new Set(recommendations.map(r => r.category.id)), [recommendations]);
+  const baseCategories = filterVocabCategories(query);
+  const categories = useMemo(() => {
+    if (filterTab === 'recommended') {
+      return baseCategories.filter(cat => recCategoryIds.has(cat.id));
+    }
+    if (filterTab === 'practiced') {
+      return baseCategories.filter(cat => history.categories[cat.id]?.sessions > 0);
+    }
+    if (filterTab === 'unpracticed') {
+      return baseCategories.filter(cat => !history.categories[cat.id]?.sessions);
+    }
+    if (filterTab === 'needs_review') {
+      return baseCategories.filter(cat => weakWordsMap[cat.id] > 0 || (history.categories[cat.id] && daysSince(history.categories[cat.id].lastPracticedAt) >= 3));
+    }
+    return baseCategories;
+  }, [baseCategories, filterTab, recCategoryIds, history, weakWordsMap]);
+
+  const allCount = VOCAB_CATEGORIES.length;
   const practicedCategories = Object.keys(history.categories).length;
+  const unpracticedCount = allCount - practicedCategories;
+  const reviewCount = VOCAB_CATEGORIES.filter(c => weakWordsMap[c.id] > 0 || (history.categories[c.id] && daysSince(history.categories[c.id].lastPracticedAt) >= 3)).length;
   const totalSessions = Object.values(history.categories).reduce((sum, item) => sum + item.sessions, 0);
   return <main className="vocab-hub">
     <header className="vocab-header">
@@ -181,17 +361,129 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
     {historySaveFailed && <p role="alert">บันทึกประวัติการฝึกในเครื่องไม่สำเร็จ</p>}
     <p className="vocab-evidence-note">ผลรายคำบันทึกในเบราว์เซอร์นี้{student?.isDemo ? ' · Demo เก็บชั่วคราวจนรีเฟรช' : ' แยกตามผู้เรียนและโรงเรียน'} · การตอบถูกในแบบฝึกยังไม่ใช่การยืนยันความเชี่ยวชาญ</p>
     {canSyncVocabulary(student) && <p className="vocab-evidence-note" role="status">{cloudStatus === 'error' ? 'ยังส่งผลให้ครูไม่ได้ · เก็บคิวไว้ในเครื่องและจะลองใหม่เมื่อเชื่อมต่อ' : wordHistory.events.some(event => event.cloudPending) ? 'กำลังรอส่งผลฝึกให้ครู…' : cloudStatus === 'synced' ? 'ส่งผลฝึกให้ครูแล้ว' : 'ผลฝึกใหม่จะส่งให้ครู · ประวัติเก่าในเครื่องยังไม่ส่งย้อนหลัง'} <button type="button" onClick={() => setSyncRevision(previous => previous + 1)}>ลองส่งอีกครั้ง</button></p>}
-    <label className="vocab-search"><Search size={19} aria-hidden="true" /><input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="ค้นหาหมวดคำศัพท์" aria-label="ค้นหาหมวดคำศัพท์" /></label>
+    {/* Smart Next Recommendations */}
+    {recommendations.length > 0 && (
+      <section className="vocab-recommendations" aria-labelledby="vocab-rec-title">
+        <div className="vocab-recommendations-header">
+          <h2 id="vocab-rec-title">🎯 หมวดแนะนำสำหรับคุณ (Next Recommendations)</h2>
+          <p className="vocab-recommendations-subtitle">เลือกฝึกตามแนวข้อสอบ O-NET, เควสต์ที่เรียน, และการทวนซ้ำเพื่อความแม่นยำ</p>
+        </div>
+        <div className="vocab-recommendations-grid">
+          {recommendations.map(rec => {
+            const cat = rec.category;
+            const practice = history.categories[cat.id];
+            const count = getDrillCards(cat).length;
+            return (
+              <div key={rec.tagLabel + cat.id} className="vocab-rec-card">
+                <div>
+                  <span className={`vocab-rec-tag ${rec.tagClass}`}>{rec.tagLabel}</span>
+                  <div className="vocab-rec-top">
+                    <img className="vocab-rec-artwork" src={getVocabCategoryArtwork(cat.id)} alt="" aria-hidden="true" />
+                    <div>
+                      <h3 className="vocab-rec-title">{cat.name}</h3>
+                      <p className="vocab-rec-reason">{rec.reason}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="vocab-rec-bottom">
+                  <span className="vocab-rec-badge">
+                    {practice?.sessions > 0 ? `🏆 ฝึกแล้ว ${practice.sessions} รอบ` : '✨ ยังไม่เคยฝึก'} • {count} คำ
+                  </span>
+                  <button
+                    type="button"
+                    className="vocab-rec-cta"
+                    onClick={event => {
+                      selectionTrigger.current = event.currentTarget;
+                      setSelectedCategory(cat);
+                    }}
+                  >
+                    เริ่มฝึกหมวดนี้ ➔
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    )}
+
+    {/* Filter Pills Bar */}
+    <div className="vocab-filter-bar" role="tablist" aria-label="ตัวกรองหมวดคำศัพท์">
+      <button
+        type="button"
+        role="tab"
+        aria-selected={filterTab === 'all'}
+        className={`vocab-filter-pill ${filterTab === 'all' ? 'is-active' : ''}`}
+        onClick={() => setFilterTab('all')}
+      >
+        ทั้งหมด <span className="pill-count">{allCount}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        aria-selected={filterTab === 'recommended'}
+        className={`vocab-filter-pill ${filterTab === 'recommended' ? 'is-active' : ''}`}
+        onClick={() => setFilterTab('recommended')}
+      >
+        🎯 แนะนำ <span className="pill-count">{recommendations.length}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        aria-selected={filterTab === 'practiced'}
+        className={`vocab-filter-pill ${filterTab === 'practiced' ? 'is-active' : ''}`}
+        onClick={() => setFilterTab('practiced')}
+      >
+        เคยฝึกแล้ว <span className="pill-count">{practicedCategories}</span>
+      </button>
+      <button
+        type="button"
+        role="tab"
+        aria-selected={filterTab === 'unpracticed'}
+        className={`vocab-filter-pill ${filterTab === 'unpracticed' ? 'is-active' : ''}`}
+        onClick={() => setFilterTab('unpracticed')}
+      >
+        ยังไม่เคยฝึก <span className="pill-count">{unpracticedCount}</span>
+      </button>
+      {reviewCount > 0 && (
+        <button
+          type="button"
+          role="tab"
+          aria-selected={filterTab === 'needs_review'}
+          className={`vocab-filter-pill ${filterTab === 'needs_review' ? 'is-active' : ''}`}
+          onClick={() => setFilterTab('needs_review')}
+        >
+          ⚠️ ต้องซ่อม/ควรทวน <span className="pill-count">{reviewCount}</span>
+        </button>
+      )}
+    </div>
+
+    <label className="vocab-search"><Search size={19} aria-hidden="true" /><input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="ค้นหาหมวด คำศัพท์ หรือคำแปล" aria-label="ค้นหาหมวด คำศัพท์ หรือคำแปล" /></label>
     {VOCAB_GROUPS.map(group => {
       const groupCategories = categories.filter(cat => cat.group === group.id);
       if (!groupCategories.length) return null;
-      return <section key={group.id} className="vocab-group" aria-labelledby={`vocab-group-${group.id}`}><h2 id={`vocab-group-${group.id}`}>{group.name}</h2><div className="vocab-category-grid">
+      return <section key={group.id} className="vocab-group" aria-labelledby={`vocab-group-${group.id}`}><h2 id={`vocab-group-${group.id}`}>{group.name}</h2>{group.description && <p className="vocab-evidence-note">{group.description}</p>}<div className="vocab-category-grid">
         {groupCategories.map(cat => {
           const count = getDrillCards(cat).length;
           const practice = history.categories[cat.id];
           return <button key={cat.id} data-category={cat.id} style={paletteStyle(cat.tone)} className="vocab-category" disabled={!count} onClick={event => { selectionTrigger.current = event.currentTarget; setSelectedCategory(cat); }} aria-haspopup="dialog">
             <img className="vocab-category-artwork" src={getVocabCategoryArtwork(cat.id)} alt="" aria-hidden="true" /><strong>{cat.name}</strong>
-            <span className="vocab-category-history">{practice ? <><span>ฝึกแล้ว {practice.sessions} รอบ</span><small>ล่าสุด {formatVocabPracticeDate(practice.lastPracticedAt)}</small></> : <span>ยังไม่มีประวัติการฝึก</span>}</span>
+            <div className="vocab-category-badges">
+              {practice?.sessions > 0 ? (
+                <span className={`vocab-badge-session is-tier${Math.min(3, practice.sessions)}`}>
+                  {practice.sessions >= 3 ? '🏆' : practice.sessions === 2 ? '⭐⭐' : '⭐'} ฝึกแล้ว {practice.sessions} รอบ
+                </span>
+              ) : (
+                <span className="vocab-badge-session is-new">✨ ยังไม่เคยฝึก</span>
+              )}
+              {practice?.sessions > 0 && daysSince(practice.lastPracticedAt) >= 3 && (
+                <span className="vocab-badge-review">⏰ ควรทวน</span>
+              )}
+              {weakWordsMap[cat.id] > 0 && (
+                <span className="vocab-badge-weak">⚠️ มี {weakWordsMap[cat.id]} คำต้องซ่อม</span>
+              )}
+            </div>
+            <span className="vocab-category-history">{practice ? <small>ล่าสุด {formatVocabPracticeDate(practice.lastPracticedAt)}</small> : <small>เริ่มฝึกสะสม Mastery Stars</small>}</span>
             <span className="vocab-category-meta">{count ? `${count} รายการ` : 'ยังไม่พร้อม'}<ArrowRight size={16} aria-hidden="true" /></span>
           </button>;
         })}
@@ -200,10 +492,15 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
     {!categories.length && <p className="vocab-empty" role="status">ไม่พบหมวดคำศัพท์<button onClick={() => setQuery('')}>ล้างการค้นหา</button></p>}
     {selectedCategory && !activeMode && <dialog ref={dialog} className="vocab-dialog" style={paletteStyle(selectedCategory.tone)} aria-labelledby="vocab-dialog-title" onCancel={closeSelection} onClick={e => { if (e.target === e.currentTarget) closeSelection(); }}>
       <header><div><img className="vocab-category-artwork" src={getVocabCategoryArtwork(selectedCategory.id)} alt="" aria-hidden="true" /><h2 id="vocab-dialog-title">{selectedCategory.name}</h2></div><button type="button" className="vocab-icon-button" onClick={closeSelection} aria-label="ปิดหน้าต่าง" title="ปิดหน้าต่าง"><X size={20} /></button></header>
+      {selectedCategory.sourceNote && <p className="vocab-evidence-note">{selectedCategory.sourceNote}</p>}
       {linkedDeck && selectedCategory.id === linkedCategoryId && <section className="vocab-word-progress" aria-label="คำศัพท์ที่เชื่อมกับด่าน"><h3>คำศัพท์จำเป็นของด่าน · ตอบถูกในแบบฝึก {summarizeWords(wordHistory, linkedDeck.cards).recognized}/{linkedDeck.cards.length} คำ</h3><ul>{linkedDeck.cards.map(card => <li key={card.linkedWord}><span lang="en">{card.linkedWord}</span><small>{wordStatus(wordHistory, card).label}</small></li>)}</ul>{linkedDeck.missingWords.length > 0 && <p>กำลังเตรียมการ์ดเพิ่ม: {linkedDeck.missingWords.join(', ')}</p>}<button type="button" disabled={!linkedDeck.cards.length} onClick={() => creditPilotAvailable ? openCreditSet('quest:' + initialQuestId) : startMode('flashcard', true)}>ฝึกเฉพาะคำของด่าน</button><button type="button" disabled={linkedDeck.cards.length < 2} onClick={() => startMode('quick_check', true)}>ตรวจเฉพาะคำของด่าน</button></section>}
       {creditPilotAvailable && creditAccount.state?.sets.find(set => set.id === (linkedDeck && selectedCategory.id === linkedCategoryId ? 'quest:' + initialQuestId : 'category:' + selectedCategory.id)) && <CreditSetProgress set={creditAccount.state.sets.find(set => set.id === (linkedDeck && selectedCategory.id === linkedCategoryId ? 'quest:' + initialQuestId : 'category:' + selectedCategory.id))} onStart={step => openCreditSet(linkedDeck && selectedCategory.id === linkedCategoryId ? 'quest:' + initialQuestId : 'category:' + selectedCategory.id, step)} />}
       <details className="vocab-word-progress"><summary>ผลรายคำในหมวดนี้ · ตอบถูกในแบบฝึก {summarizeWords(wordHistory, getDrillCards(selectedCategory)).recognized}/{getDrillCards(selectedCategory).length}</summary><ul>{getDrillCards(selectedCategory).map(card => <li key={card.id}><span lang="en">{vocabularyWord(card)}</span><small>{wordStatus(wordHistory, card).label}</small></li>)}</ul></details>
-      <div className="vocab-mode-list"><button type="button" onClick={() => startMode('quick_check')}>ตรวจคำศัพท์เบื้องต้น · ไม่คิด XP</button>{DRILL_MODES.map(mode => <button key={mode.id} onClick={() => startMode(mode.id)}><span className="vocab-mode-icon"><UIIcon value={mode.icon} size={22} /></span><span>{mode.name}</span><ArrowRight size={18} aria-hidden="true" /></button>)}</div>
+      <p className="vocab-word-progress" data-coverage-revision={coverageRevision}>ทั้ง 6 เกมใช้ประวัติร่วมกัน · ฝึกแล้วรวม {vocabularyCoverage(getDrillCards(selectedCategory), coverageFor(selectedCategory.id)).practiced}/{getDrillCards(selectedCategory).length} คำ · เลือกคำที่ยังฝึกไม่ครบก่อน · จำบนอุปกรณ์นี้แยกผู้เรียน · ฝึกครบไม่ได้แปลว่าตอบถูกทั้งหมด</p><div className="vocab-mode-list"><button type="button" onClick={() => startMode('quick_check')}>ตรวจคำศัพท์เบื้องต้น · ไม่คิด XP</button>{DRILL_MODES.map(mode => {
+        const all = getDrillCards(selectedCategory), coverage = vocabularyCoverage(all, coverageFor(selectedCategory.id), mode.id);
+        const next = planVocabularyRound(all, coverageFor(selectedCategory.id), mode.id);
+        return <button key={mode.id} aria-label={mode.name} onClick={() => startMode(mode.id)}><span className="vocab-mode-icon"><UIIcon value={mode.icon} size={22} /></span><span>{mode.name}<small className="block">เกมนี้ฝึกแล้ว {coverage.practiced}/{coverage.total} คำ · รอบถัดไป {next.length} {mode.id === 'memory' ? 'คู่' : 'คำ'}{coverage.cycles ? ` · ครบหมวด ${coverage.cycles} รอบ` : ''}</small></span><ArrowRight size={18} aria-hidden="true" /></button>;
+      })}</div>
     </dialog>}
   </main>;
 }

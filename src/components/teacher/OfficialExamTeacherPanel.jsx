@@ -1,0 +1,21 @@
+import {useEffect,useMemo,useState} from 'react';
+import {fetchExamResults,buildExamReport,officialExamResultsEnabled} from '../../utils/officialExamResults';
+import {formatStudent360Date} from '../../utils/student360Model';
+import '../../styles/officialOnet.css';
+export default function OfficialExamTeacherPanel({actor,schoolId,studentId=null,studentIds,onRemediate,client,enabled=officialExamResultsEnabled}){
+ const[load,setLoad]=useState({status:'loading'}),[revision,setRevision]=useState(0),[version,setVersion]=useState(''),[selected,setSelected]=useState(null);
+ const key=JSON.stringify([schoolId,studentId,actor?.user_id,actor?.authVerified,actor?.role,actor?.isDemo,actor?.school_membership_id,actor?.membership_role]);
+ useEffect(()=>{let active=true;setLoad({key,status:'loading'});fetchExamResults(actor,{schoolId,studentId},client,{enabled}).then(snapshot=>{if(active)setLoad({key,status:'ready',snapshot});}).catch(error=>{if(active)setLoad({key,status:error.code||'exam_results_unavailable'});});return()=>{active=false;};},[key,revision,client,enabled]);
+ const snapshot=load.key===key&&load.status==='ready'?load.snapshot:null,versions=[...new Set(snapshot?.attempts.map(a=>a.version)||[])],currentVersion=versions.includes(version)?version:versions[0];
+ const report=useMemo(()=>snapshot?buildExamReport(snapshot,{version:currentVersion,studentIds}):null,[snapshot,currentVersion,studentIds]);
+ const attempt=report?.history.find(a=>a.attemptId===selected);
+ return <section className="official-teacher-exams"><h3>ผลสอบ O-NET 2569 · หลักฐานจากเซิร์ฟเวอร์</h3><p>นับครั้งแรกที่ทำเองต่อคน/ชุด/เวอร์ชันในภาพรวม เก็บรอบอื่นไว้ในประวัติ ไม่ใช้ XP แทนความสามารถ และไม่วินิจฉัยจากสอบครั้งเดียว</p>
+ {!snapshot&&<p role={load.status==='loading'?'status':'alert'}>{load.key!==key||load.status==='loading'?'กำลังตรวจสิทธิ์อ่านผลสอบ…':load.status==='exam_results_blocked'?'BLOCKED · ยังไม่เปิดตัวอ่านผลสอบที่ผ่านการตรวจสิทธิ์ ไม่ใช้คะแนนเดโมหรือข้อมูลในเครื่องครูแทน':load.status==='exam_results_forbidden'?'ไม่มีสิทธิ์อ่านผลสอบของนักเรียนหรือโรงเรียนนี้':'ยังโหลดผลสอบไม่ได้ ไม่แสดงเป็นคะแนนศูนย์'}</p>}
+ <button type="button" onClick={()=>setRevision(v=>v+1)}>ตรวจสิทธิ์และโหลดผลสอบใหม่</button>
+ {report&&<>{!report.history.length?<p>ยังไม่มีผลสอบที่ยืนยันแล้วในขอบเขตนี้</p>:<><label>เวอร์ชันข้อสอบ <select value={currentVersion} onChange={e=>setVersion(e.target.value)}>{versions.map(v=><option key={v}>{v}</option>)}</select></label><p>มีผลที่นับในภาพรวม {report.attempted} คน · เฉลี่ย {report.average?.toLocaleString('th-TH',{maximumFractionDigits:3})}/100 · ประวัติ {report.history.length} รอบ</p><p>ช่วงคะแนน 0–ต่ำกว่า20: {report.histogram[0]} · 20–ต่ำกว่า40: {report.histogram[1]} · 40–ต่ำกว่า60: {report.histogram[2]} · 60–ต่ำกว่า80: {report.histogram[3]} · 80–100: {report.histogram[4]}</p><p>มีข้อที่ครูอาจตรวจเพิ่มเติม {new Set(report.needingReview).size} คน ไม่ใช่ข้อสรุประดับภาษา</p>
+ <div className="table-scroll"><table><caption>ประวัติผลสอบที่มีสิทธิ์อ่าน</caption><thead><tr><th>นักเรียน</th><th>วันที่</th><th>ถูก/32</th><th>คะแนน/100</th><th>รายละเอียด</th></tr></thead><tbody>{report.history.map(a=><tr key={a.attemptId}><td>{a.studentId}</td><td>{formatStudent360Date(a.completedAt)}</td><td>{a.result.correctCount}/32</td><td>{a.result.score100}</td><td><button type="button" onClick={()=>setSelected(a.attemptId)}>ดูรายข้อ</button></td></tr>)}</tbody></table></div>
+ {!studentId&&<details><summary>จำนวนถูก/ผิดรายข้อจากรอบแรก</summary><ul>{report.questions.map(q=><li key={q.number}>ข้อ {q.number}: ถูก {q.correct} · ผิดหรือไม่ตอบ {q.incorrect}</li>)}</ul></details>}
+ {attempt&&<div><h4>รายข้อ · {attempt.version} · {formatStudent360Date(attempt.completedAt)}</h4><ul>{attempt.result.items.map(item=><li key={item.questionNumber}>ข้อ {item.questionNumber} · เลือก {item.selectedOption??'ไม่ตอบ'} · {item.correct?'ถูก':'ผิด/ไม่ตอบ'} · {item.skillTags.length?item.skillTags.join(', '):'รอครูตรวจการจับคู่ทักษะ/คำศัพท์'}</li>)}</ul>{onRemediate&&<button type="button" onClick={()=>onRemediate(attempt.studentId)}>พิจารณามอบหมายซ่อมเสริม</button>}<p>การฝึกและ Fresh Check ต้องเป็นหลักฐานคนละรอบ ไม่เขียนทับผลสอบนี้ ตัวเชื่อมงานและ Fresh Check ยังรอระบบมอบหมายที่อนุมัติเนื้อหาแล้ว</p></div>}
+ </> }</>}
+ </section>;
+}

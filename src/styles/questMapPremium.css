@@ -1,0 +1,203 @@
+.qm-adventure-map {
+  border: 3px solid #dba846;
+  border-radius: 24px;
+  background: #f7fbff;
+  box-shadow: 0 8px 0 #9a74334d, 0 24px 45px #1739583d, inset 0 2px #fff;
+}
+
+.qm-adventure-map > header {
+  min-height: 106px;
+  padding: 18px 24px 18px 112px;
+  border-bottom: 3px solid #dca644;
+  background: linear-gradient(100deg, #f9fcfff2, #ffffffdc 63%, #fff5e8f0);
+  box-shadow: 0 5px 16px #1739582e;
+}
+
+.qm-adventure-map > header::before {
+  content: '';
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  width: 68px;
+  height: 68px;
+  transform: translateY(-50%);
+  background: url('/assets/avatar-v3/equipment/map.png') center / contain no-repeat;
+  filter: drop-shadow(0 5px 5px #26364b47);
+  pointer-events: none;
+}
+
+.qm-adventure-map h3 { font-size: clamp(21px, 2vw, 29px); color: #123b67; }
+.qm-adventure-map .qm-chapter-objective { font-size: 13px; color: #365f7e; }
+.qm-map-header-actions > span { color: #123b67; font-size: 15px; font-weight: 900; white-space: nowrap; }
+.qm-map-header-actions button { min-height: 44px; padding: 8px 14px; box-shadow: 0 3px 8px #1739581d; }
+
+.qm-map-viewport {
+  background: linear-gradient(180deg, #e5f5ff08, #092c4c0b 73%, #102f3e2b), url('../premium-quest-landscape.png') center 52% / cover no-repeat;
+}
+
+.qm-map-viewport .qm-world-sky,
+.qm-map-viewport .qm-world-landmarks,
+.qm-map-viewport::before { display: none; }
+
+.qm-map-scroll {
+  scrollbar-color: #daa142 #fff0c2;
+  scrollbar-width: thin;
+}
+
+.qm-adventure-map[data-chapter="1"] .qm-map-scroll { scroll-snap-type: x proximity; }
+.qm-adventure-map[data-chapter="1"] .qm-map-node { scroll-snap-align: center; }
+.qm-adventure-map[data-chapter="1"] .qm-map-node button { scroll-snap-align: none; }
+.qm-adventure-map[data-chapter="1"] .qm-map-node.is-boss.is-locked .qm-map-marker { background: #e8edf0; }
+.qm-adventure-map[data-chapter="1"] .qm-map-node.is-boss.is-locked .qm-boss-gate > svg { color: #53616b; fill: #cbd5de; }
+.qm-map-header-actions .qm-boss-shortcut.is-locked {
+  color: #344559;
+  background: #edf1f5;
+  border-color: #71828b;
+}
+
+.qm-map-marker {
+  border: 6px solid #fff;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #f8fdff, #d8eefa);
+  box-shadow: 0 0 0 4px #287fa7, 0 0 0 7px #ffffffa6, 0 12px 0 #102f3452, 0 19px 23px #0d2d4a87;
+}
+
+.qm-adventure-map .qm-map-route {
+  grid-template-columns: repeat(var(--map-count), 194px);
+  min-width: max(100%, calc(var(--map-count) * 194px));
+}
+.qm-map-node.is-completed:not(.is-boss) .qm-map-marker { width: 90px; height: 90px; margin-block: 11px; }
+.qm-map-node.is-current:not(.is-boss) .qm-map-marker { width: 124px; height: 124px; }
+.qm-map-choice-note { margin: 0; padding: 10px 20px; background: #f5fbff; color: #35536d; font-size: 13px; }
+.qm-quest-card.is-passed .qm-card-play { background: transparent; border-color: #8dbfac; box-shadow: none; color: #39715e; }
+.qm-quest-card.is-passed .qm-completion-reward,
+.qm-quest-card.is-passed .qm-card-footer > span { color: #086548; font-weight: 800; }
+
+@media (max-width: 699px) {
+  .qm-adventure-map .qm-map-route { grid-template-columns: repeat(var(--map-count), 166px); min-width: max(100%, calc(var(--map-count) * 166px)); }
+  .qm-map-node.is-completed:not(.is-boss) .qm-map-marker { width: 70px; height: 70px; margin-block: 7px; }
+  .qm-map-node.is-current:not(.is-boss) .qm-map-marker { width: 96px; height: 96px; }
+}
+
+.qm-map-marker::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid #ffffffa8;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.qm-map-marker img { filter: drop-shadow(0 3px 2px #0c335350); }
+.qm-map-node.is-completed .qm-map-marker { box-shadow: 0 0 0 4px #168b6b, 0 0 0 7px #fff9, 0 10px 0 #124c3f66, 0 17px 24px #0e392e78; }
+.qm-map-node.is-current .qm-map-marker { box-shadow: 0 0 0 5px #ffc841, 0 0 0 9px #fff4d3, 0 0 23px 12px #f9bd48ab, 0 13px 21px #4c32167d; }
+.qm-map-node.is-selected .qm-map-marker { box-shadow: 0 0 0 5px #167eaa, 0 0 0 9px #fff, 0 11px 23px #123e6185; }
+.qm-map-node.is-locked .qm-map-marker { box-shadow: 0 0 0 4px #71828b, 0 0 0 7px #fffa, 0 11px 21px #17395870; }
+.qm-map-node.is-boss .qm-map-marker { border-radius: 25px 25px 11px 11px; }
+
+.qm-map-step { width: 32px; height: 32px; border-width: 3px; font-size: 14px; box-shadow: 0 4px 8px #102f4b85; }
+.qm-map-node strong {
+  width: auto;
+  max-width: 150px;
+  padding: 4px 8px;
+  border-radius: 9px;
+  background: #102e4df5;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.25;
+  text-shadow: 0 1px 2px #051a2c;
+  white-space: normal;
+  box-shadow: 0 0 0 1px #ffffff9c, 0 3px 8px #08213bb3;
+}
+.qm-map-node.is-boss strong { color: #fff; background: #492870f5; }
+.qm-map-node.is-locked strong { background: #344559f5; }
+.qm-map-state-label { min-height: 26px; padding: 4px 10px; border: 1px solid #ffffffb8; box-shadow: 0 3px 8px #17395857; font-size: 11px; }
+.qm-map-stars svg { width: 17px; height: 17px; color: #fff; filter: drop-shadow(0 2px 2px #183d4a); }
+.qm-map-stars svg.is-earned { color: #a56600; fill: #ffd23f; filter: drop-shadow(0 2px 3px #543700); }
+.qm-map-lock-reason { padding: 3px 5px; border-radius: 6px; background: #f9fcffde; }
+.qm-map-path { border-top: 11px dotted #fff6d4; filter: drop-shadow(0 2px 2px #102d40) drop-shadow(0 0 3px #102d40); opacity: 1; }
+.qm-map-path.is-travelled { border-color: #b5ffe2; }
+.qm-map-node.is-locked .qm-map-path { border-color: #b4bec3; opacity: .68; }
+
+.qm-map-avatar { top: -46px; right: -13px; width: 64px; height: 64px; box-shadow: 0 0 0 4px #ffcc49, 0 0 14px 4px #fff6cc, 0 8px 16px #163b5c9c; }
+.qm-map-avatar .student-avatar, .qm-map-avatar img { width: 56px; height: 56px; }
+.qm-map-avatar small { top: -28px; font-size: 11px; }
+.qm-map-control { width: 46px; height: 46px; min-height: 46px; padding: 0; border: 1px solid #ffffffdc; border-radius: 50%; background: #fffffff0; color: #214e6c; backdrop-filter: blur(8px); box-shadow: 0 3px 12px #0a345a66; }
+.qm-map-control.is-back, .qm-map-control.is-forward { border-radius: 50%; }
+.qm-map-control.is-back { left: 6px; }
+.qm-map-control.is-forward { right: 6px; }
+.qm-smart-banner { margin: 0 0 16px; padding: 14px 18px; }
+.qm-smart-banner-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.qm-smart-banner-summary > svg { flex: 0 0 auto; color: #16745a; }
+.qm-smart-banner-summary > div { flex: 1 1 220px; min-width: 0; }
+.qm-smart-banner-summary h2 { margin: 3px 0 0; font-size: 17px; line-height: 1.5; }
+.qm-smart-banner-summary button { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+.qm-smart-banner-details { margin-top: 8px; font-size: 13px; line-height: 1.7; }
+.qm-smart-banner-details summary { cursor: pointer; padding: 6px 0; color: #365d75; }
+.qm-smart-banner-details > p { margin: 8px 0; }
+.qm-map-header-actions { flex-wrap: wrap; gap: 8px; }
+#qm-quest-list[hidden] { display: none; }
+.qm-map-view[hidden] { display: none; }
+#qm-quest-list { padding: 16px; background: #f8fcff; }
+.qm-map-legend { background: linear-gradient(90deg, #fffdf4, #f3faff, #fffdf4); }
+
+.qm-quest-detail {
+  gap: 18px;
+  padding: 18px 22px;
+  border-top: 3px solid #deb65d;
+  background: linear-gradient(110deg, #fdfefe, #fffdf5 55%, #f7fcff);
+  box-shadow: inset 0 5px 10px #31546d12;
+}
+.qm-quest-detail-art { width: 72px; height: 72px; border: 2px solid #add8ee; border-radius: 16px; background: linear-gradient(145deg, #e6f6ff, #fff); box-shadow: 0 4px 8px #17395830; }
+.qm-quest-detail-copy h4 { font-size: 21px; color: #123b67; }
+.qm-quest-detail-copy p { color: #35536d; font-size: 13px; }
+.qm-detail-action { min-height: 52px; border-color: #bc7a00; border-radius: 14px; background: linear-gradient(#ffdf75, #ffa919); color: #703b00; box-shadow: 0 5px 0 #ba7300, 0 9px 16px #74501845; }
+.qm-detail-action:hover { filter: brightness(1.04); }
+
+@media (max-width: 699px) {
+  .qm-adventure-map > header { min-height: 110px; padding: 14px 14px 12px; }
+  .qm-adventure-map > header::before { display: none; }
+  .qm-map-header-actions > span { font-size: 12px; }
+  .qm-map-viewport { background-position: 50% 52%; }
+  .qm-map-avatar { top: -39px; right: -9px; width: 52px; height: 52px; }
+  .qm-map-avatar .student-avatar, .qm-map-avatar img { width: 44px; height: 44px; }
+  .qm-map-node strong { max-width: 126px; font-size: 11px; }
+  .qm-map-stars svg { width: 15px; height: 15px; }
+  .qm-quest-detail { gap: 10px; padding: 12px; }
+  .qm-quest-detail-art { width: 54px; height: 54px; }
+}
+
+@media (max-width: 420px) {
+  .qm-adventure-map > header { display: block; }
+  .qm-adventure-map > header h3 { font-size: 18px; }
+  .qm-map-header-actions { justify-content: space-between; margin-top: 10px; }
+  .qm-map-header-actions button { min-height: 44px; white-space: nowrap; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qm-map-node.is-current .qm-map-marker,
+  .qm-map-node.is-current .qm-map-marker::before,
+  .qm-map-avatar { animation: none; }
+}
+.qm-gate-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+  padding: 14px 18px;
+  background: #f0f7fc;
+  border: 1px solid #a8c9df;
+  border-radius: 14px;
+  color: #204c69;
+  line-height: 1.7;
+}
+.qm-gate-summary button {
+  min-height: 44px;
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #6095b9;
+  border-radius: 10px;
+}

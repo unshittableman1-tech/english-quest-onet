@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import UIIcon from './UIIcon';
+import ThemeManagement from '../themes/ThemeManagement';
+import {canManageThemes} from '../themes/themeSettings';
 import { useApp } from '../App';
 import { hasSupabaseConfig, supabaseConfig } from '../config/runtimeMode';
 import { getAllSchools } from '../utils/schoolStorage';
@@ -10,15 +12,20 @@ import {
   platformUpdateSchool, platformDeleteSchool,
 } from '../utils/schoolAdmin';
 import { listSchoolApplications, updateSchoolApplicationStatus } from '../utils/schoolApplications';
+import { getAllAdmins, toggleAdminStatus, ADMIN_PERMISSIONS, ADMIN_ROLES } from '../utils/adminStorage';
+import AdminManagementModal from './AdminManagementModal';
+import SchoolUsersView from './SchoolUsersView';
 
 const LIVE = hasSupabaseConfig;
-const ROLES = { platform_admin: 'Platform Admin', school_admin: 'School Admin', teacher: 'Teacher', student: 'Student' };
+const ROLES = { platform_admin: 'Platform Admin', school_admin: 'School Admin', academic_admin: 'Academic Admin', teacher: 'Teacher', student: 'Student' };
 const NAV = [
   ['schools', '🏫', 'โรงเรียน'],
   ['applications', '📋', 'คำขอสมัคร'],
+  ['admins', '🛡️', 'จัดการ Admin'],
   ['users', '👥', 'ผู้ใช้งาน'],
   ['plans', '🧾', 'แผนและสมาชิก'],
-  ['system', '🛡️', 'สถานะระบบ']
+  ['themes', '🎨', 'ธีม'],
+  ['system', '⚙️', 'สถานะระบบ']
 ];
 const fmtDate = (value) => value ? new Date(value).toLocaleDateString('th-TH') : 'ไม่พร้อมใช้งาน';
 const fmtMoney = (value, currency = 'THB') => value == null ? 'ไม่ระบุ' : new Intl.NumberFormat('th-TH', { style: 'currency', currency, maximumFractionDigits: 0 }).format(Number(value));
@@ -32,7 +39,7 @@ function Empty({ title, detail }) {
 }
 
 export default function SuperAdminDashboard() {
-  const { handleLogout, showToast } = useApp();
+  const { handleLogout, showToast, student } = useApp();
   const [tab, setTab] = useState('schools');
   const [schools, setSchools] = useState(() => LIVE ? [] : getAllSchools());
   const [plans, setPlans] = useState([]);
@@ -62,6 +69,38 @@ export default function SuperAdminDashboard() {
     endsAt: '',
   });
   const [savingEdit, setSavingEdit] = useState(false);
+
+  // Admin Management state
+  const [adminsList, setAdminsList] = useState(() => getAllAdmins());
+  const [adminModalState, setAdminModalState] = useState({ isOpen: false, mode: 'create', admin: null });
+
+  const handleAdminSaved = ({ type }) => {
+    setAdminsList(getAllAdmins());
+    if (type === 'create') {
+      showToast('✅ เพิ่ม Admin ใหม่และกำหนดสิทธิ์เรียบร้อยแล้ว');
+    } else if (type === 'update') {
+      showToast('✅ บันทึกการแก้ไขสิทธิ์ Admin เรียบร้อยแล้ว');
+    } else if (type === 'delete') {
+      showToast('🗑️ ลบ Admin ออกจากระบบเรียบร้อยแล้ว');
+    }
+  };
+
+  const handleToggleAdminStatus = (targetAdmin) => {
+    try {
+      toggleAdminStatus(targetAdmin.id);
+      setAdminsList(getAllAdmins());
+      showToast(`✅ ${targetAdmin.status === 'active' ? 'ระงับ' : 'เปิดใช้งาน'} บัญชี Admin แล้ว`);
+    } catch (err) {
+      showToast(`❌ ${err?.message || 'เกิดข้อผิดพลาด'}`);
+    }
+  };
+
+  // Selected School for Users Tab state
+  const [selectedSchoolForUsers, setSelectedSchoolForUsers] = useState('all');
+  const handleViewSchoolUsers = (schoolId) => {
+    setSelectedSchoolForUsers(String(schoolId));
+    setTab('users');
+  };
 
   // Delete School state
   const [deletingSchool, setDeletingSchool] = useState(null);
@@ -117,6 +156,7 @@ export default function SuperAdminDashboard() {
   const visibleSchools = useMemo(() => schools.filter(s => (!search || [s.code, s.name, s.province, s.area].some(v => String(v || '').toLowerCase().includes(search.toLowerCase()))) && (filter === 'all' || s.status === filter)), [schools, search, filter]);
   const visibleAccounts = useMemo(() => accounts.filter(a => (!search || [a.displayName, a.email, a.secondaryId, a.schoolName].some(v => String(v || '').toLowerCase().includes(search.toLowerCase()))) && (filter === 'all' || a.role === filter)), [accounts, search, filter]);
   const visibleApplications = useMemo(() => applications.filter(app => (!search || [app.referenceCode, app.schoolName, app.province, app.contactName, app.contactEmail].some(v => String(v || '').toLowerCase().includes(search.toLowerCase()))) && (filter === 'all' || app.status === filter)), [applications, search, filter]);
+  const visibleAdmins = useMemo(() => adminsList.filter(a => (!search || [a.name, a.email, a.schoolName].some(v => String(v || '').toLowerCase().includes(search.toLowerCase()))) && (filter === 'all' || a.role === filter || a.status === filter)), [adminsList, search, filter]);
   const verifiedStudents = schools.every(s => Number.isFinite(s.activeStudents)) ? schools.reduce((n, s) => n + s.activeStudents, 0) : null;
 
   const openWizard = () => { setForm(blankForm()); setStep(1); setWizard(true); };
@@ -245,6 +285,9 @@ export default function SuperAdminDashboard() {
   const openEditSchool = school => {
     const sub = subscriptions.find(x => x.school_id === school.id);
     const targetPlan = plans.find(p => p.id === sub?.plan_id) || plans.find(p => p.name === school.planName) || plans[0];
+    const agreedPrice = sub?.features_override?.agreed_price_thb != null
+      ? String(sub.features_override.agreed_price_thb)
+      : (school.agreedPrice != null ? String(school.agreedPrice) : (school.customPrice != null ? String(school.customPrice) : ''));
     setEditForm({
       name: school.name || '',
       code: school.code || '',
@@ -252,6 +295,7 @@ export default function SuperAdminDashboard() {
       area: school.area || '',
       planId: targetPlan?.id || '',
       customSeats: sub?.max_students_override != null ? String(sub.max_students_override) : (school.quota ? String(school.quota) : ''),
+      customPrice: agreedPrice,
       subscriptionStatus: school.subscriptionStatus || sub?.status || 'active',
       endsAt: school.expiresAt ? new Date(school.expiresAt).toISOString().slice(0, 10) : (sub?.ends_at ? new Date(sub.ends_at).toISOString().slice(0, 10) : ''),
     });
@@ -263,6 +307,7 @@ export default function SuperAdminDashboard() {
     if (!editingSchool) return;
     setSavingEdit(true);
     try {
+      const parsedCustomPrice = editForm.customPrice ? parseFloat(editForm.customPrice) : null;
       await platformUpdateSchool(editingSchool.id, {
         schoolName: editForm.name,
         schoolCode: editForm.code,
@@ -270,8 +315,21 @@ export default function SuperAdminDashboard() {
         schoolArea: editForm.area,
         planId: editForm.planId || null,
         maxStudentsOverride: editForm.customSeats ? parseInt(editForm.customSeats, 10) : -1,
+        customPrice: parsedCustomPrice,
         subscriptionStatus: editForm.subscriptionStatus,
         subscriptionEndsAt: editForm.endsAt ? new Date(editForm.endsAt).toISOString() : null,
+      });
+      saveSchool({
+        id: editingSchool.id,
+        code: editForm.code,
+        name: editForm.name,
+        province: editForm.province,
+        area: editForm.area,
+        quota: editForm.customSeats ? parseInt(editForm.customSeats, 10) : editingSchool.quota,
+        agreedPrice: parsedCustomPrice,
+        customPrice: parsedCustomPrice,
+        status: editForm.subscriptionStatus,
+        expiresAt: editForm.endsAt,
       });
       showToast('✅ บันทึกการแก้ไขโรงเรียนเรียบร้อยแล้ว');
       setEditingSchool(null);
@@ -309,22 +367,48 @@ export default function SuperAdminDashboard() {
     <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/95 backdrop-blur-xl">
       <div className="mx-auto flex max-w-[1500px] flex-col gap-3 px-4 py-4 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <div className="flex items-center gap-3"><div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-xl"><UIIcon value="👑" /></div><div><div className="flex flex-wrap items-center gap-2"><h1 className="text-lg font-black">Super Admin Hub</h1><Badge tone="amber">PLATFORM OWNER</Badge></div><p className="text-xs text-slate-400">ศูนย์บริหารโรงเรียน คำขอสมัคร ผู้ใช้งาน และสมาชิก</p></div></div>
-        <div className="flex flex-wrap items-center gap-2"><Badge tone={localStaging ? 'blue' : 'red'}>{localStaging ? 'Local Staging' : 'Environment ไม่ยืนยัน'}</Badge><button onClick={openWizard} disabled={!LIVE || activePlans.length === 0} className="min-h-11 rounded-xl bg-amber-400 px-4 text-sm font-black text-slate-950 disabled:opacity-40">+ เพิ่มโรงเรียนใหม่</button><button onClick={handleLogout} className="min-h-11 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 text-sm font-bold text-rose-300">ออกจากระบบ</button></div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge tone={localStaging ? 'blue' : 'red'}>{localStaging ? 'Local Staging' : 'Environment ไม่ยืนยัน'}</Badge>
+          <button
+            onClick={() => { setTab('admins'); setSearch(''); setFilter('all'); }}
+            className={`min-h-11 rounded-xl border px-3.5 text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer ${
+              tab === 'admins'
+                ? 'border-sky-400 bg-sky-400 text-slate-950 shadow-md shadow-sky-400/20'
+                : 'border-sky-500/40 bg-sky-500/10 text-sky-300 hover:bg-sky-500/20'
+            }`}
+          >
+            <span>🛡️</span> จัดการ Admin
+          </button>
+          <button onClick={openWizard} disabled={!LIVE || activePlans.length === 0} className="min-h-11 rounded-xl bg-amber-400 px-4 text-sm font-black text-slate-950 disabled:opacity-40">+ เพิ่มโรงเรียนใหม่</button>
+          <button onClick={handleLogout} className="min-h-11 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 text-sm font-bold text-rose-300">ออกจากระบบ</button>
+        </div>
       </div>
-      <nav className="mx-auto flex max-w-[1500px] gap-2 overflow-x-auto px-4 pb-3 lg:px-8" aria-label="เมนูผู้ดูแลแพลตฟอร์ม">{NAV.map(([id, icon, label]) => <button key={id} onClick={() => { setTab(id); setSearch(''); setFilter('all'); }} className={`min-h-11 shrink-0 rounded-xl px-4 text-sm font-bold ${tab === id ? 'bg-amber-400 text-slate-950' : 'border border-white/10 bg-slate-900 text-slate-300'}`}><UIIcon value={icon} /> {label}</button>)}</nav>
+      <nav className="mx-auto flex max-w-[1500px] gap-2 overflow-x-auto px-4 pb-3 lg:px-8" aria-label="เมนูผู้ดูแลแพลตฟอร์ม">{NAV.filter(([id])=>id!=='themes'||canManageThemes(student)).map(([id, icon, label]) => <button key={id} onClick={() => { setTab(id); setSearch(''); setFilter('all'); }} className={`min-h-11 shrink-0 rounded-xl px-4 text-sm font-bold ${tab === id ? 'bg-amber-400 text-slate-950' : 'border border-white/10 bg-slate-900 text-slate-300'}`}><UIIcon value={icon} /> {label}</button>)}</nav>
     </header>
     <main className="mx-auto max-w-[1500px] space-y-5 p-4 lg:p-8">
       {loading && <div role="status" className="rounded-2xl border border-sky-500/20 bg-sky-500/10 p-4 text-sm font-bold text-sky-200">กำลังโหลดข้อมูลที่ยืนยันจากเซิร์ฟเวอร์…</div>}
       {error && <div role="alert" className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm font-bold text-rose-200">{error}</div>}
-      {tab === 'schools' && <Schools schools={visibleSchools} allSchools={schools} subscriptions={subscriptions} students={verifiedStudents} local={localStaging} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} changeSchool={changeSchool} openEditSchool={openEditSchool} openDeleteSchool={openDeleteSchool} />}
+      {tab === 'schools' && <Schools schools={visibleSchools} allSchools={schools} subscriptions={subscriptions} students={verifiedStudents} local={localStaging} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} changeSchool={changeSchool} openEditSchool={openEditSchool} openDeleteSchool={openDeleteSchool} onViewUsers={handleViewSchoolUsers} />}
       {tab === 'applications' && <Applications applications={visibleApplications} allApplications={applications} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} onApprove={openWizardWithApp} onReject={rejectApp} />}
-      {tab === 'users' && <Users accounts={visibleAccounts} invitations={invitations} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} changeTeacher={changeTeacher} revoke={revoke} />}
+      {tab === 'admins' && <AdminsView admins={visibleAdmins} allAdmins={adminsList} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} onAdd={() => setAdminModalState({ isOpen: true, mode: 'create', admin: null })} onEdit={(a) => setAdminModalState({ isOpen: true, mode: 'edit', admin: a })} onDelete={(a) => setAdminModalState({ isOpen: true, mode: 'delete', admin: a })} onToggleStatus={handleToggleAdminStatus} />}
+      {tab === 'users' && <SchoolUsersView schools={schools} accounts={accounts} invitations={invitations} adminsList={adminsList} initialSelectedSchool={selectedSchoolForUsers} changeTeacher={changeTeacher} revoke={revoke} showToast={showToast} />}
       {tab === 'plans' && <Plans plans={plans} subscriptions={subscriptions} schools={schools} />}
+      {tab === 'themes' && <ThemeManagement actor={student} />}
       {tab === 'system' && <SystemStatus local={localStaging} error={error} />}
     </main>
     {wizard && <Wizard step={step} setStep={setStep} form={form} setForm={setForm} activePlans={activePlans} close={() => setWizard(false)} goNext={goNext} createSchool={createSchool} saving={saving} />}
     {editingSchool && <EditSchoolModal school={editingSchool} form={editForm} setForm={setEditForm} activePlans={activePlans} onClose={() => setEditingSchool(null)} onSave={saveEditSchool} saving={savingEdit} />}
     {deletingSchool && <DeleteSchoolModal school={deletingSchool} onClose={() => setDeletingSchool(null)} onConfirm={confirmDeleteSchool} saving={savingDelete} />}
+    {adminModalState.isOpen && (
+      <AdminManagementModal
+        isOpen={adminModalState.isOpen}
+        mode={adminModalState.mode}
+        admin={adminModalState.admin}
+        schools={schools}
+        onClose={() => setAdminModalState({ isOpen: false, mode: 'create', admin: null })}
+        onSaved={handleAdminSaved}
+      />
+    )}
     {inviteResult && (
       <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/85 p-4 backdrop-blur-md animate-fade-in">
         <div className="w-full max-w-xl rounded-3xl border border-emerald-500/40 bg-slate-900 p-6 text-white shadow-2xl space-y-4">
@@ -594,18 +678,205 @@ function Applications({ applications, allApplications, search, setSearch, filter
   </>;
 }
 
-function Schools({ schools, allSchools, subscriptions, students, local, search, setSearch, filter, setFilter, changeSchool, openEditSchool, openDeleteSchool }) {
+function Schools({ schools, allSchools, subscriptions, students, local, search, setSearch, filter, setFilter, changeSchool, openEditSchool, openDeleteSchool, onViewUsers }) {
   const stats = [['🏫', allSchools.length, 'โรงเรียนทั้งหมด', `${allSchools.filter(s => s.status === 'active').length} ใช้งานอยู่`], ['🎒', students ?? '—', 'นักเรียน Active', students == null ? 'ข้อมูลไม่พร้อม' : 'ยืนยันจากสมาชิก'], ['🧾', subscriptions.length, 'สัญญาสมาชิก', 'แยกจากสถานะโรงเรียน'], ['🛡️', local ? 'Local' : 'ไม่ยืนยัน', 'Environment', 'ไม่ใช่ Production Ready']];
-  return <><section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{stats.map(([icon, value, label, detail]) => <div key={label} className="rounded-2xl border border-white/10 bg-slate-900/80 p-5"><div className="text-2xl"><UIIcon value={icon} /></div><div className="mt-3 text-3xl font-black">{value}</div><div className="text-sm font-bold">{label}</div><div className="mt-1 text-xs text-slate-500">{detail}</div></div>)}</section><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-4"><Toolbar search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} type="schools" />{schools.length === 0 ? <Empty title="ไม่พบโรงเรียน" detail="ข้อมูลจะแสดงเมื่อเซิร์ฟเวอร์อนุญาต" /> : <div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm"><thead><tr className="border-b border-white/10 text-xs text-slate-500"><th className="p-3">โรงเรียน</th><th className="p-3">แผน / สมาชิก</th><th className="p-3">นักเรียน / ที่นั่ง</th><th className="p-3">หมดอายุ</th><th className="p-3">สถานะโรงเรียน</th><th className="p-3 text-right">จัดการ</th></tr></thead><tbody>{schools.map(s => <tr key={s.id} className="border-b border-white/5"><td className="p-3"><b>{s.name}</b><div className="font-mono text-xs text-amber-300">{s.code}</div><div className="text-xs text-slate-500">{[s.area, s.province].filter(Boolean).join(' · ') || 'ไม่ระบุพื้นที่'}</div></td><td className="p-3">{s.planName || 'ไม่พร้อมใช้งาน'}<div className="mt-1"><Badge tone={s.subscriptionStatus === 'active' ? 'green' : 'amber'}>{s.subscriptionStatus || 'ไม่พบสมาชิก'}</Badge></div></td><td className="p-3 font-bold">{Number.isFinite(s.activeStudents) ? s.activeStudents : '—'} / {Number.isFinite(s.quota) ? s.quota : '—'}</td><td className="p-3">{fmtDate(s.expiresAt)}</td><td className="p-3"><Badge tone={s.status === 'active' ? 'green' : 'red'}>{s.status}</Badge></td><td className="p-3 text-right"><div className="flex items-center justify-end gap-1.5 flex-wrap"><button onClick={() => changeSchool(s)} className={`min-h-9 rounded-xl border px-2.5 text-xs font-bold transition-colors ${s.status === 'active' ? 'border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20' : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'}`}>{s.status === 'active' ? 'ระงับ' : 'เปิดใช้งาน'}</button><button onClick={() => openEditSchool(s)} className="min-h-9 rounded-xl border border-sky-500/30 bg-sky-500/10 px-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition-colors" title="แก้ไขข้อมูลโรงเรียนและแพ็กเกจ">✏️ แก้ไข</button><button onClick={() => openDeleteSchool(s)} className="min-h-9 rounded-xl border border-rose-500/30 bg-rose-500/10 px-2.5 text-xs font-bold text-rose-300 hover:bg-rose-500/20 transition-colors" title="ลบโรงเรียนนี้ออกจากระบบ">🗑️ ลบ</button></div></td></tr>)}</tbody></table></div>}</section></>;
+  return <><section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{stats.map(([icon, value, label, detail]) => <div key={label} className="rounded-2xl border border-white/10 bg-slate-900/80 p-5"><div className="text-2xl"><UIIcon value={icon} /></div><div className="mt-3 text-3xl font-black">{value}</div><div className="text-sm font-bold">{label}</div><div className="mt-1 text-xs text-slate-500">{detail}</div></div>)}</section><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-4"><Toolbar search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} type="schools" />{schools.length === 0 ? <Empty title="ไม่พบโรงเรียน" detail="ข้อมูลจะแสดงเมื่อเซิร์ฟเวอร์อนุญาต" /> : <div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm"><thead><tr className="border-b border-white/10 text-xs text-slate-500"><th className="p-3">โรงเรียน</th><th className="p-3">แผน / สมาชิก</th><th className="p-3">นักเรียน / ที่นั่ง</th><th className="p-3">หมดอายุ</th><th className="p-3">สถานะโรงเรียน</th><th className="p-3 text-right">จัดการ</th></tr></thead><tbody>{schools.map(s => <tr key={s.id} className="border-b border-white/5"><td className="p-3"><b>{s.name}</b><div className="font-mono text-xs text-amber-300">{s.code}</div><div className="text-xs text-slate-500">{[s.area, s.province].filter(Boolean).join(' · ') || 'ไม่ระบุพื้นที่'}</div></td><td className="p-3">{s.planName || 'ไม่พร้อมใช้งาน'}<div className="mt-1 flex flex-wrap items-center gap-1.5"><Badge tone={s.subscriptionStatus === 'active' ? 'green' : 'amber'}>{s.subscriptionStatus || 'ไม่พบสมาชิก'}</Badge>{s.agreedPrice != null && (<span className="inline-block text-[10px] font-bold text-emerald-300 bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">฿{Number(s.agreedPrice).toLocaleString()} (ราคาพิเศษ)</span>)}</div></td><td className="p-3 font-bold">{Number.isFinite(s.activeStudents) ? s.activeStudents : '—'} / {Number.isFinite(s.quota) ? s.quota : '—'}{s.quota && s.quota !== 60 && s.quota !== 200 && s.quota !== 500 && (<span className="block text-[10px] text-amber-300 font-normal">โควตาพิเศษ</span>)}</td><td className="p-3">{fmtDate(s.expiresAt)}</td><td className="p-3"><Badge tone={s.status === 'active' ? 'green' : 'red'}>{s.status}</Badge></td><td className="p-3 text-right"><div className="flex items-center justify-end gap-1.5 flex-wrap"><button onClick={() => onViewUsers && onViewUsers(s.id)} className="min-h-9 rounded-xl border border-amber-500/30 bg-amber-500/10 px-2.5 text-xs font-bold text-amber-300 hover:bg-amber-500/20 transition-colors" title="ดูผู้ใช้งานของโรงเรียนนี้">👥 ผู้ใช้</button><button onClick={() => changeSchool(s)} className={`min-h-9 rounded-xl border px-2.5 text-xs font-bold transition-colors ${s.status === 'active' ? 'border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20' : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'}`}>{s.status === 'active' ? 'ระงับ' : 'เปิดใช้งาน'}</button><button onClick={() => openEditSchool(s)} className="min-h-9 rounded-xl border border-sky-500/30 bg-sky-500/10 px-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition-colors" title="แก้ไขข้อมูลโรงเรียนและแพ็กเกจ">✏️ แก้ไข</button><button onClick={() => openDeleteSchool(s)} className="min-h-9 rounded-xl border border-rose-500/30 bg-rose-500/10 px-2.5 text-xs font-bold text-rose-300 hover:bg-rose-500/20 transition-colors" title="ลบโรงเรียนนี้ออกจากระบบ">🗑️ ลบ</button></div></td></tr>)}</tbody></table></div>}</section></>;
 }
 
 function Toolbar({ search, setSearch, filter, setFilter, type }) {
   return <div className="mb-4 flex flex-col gap-3 md:flex-row md:justify-between"><input aria-label="ค้นหา" value={search} onChange={e => setSearch(e.target.value)} placeholder="ค้นหา…" className="min-h-11 rounded-xl border border-white/10 bg-slate-950 px-4 text-sm md:w-96" /><select aria-label="กรอง" value={filter} onChange={e => setFilter(e.target.value)} className="min-h-11 rounded-xl border border-white/10 bg-slate-950 px-3 text-sm"><option value="all">ทั้งหมด</option>{type === 'schools' ? <><option value="active">ใช้งานอยู่</option><option value="suspended">ระงับ</option><option value="archived">เก็บถาวร</option></> : Object.entries(ROLES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></div>;
 }
 
-function Users({ accounts, invitations, search, setSearch, filter, setFilter, changeTeacher, revoke }) {
-  return <><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-5"><h2 className="text-xl font-black">User Management</h2><p className="mt-1 text-xs text-slate-400">แสดงเฉพาะขอบเขตที่ API อนุญาต ไม่แสดงรหัสผ่าน PIN verifier หรือ service credentials</p></section><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-4"><Toolbar search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} type="users" />{accounts.length === 0 ? <Empty title="ไม่พบบัญชี" detail="ระบบไม่อ่าน auth.users โดยตรงจากเบราว์เซอร์" /> : <div className="overflow-x-auto"><table className="w-full min-w-[900px] text-left text-sm"><thead><tr className="border-b border-white/10 text-xs text-slate-500"><th className="p-3">บัญชี</th><th className="p-3">บทบาท</th><th className="p-3">ขอบเขต</th><th className="p-3">สถานะ</th><th className="p-3 text-right">การดำเนินการ</th></tr></thead><tbody>{accounts.map(a => <tr key={a.key} className="border-b border-white/5"><td className="p-3"><b>{a.displayName}</b>{a.secondaryId && <div className="font-mono text-xs text-slate-500">Student ID: {a.secondaryId}</div>}</td><td className="p-3"><Badge tone="blue">{ROLES[a.role] || a.role}</Badge></td><td className="p-3">{a.schoolName}</td><td className="p-3"><Badge tone={String(a.status).toLowerCase() === 'active' ? 'green' : 'amber'}>{a.status}</Badge></td><td className="p-3 text-right">{a.role === 'teacher' && <button onClick={() => changeTeacher(a)} className="min-h-10 rounded-xl border border-white/10 px-3 text-xs font-bold">{a.status === 'active' ? 'ระงับ' : 'เปิดใช้งาน'}</button>} <button disabled title="ยังไม่มี browser-safe credential reset API" className="min-h-10 cursor-not-allowed rounded-xl border border-white/10 px-3 text-xs text-slate-600">รีเซ็ตรหัสผ่าน</button></td></tr>)}</tbody></table></div>}</section><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-5"><h3 className="font-black">คำเชิญ School Admin</h3><p className="mb-4 text-xs text-slate-400">สร้างและยกเลิกผ่าน RPC ที่ตรวจสิทธิ์ฝั่งเซิร์ฟเวอร์</p>{invitations.length === 0 ? <Empty title="ไม่มีคำเชิญ" detail="สร้างพร้อมโรงเรียนใหม่จาก wizard" /> : <div className="grid gap-3 lg:grid-cols-2">{invitations.map(i => <div key={i.invitation_id || i.id} className="rounded-2xl border border-white/10 bg-slate-950/60 p-4"><b>{i.admin_email || i.email}</b><div className="text-xs text-slate-500">{i.status} · หมดอายุ {fmtDate(i.expires_at)}</div>{i.status === 'pending' && <button onClick={() => revoke(i)} className="mt-3 min-h-10 rounded-xl border border-rose-500/30 px-3 text-xs font-bold text-rose-300">ยกเลิกคำเชิญ</button>}</div>)}</div>}</section></>;
+function AdminsView({ admins, allAdmins, search, setSearch, filter, setFilter, onAdd, onEdit, onDelete, onToggleStatus }) {
+  const stats = [
+    ['🛡️', allAdmins.length, 'Admin ทั้งหมด', 'ผู้ดูแลที่ได้รับสิทธิ์ในระบบ'],
+    ['👑', allAdmins.filter(a => a.role === 'platform_admin').length, 'Platform Admin', 'สิทธิ์ระดับ Super Admin'],
+    ['🏫', allAdmins.filter(a => a.role === 'school_admin').length, 'School Admin', 'ดูแลเฉพาะโรงเรียนตนเอง'],
+    ['⚡', allAdmins.filter(a => a.status === 'active').length, 'Active Accounts', 'เปิดใช้งานปกติ']
+  ];
+
+  const roleLabels = {
+    platform_admin: { name: 'Platform Admin', tone: 'green', icon: '👑' },
+    school_admin: { name: 'School Admin', tone: 'amber', icon: '🏫' },
+    academic_admin: { name: 'Academic Admin', tone: 'blue', icon: '🎓' }
+  };
+
+  return (
+    <>
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map(([icon, value, label, detail]) => (
+          <div key={label} className="rounded-2xl border border-white/10 bg-slate-900/80 p-5">
+            <div className="text-2xl"><UIIcon value={icon} /></div>
+            <div className="mt-3 text-3xl font-black">{value}</div>
+            <div className="text-sm font-bold">{label}</div>
+            <div className="mt-1 text-xs text-slate-500">{detail}</div>
+          </div>
+        ))}
+      </section>
+
+      <section className="rounded-3xl border border-white/10 bg-slate-900/75 p-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-black text-white flex items-center gap-2">
+              <span>🛡️</span> ระบบจัดการ Admin และกำหนดสิทธิ์ (Admin & Permissions Hub)
+            </h2>
+            <p className="mt-1 text-xs text-slate-400">
+              เพิ่ม ลบ แก้ไขสิทธิ์ผู้ดูแลระบบ และกำหนด Check box สิทธิ์การเข้าถึงแต่ละส่วนของแพลตฟอร์ม
+            </p>
+          </div>
+          <button
+            onClick={onAdd}
+            className="min-h-11 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-950 font-black text-xs px-4 shadow-lg shadow-sky-500/20 transition-all flex items-center gap-2 cursor-pointer self-start md:self-auto"
+          >
+            <span>➕</span> เพิ่ม Admin ใหม่
+          </button>
+        </div>
+
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:justify-between">
+          <input
+            aria-label="ค้นหา Admin"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="ค้นหาชื่อ, อีเมล, หรือโรงเรียน…"
+            className="min-h-11 rounded-xl border border-white/10 bg-slate-950 px-4 text-sm md:w-96 text-white outline-none focus:border-sky-400"
+          />
+          <select
+            aria-label="กรองบทบาท"
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+            className="min-h-11 rounded-xl border border-white/10 bg-slate-950 px-3 text-sm text-white outline-none"
+          >
+            <option value="all">บทบาททั้งหมด</option>
+            <option value="platform_admin">👑 Platform Admin</option>
+            <option value="school_admin">🏫 School Admin</option>
+            <option value="academic_admin">🎓 Academic Admin</option>
+            <option value="active">เปิดใช้งาน (Active)</option>
+            <option value="suspended">ระงับสิทธิ์ (Suspended)</option>
+          </select>
+        </div>
+
+        {admins.length === 0 ? (
+          <Empty title="ไม่พบผู้ดูแลระบบ" detail="ลองปรับคำค้นหาหรือตัวกรอง หรือคลิก '+ เพิ่ม Admin ใหม่'" />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[1000px] text-left text-sm">
+              <thead>
+                <tr className="border-b border-white/10 text-xs text-slate-500">
+                  <th className="p-3">ผู้ดูแลระบบ (Admin)</th>
+                  <th className="p-3">บทบาท</th>
+                  <th className="p-3">สังกัด / ขอบเขต</th>
+                  <th className="p-3">สิทธิ์ที่เปิดใช้งาน (Permissions)</th>
+                  <th className="p-3">สถานะ</th>
+                  <th className="p-3 text-right">การดำเนินการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {admins.map(a => {
+                  const roleInfo = roleLabels[a.role] || { name: a.role, tone: 'slate', icon: '👤' };
+                  const perms = a.permissions || {};
+                  const granted = Object.entries(perms).filter(([, v]) => Boolean(v));
+                  const totalPossible = ADMIN_PERMISSIONS.length;
+
+                  return (
+                    <tr key={a.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                      <td className="p-3">
+                        <div className="flex items-center gap-2">
+                          <b className="text-white">{a.name}</b>
+                          {a.isSuperOwner && (
+                            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                              SUPER OWNER
+                            </span>
+                          )}
+                        </div>
+                        <div className="font-mono text-xs text-sky-400 mt-0.5">{a.email}</div>
+                      </td>
+                      <td className="p-3">
+                        <Badge tone={roleInfo.tone}>
+                          <span className="mr-1">{roleInfo.icon}</span> {roleInfo.name}
+                        </Badge>
+                      </td>
+                      <td className="p-3">
+                        <span className="text-xs text-slate-300 font-medium">
+                          {a.schoolName || 'ระบบส่วนกลาง'}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className={`text-[11px] font-black px-2 py-0.5 rounded-full ${
+                              granted.length === totalPossible
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'
+                            }`}>
+                              ✓ {granted.length}/{totalPossible} สิทธิ์
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1 max-w-xs">
+                            {granted.slice(0, 4).map(([pId]) => {
+                              const pDef = ADMIN_PERMISSIONS.find(x => x.id === pId);
+                              return (
+                                <span key={pId} className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-white/5">
+                                  {pDef?.icon} {pDef?.label?.split(' ')[0]}
+                                </span>
+                              );
+                            })}
+                            {granted.length > 4 && (
+                              <span className="text-[10px] text-slate-400 px-1 py-0.5">
+                                +{granted.length - 4} เพิ่มเติม
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-3">
+                        <Badge tone={a.status === 'active' ? 'green' : 'amber'}>
+                          {a.status === 'active' ? 'Active' : 'Suspended'}
+                        </Badge>
+                      </td>
+                      <td className="p-3 text-right">
+                        <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                          <button
+                            onClick={() => onEdit(a)}
+                            className="min-h-9 rounded-xl border border-sky-500/30 bg-sky-500/10 px-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 transition-colors cursor-pointer"
+                            title="แก้ไขข้อมูลและเลือก Check box สิทธิ์"
+                          >
+                            ✏️ แก้ไขสิทธิ์
+                          </button>
+                          {!a.isSuperOwner && (
+                            <>
+                              <button
+                                onClick={() => onToggleStatus(a)}
+                                className={`min-h-9 rounded-xl border px-2.5 text-xs font-bold transition-colors cursor-pointer ${
+                                  a.status === 'active'
+                                    ? 'border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20'
+                                    : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
+                                }`}
+                              >
+                                {a.status === 'active' ? 'ระงับ' : 'เปิดใช้งาน'}
+                              </button>
+                              <button
+                                onClick={() => onDelete(a)}
+                                className="min-h-9 rounded-xl border border-rose-500/30 bg-rose-500/10 px-2.5 text-xs font-bold text-rose-300 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                                title="ลบ Admin นี้ออกจากระบบ"
+                              >
+                                🗑️ ลบ
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </>
+  );
 }
+
 
 function Plans({ plans, subscriptions, schools }) {
   return <><section className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-5"><h2 className="text-xl font-black">Plans & Subscriptions</h2><p className="mt-1 text-sm text-slate-300">ข้อมูลจริงจากเซิร์ฟเวอร์ การสร้างหรือแก้ไขถูกปิดเพราะยังไม่มี Server API ที่ปลอดภัย</p><button disabled className="mt-4 min-h-11 cursor-not-allowed rounded-xl border border-white/10 px-4 text-slate-600">สร้างหรือแก้ไขแผน — ยังไม่พร้อมใช้งาน</button></section><section className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">{plans.map(p => <article key={p.id} className="rounded-3xl border border-white/10 bg-slate-900/75 p-5"><div className="flex justify-between"><div><h3 className="text-lg font-black">{p.name}</h3><div className="font-mono text-xs text-amber-300">{p.code}</div></div><Badge tone={p.is_active ? 'green' : 'slate'}>{p.is_active ? 'Active' : 'Inactive'}</Badge></div><p className="mt-3 text-xs text-slate-400">{p.description || 'ไม่มีคำอธิบาย'}</p><div className="mt-4 grid grid-cols-3 gap-2 text-xs"><div className="rounded-xl bg-slate-950 p-2.5">รายเดือน<br /><b>{fmtMoney(p.price_monthly, p.currency)}</b></div><div className="rounded-xl bg-slate-950 p-2.5">รายเทอม<br /><b>{p.features?.price_semester ? fmtMoney(p.features.price_semester, p.currency) : '—'}</b></div><div className="rounded-xl bg-slate-950 p-2.5">รายปี<br /><b>{fmtMoney(p.price_yearly, p.currency)}</b></div></div><div className="mt-4 space-y-2 text-sm"><div>นักเรียน <b>{p.max_students}</b> <span className="text-emerald-400">บังคับใช้</span></div><div>ครู <b>{p.max_teachers}</b> <span className="text-amber-400">ยังไม่บังคับใช้</span></div><div>ห้องเรียน <b>{p.max_classes}</b> <span className="text-amber-400">ยังไม่บังคับใช้</span></div></div></article>)}</section><section className="rounded-3xl border border-white/10 bg-slate-900/75 p-4"><h3 className="mb-4 font-black">สมาชิกโรงเรียน</h3>{subscriptions.length === 0 ? <Empty title="ไม่พบสมาชิก" detail="ไม่มีค่าทดแทนหรือข้อมูลสมมติ" /> : <div className="overflow-x-auto"><table className="w-full min-w-[850px] text-left text-sm"><thead><tr className="border-b border-white/10 text-xs text-slate-500"><th className="p-3">โรงเรียน</th><th className="p-3">แผน</th><th className="p-3">สถานะสมาชิก</th><th className="p-3">ช่วงสัญญา</th><th className="p-3">โควตา</th></tr></thead><tbody>{subscriptions.map(s => { const school = schools.find(x => x.id === s.school_id); const plan = plans.find(x => x.id === s.plan_id); return <tr key={s.id} className="border-b border-white/5"><td className="p-3 font-bold">{school?.name || s.school_id}</td><td className="p-3">{plan?.name || 'ไม่พร้อมใช้งาน'}</td><td className="p-3"><Badge tone={s.status === 'active' ? 'green' : 'amber'}>{s.status}</Badge></td><td className="p-3 text-xs">{fmtDate(s.starts_at)} – {fmtDate(s.ends_at)}</td><td className="p-3 text-xs">นักเรียน {s.max_students_override ?? plan?.max_students ?? '—'} · ครู {s.max_teachers_override ?? plan?.max_teachers ?? '—'} · ห้อง {s.max_classes_override ?? plan?.max_classes ?? '—'}<div className="text-amber-300">ครู/ห้องยังไม่บังคับใช้</div></td></tr>; })}</tbody></table></div>}</section></>;
@@ -1049,6 +1320,31 @@ function EditSchoolModal({ school, form, setForm, activePlans, onClose, onSave, 
               </div>
             </label>
 
+            <label className="font-bold sm:col-span-2">
+              ราคาข้อตกลงพิเศษ (Custom Agreed Price THB)
+              <div className="mt-1 flex items-center gap-2">
+                <input
+                  type="number"
+                  min="0"
+                  step="10"
+                  value={form.customPrice}
+                  onChange={e => setForm({ ...form, customPrice: e.target.value.replace(/[^0-9]/g, '') })}
+                  className={`${input} mt-0 font-mono`}
+                  placeholder="เช่น 1190 หรือ 3500 (เว้นว่างไว้เพื่อใช้ราคามาตรฐานตามแผน)"
+                />
+                {form.customPrice && (
+                  <button
+                    type="button"
+                    onClick={() => setForm({ ...form, customPrice: '' })}
+                    className="min-h-11 px-3 rounded-xl border border-white/10 bg-slate-800 text-xs font-bold text-slate-300 hover:text-white shrink-0"
+                  >
+                    ล้างค่า
+                  </button>
+                )}
+              </div>
+              <span className="mt-1 block text-[11px] text-slate-400">ระบุราคาที่เจรจากับโรงเรียน เช่น แพ็กเกจต่อรองพิเศษ หรือเงินอุดหนุนเฉพาะกรณี</span>
+            </label>
+
             <label className="font-bold">
               สถานะสมาชิก
               <select
@@ -1073,6 +1369,59 @@ function EditSchoolModal({ school, form, setForm, activePlans, onClose, onSave, 
                 className={input}
               />
             </label>
+
+            <div className="sm:col-span-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3.5 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-amber-300">⚡ ทางลัดขยายวันหมดอายุ / ต่อเวลาทดลอง:</span>
+                <span className="text-[11px] text-slate-400">คลิกเพื่อบวกวันทันที</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const base = form.endsAt ? new Date(form.endsAt) : new Date();
+                    base.setDate(base.getDate() + 7);
+                    setForm({ ...form, endsAt: base.toISOString().slice(0, 10), subscriptionStatus: form.subscriptionStatus === 'expired' ? 'trialing' : form.subscriptionStatus });
+                  }}
+                  className="rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-bold text-amber-200 hover:bg-amber-400 hover:text-slate-950 transition-all cursor-pointer"
+                >
+                  +7 วัน
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const base = form.endsAt ? new Date(form.endsAt) : new Date();
+                    base.setDate(base.getDate() + 15);
+                    setForm({ ...form, endsAt: base.toISOString().slice(0, 10), subscriptionStatus: form.subscriptionStatus === 'expired' ? 'trialing' : form.subscriptionStatus });
+                  }}
+                  className="rounded-xl border border-amber-400/50 bg-amber-400/25 px-3 py-1.5 text-xs font-black text-amber-300 hover:bg-amber-400 hover:text-slate-950 transition-all shadow-sm cursor-pointer"
+                >
+                  🔥 +15 วัน (Trial Pass)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const base = form.endsAt ? new Date(form.endsAt) : new Date();
+                    base.setDate(base.getDate() + 30);
+                    setForm({ ...form, endsAt: base.toISOString().slice(0, 10), subscriptionStatus: form.subscriptionStatus === 'expired' ? 'active' : form.subscriptionStatus });
+                  }}
+                  className="rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-bold text-amber-200 hover:bg-amber-400 hover:text-slate-950 transition-all cursor-pointer"
+                >
+                  +30 วัน (1 เดือน)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const base = new Date();
+                    base.setMonth(base.getMonth() + 5);
+                    setForm({ ...form, endsAt: base.toISOString().slice(0, 10), subscriptionStatus: 'active' });
+                  }}
+                  className="rounded-xl border border-emerald-400/30 bg-emerald-400/15 px-3 py-1.5 text-xs font-bold text-emerald-300 hover:bg-emerald-400 hover:text-slate-950 transition-all cursor-pointer"
+                >
+                  🎓 +1 ภาคเรียน (5 เดือน)
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="flex gap-2 pt-3 border-t border-white/10">
