@@ -646,6 +646,7 @@ export default function TeacherDashboard({ initialTab = 'overview' }) {
     const report = buildExecutivePretestReport(filteredStudents);
     const html = renderExecutivePretestReport(report, displaySchool, {
       scope: selectedClass === 'all' ? 'นักเรียนทุกห้องในรายชื่อที่โหลด' : 'ห้อง ' + selectedClass,
+      teacherName: currentTeacher?.teacher_name || currentTeacher?.name || currentTeacher?.email || 'ครูผู้สอนวิชาภาษาอังกฤษ',
     });
     const printWindow = window.open('', '_blank');
     if (!printWindow) {

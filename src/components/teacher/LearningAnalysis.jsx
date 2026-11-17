@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BarChart3, BookOpen, ChevronRight, ClipboardList, FileSearch, Users, CheckCircle2, Sparkles, Compass } from 'lucide-react';
-import { summarizeQuestScores, getTeacherVerifiedIndicators } from '../../utils/learningAnalysis';
+import { summarizeQuestScores, summarizeSkillScores, getTeacherVerifiedIndicators } from '../../utils/learningAnalysis';
 import '../../styles/learningAnalysis.css';
 
 const tabs = [
@@ -12,6 +12,8 @@ const tabs = [
 export default function LearningAnalysis({ students, formatQuestLabel, onQuest, onStudentList, onQuestionReview, dataUnavailable = false }) {
   const [view, setView] = useState('indicators');
   const quests = summarizeQuestScores(students);
+  const skillSummaries = summarizeSkillScores(students);
+  const hasAnySkillEvidence = skillSummaries.some(s => s.hasEvidence);
   const verifiedIndicators = getTeacherVerifiedIndicators();
 
   if (dataUnavailable) {
@@ -113,19 +115,67 @@ export default function LearningAnalysis({ students, formatQuestLabel, onQuest, 
           <div className="learning-analysis-heading">
             <div>
               <span className="learning-analysis-eyebrow">หลักฐานการเรียนรู้</span>
-              <h4 id="skill-title">รายทักษะ</h4>
-              <p>ติดตามทักษะจากหลักฐานที่ระบุแหล่งและขอบเขตได้</p>
+              <h4 id="skill-title">รายทักษะภาษาอังกฤษ</h4>
+              <p>ติดตามและสรุปคะแนนทักษะหลักจาก Quest และกิจกรรมฝึกในห้องเรียนนี้</p>
             </div>
-            <span className="learning-analysis-pending">ยังไม่มีสรุประดับห้อง</span>
+            {hasAnySkillEvidence ? (
+              <span className="learning-analysis-pending is-verified">
+                <CheckCircle2 size={13} aria-hidden="true" /> มีข้อมูลการฝึก
+              </span>
+            ) : (
+              <span className="learning-analysis-pending">รอเริ่มฝึก</span>
+            )}
           </div>
-          <div className="learning-analysis-empty">
-            <BarChart3 size={28} aria-hidden="true" />
-            <h5>ยังไม่มีข้อมูลรายทักษะระดับห้องที่สรุปได้</h5>
-            <p>ผล Quest ไม่ใช่คะแนนตัวชี้วัดโดยอัตโนมัติ สามารถดูหลักฐานรายทักษะที่มีอยู่ในรายงานนักเรียนแต่ละคนได้</p>
-            <button type="button" onClick={onStudentList}>
-              เปิดรายชื่อนักเรียน <ChevronRight size={16} />
-            </button>
-          </div>
+
+          {hasAnySkillEvidence ? (
+            <div className="learning-analysis-quest-list">
+              {skillSummaries.map((skill) => (
+                <article className="learning-analysis-quest" key={skill.id}>
+                  <div className="learning-analysis-quest-top">
+                    <div>
+                      <strong>{skill.name} <small>({skill.english})</small></strong>
+                      <p style={{ margin: '3px 0 0', fontSize: '11px', color: 'var(--la-muted)' }}>{skill.scope}</p>
+                    </div>
+                    <span>
+                      {skill.avg !== null ? `${skill.avg}%` : '—'} <small>· {skill.count} คนมีคะแนน</small>
+                    </span>
+                  </div>
+                  {skill.avg !== null && (
+                    <div className="learning-analysis-bar" aria-hidden="true">
+                      <span
+                        style={{
+                          width: `${skill.avg}%`,
+                          backgroundColor: skill.avg >= 70 ? '#22c55e' : skill.avg >= 50 ? '#f59e0b' : '#ef4444'
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="learning-analysis-quest-bottom">
+                    <span>
+                      {skill.belowThreshold > 0
+                        ? `ต่ำกว่าเกณฑ์ 70%: ${skill.belowThreshold} รายการฝึก`
+                        : skill.count > 0 ? 'ผ่านเกณฑ์ทุกรายการที่บันทึก' : 'ยังไม่มีผู้เรียนทำแบบฝึก'}
+                    </span>
+                    <button type="button" onClick={onStudentList}>
+                      ดูหลักฐานรายคน <ChevronRight size={15} />
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="learning-analysis-empty">
+              <BarChart3 size={28} aria-hidden="true" />
+              <h5>ยังไม่มีคะแนนแบบฝึกหัดรายทักษะระดับห้อง</h5>
+              <p>ผลการเรียนรู้รายทักษะ (คำศัพท์, การอ่าน, ไวยากรณ์) จะสรุปขึ้นโดยอัตโนมัติเมื่อนักเรียนเริ่มฝึกใน Quest Map หรือ Vocab Drill</p>
+              <button type="button" onClick={onStudentList}>
+                เปิดรายชื่อนักเรียน <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
+          <p className="learning-analysis-footnote">
+            คงการวิเคราะห์ทักษะภาษาอังกฤษเดิมไว้ควบคู่กับตัวชี้วัด เพื่อช่วยครูมองเห็นภาพรวมทางภาษาในห้องเรียน
+          </p>
         </section>
       )}
 

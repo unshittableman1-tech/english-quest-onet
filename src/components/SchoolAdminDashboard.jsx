@@ -14,7 +14,7 @@ import { schoolEntryUrl } from '../utils/schoolEntry';
 import {
   getSchoolAdminDashboard, listSchoolStudents, getStudentSeatHistory,
   updateStudentProfile, changeStudentSeat, createStudentsBulk,
-  listSchoolTeachers, setTeacherMembership, parseStudentCSV,
+  listSchoolTeachers, setTeacherMembership, updateSchoolTeacherName, parseStudentCSV,
   validateStudentImportBatch, generateRequestId, resetSchoolStudentPin
 } from '../utils/schoolAdmin';
 
@@ -71,6 +71,8 @@ export default function SchoolAdminDashboard({ onBackToTeacher, embedded = false
   const [historyLoading, setHistoryLoading] = useState(false);
   const [showAddTeacherModal, setShowAddTeacherModal] = useState(false);
   const [teacherUserId, setTeacherUserId] = useState('');
+  const [editingTeacherId, setEditingTeacherId] = useState(null);
+  const [teacherName, setTeacherName] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
   // Bulk Import State
@@ -276,6 +278,24 @@ export default function SchoolAdminDashboard({ onBackToTeacher, embedded = false
   };
 
   // Teacher Handlers
+  const handleSaveTeacherName = async (teacher) => {
+    if (!teacherName.trim()) {
+      showToast('กรุณาระบุชื่อและนามสกุลครู');
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await updateSchoolTeacherName(schoolId, teacher.user_id, teacherName);
+      setEditingTeacherId(null);
+      showToast('บันทึกชื่อครูแล้ว');
+      await loadData();
+    } catch (err) {
+      showToast(`บันทึกชื่อครูไม่สำเร็จ: ${err.message}`);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleToggleTeacher = async (teacher) => {
     const willEnable = teacher.status !== 'active';
     if (teacher.user_id === currentStaff?.user_id) {
@@ -548,8 +568,8 @@ export default function SchoolAdminDashboard({ onBackToTeacher, embedded = false
         </div>
 
         {/* ── Tabs Navigation Bar ──────────────────────────────────── */}
-        <div className="glass-card-dark p-2 rounded-2xl flex items-center justify-between gap-3 border border-white/5">
-          <div className="flex gap-2">
+        <div className="glass-card-dark p-2 rounded-2xl flex flex-wrap items-center justify-between gap-3 border border-white/5">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setActiveTab('students')}
               className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
@@ -576,13 +596,6 @@ export default function SchoolAdminDashboard({ onBackToTeacher, embedded = false
 
           {activeTab === 'students' && (
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setShowImportModal(true)}
-                className="px-3.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 active:scale-95 transition-all"
-              >
-                <Upload size={14} />
-                <span>นำเข้า Excel / CSV</span>
-              </button>
               <button type="button" onClick={() => setNewStudent({student_id:'',name:'',class:'',number:''})} className="rounded-xl bg-sky-600 px-3 py-2 text-xs font-bold text-white">เพิ่มนักเรียน</button>
             </div>
           )}
@@ -603,6 +616,16 @@ export default function SchoolAdminDashboard({ onBackToTeacher, embedded = false
         {/* ── TAB 1: Student Management ────────────────────────────── */}
         {activeTab === 'students' && (
           <div className="space-y-4">
+            <section aria-labelledby="student-import-tools-title" className="rounded-2xl border border-emerald-500/25 bg-slate-900/70 p-4 md:p-5">
+              <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <div className="min-w-0"><h3 id="student-import-tools-title" className="flex items-center gap-2 text-sm font-bold text-white"><Upload size={17} className="text-emerald-400" aria-hidden="true" /> นำเข้ารายชื่อนักเรียน</h3><p className="mt-1 text-xs leading-relaxed text-slate-400">ดาวน์โหลดแบบฟอร์ม กรอกข้อมูล แล้วนำไฟล์กลับมาตรวจสอบก่อนนำเข้า</p></div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button type="button" onClick={() => { downloadStudentImportTemplate('แบบฟอร์มนำเข้านักเรียน_EnglishQuest_มาตรฐาน.csv', 'standard'); showToast('ดาวน์โหลดแบบฟอร์มชื่อรวมแล้ว'); }} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-slate-600 bg-slate-800 px-3 text-xs font-bold text-slate-100 hover:bg-slate-700"><Download size={15} aria-hidden="true" /> แบบฟอร์มชื่อรวม</button>
+                  <button type="button" onClick={() => { downloadStudentImportTemplate('แบบฟอร์มนำเข้านักเรียน_EnglishQuest_แยกคำนำหน้า.csv', 'detailed'); showToast('ดาวน์โหลดแบบฟอร์มแยกชื่อแล้ว'); }} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-slate-600 bg-slate-800 px-3 text-xs font-bold text-slate-100 hover:bg-slate-700"><Download size={15} aria-hidden="true" /> แบบฟอร์มแยกชื่อ</button>
+                  <button type="button" onClick={() => setShowImportModal(true)} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-emerald-500 px-4 text-xs font-black text-slate-950 hover:bg-emerald-400"><Upload size={15} aria-hidden="true" /> นำเข้า Excel / CSV</button>
+                </div>
+              </div>
+            </section>
             {/* Search & Filter Toolbar */}
             <div className="glass-card-dark p-3.5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-3 border border-white/5">
               <div className="relative w-full md:w-96">
@@ -818,7 +841,7 @@ export default function SchoolAdminDashboard({ onBackToTeacher, embedded = false
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="border-b border-white/10 text-slate-400 font-bold uppercase tracking-wider bg-slate-950/70">
-                    <th className="py-3 px-4">อีเมล / รหัสผู้ใช้</th>
+                    <th className="py-3 px-4">ชื่อ–นามสกุล / อีเมล</th>
                     <th className="py-3 px-4 text-center">บทบาท (Role)</th>
                     <th className="py-3 px-4 text-center">สถานะสิทธิ์</th>
                     <th className="py-3 px-4 text-center">วันที่เพิ่มเข้าสู่ระบบ</th>
@@ -840,8 +863,20 @@ export default function SchoolAdminDashboard({ onBackToTeacher, embedded = false
                       const isActive = t.status === 'active';
                       return (
                         <tr key={t.user_id} className="hover:bg-white/[0.04] transition-colors">
-                          <td className="py-3 px-4 font-mono font-medium text-white">
-                            <div>{t.email || t.user_id}</div>
+                          <td className="py-3 px-4 font-medium text-white">
+                            {editingTeacherId === t.user_id ? (
+                              <div className="flex flex-wrap items-center gap-2">
+                                <input aria-label="ชื่อและนามสกุลครู" maxLength={200} value={teacherName} onChange={(event) => setTeacherName(event.target.value)} className="min-w-0 rounded-lg border border-slate-600 bg-slate-900 px-2 py-1 text-white" />
+                                <button type="button" disabled={actionLoading} onClick={() => handleSaveTeacherName(t)} className="text-emerald-300">บันทึก</button>
+                                <button type="button" disabled={actionLoading} onClick={() => setEditingTeacherId(null)} className="text-slate-400">ยกเลิก</button>
+                              </div>
+                            ) : (
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span>{t.teacher_name || 'ยังไม่ได้ระบุชื่อ–นามสกุล'}</span>
+                                <button type="button" onClick={() => { setEditingTeacherId(t.user_id); setTeacherName(t.teacher_name || ''); }} className="text-sky-400 hover:text-sky-300">{t.teacher_name ? 'แก้ไขชื่อ' : 'เพิ่มชื่อ'}</button>
+                              </div>
+                            )}
+                            <div className="mt-1 font-mono text-slate-400">{t.email || t.user_id}</div>
                             {isSelf && <span className="text-[10px] text-sky-400 font-bold">(บัญชีของคุณ)</span>}
                           </td>
                           <td className="py-3 px-4 text-center">
@@ -1092,30 +1127,6 @@ export default function SchoolAdminDashboard({ onBackToTeacher, embedded = false
                 <p className="font-mono text-emerald-300">student_id, name, class, number</p>
                 <p className="text-slate-400">หรือภาษาไทย: <span className="font-mono">รหัสนักเรียน, ชื่อ-นามสกุล, ชั้น, เลขที่</span></p>
                 <p className="text-slate-400">หากแยกคอลัมน์ ใช้หัวข้อ คำนำหน้า, ชื่อ และ นามสกุล ระบบจะรวมเป็นชื่อที่แสดง โปรดตรวจตัวอย่างก่อนนำเข้า</p>
-                <div className="pt-2 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      downloadStudentImportTemplate('แบบฟอร์มนำเข้านักเรียน_EnglishQuest_มาตรฐาน.csv', 'standard');
-                      showToast('📥 ดาวน์โหลดแบบฟอร์มมาตรฐานเรียบร้อยแล้ว');
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors cursor-pointer shadow-md"
-                  >
-                    <Download size={14} />
-                    <span>📥 แบบฟอร์มมาตรฐาน (ชื่อรวม)</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      downloadStudentImportTemplate('แบบฟอร์มนำเข้านักเรียน_EnglishQuest_แยกคำนำหน้า.csv', 'detailed');
-                      showToast('📥 ดาวน์โหลดแบบฟอร์มแยกคำนำหน้าชื่อเรียบร้อยแล้ว');
-                    }}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs transition-colors cursor-pointer shadow-md"
-                  >
-                    <Download size={14} />
-                    <span>📥 แบบฟอร์มแยกคำนำหน้า (คำนำหน้า/ชื่อ/นามสกุล)</span>
-                  </button>
-                </div>
               </div>
 
               <label className="block text-sm font-bold">เลือกไฟล์ CSV / Excel (.xlsx)

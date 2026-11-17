@@ -162,6 +162,17 @@ export async function listSchoolTeachers(schoolId) {
   return Array.isArray(data) ? data : [];
 }
 
+export async function updateSchoolTeacherName(schoolId, userId, name) {
+  if (!userId) throw new Error('target_user_id_required');
+  const trimmedName = name.trim();
+  if (!trimmedName || trimmedName.length > 200) throw new Error('invalid_teacher_name');
+  return callRpc('school_admin_update_teacher_name', {
+    p_school_id: requireSchoolId(schoolId),
+    p_user_id: userId,
+    p_name: trimmedName,
+  });
+}
+
 /**
  * Add or suspend a teacher membership for the school.
  */

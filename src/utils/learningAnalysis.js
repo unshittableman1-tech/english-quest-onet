@@ -1,3 +1,5 @@
+import { SKILL_PRACTICE_SCOPES } from '../data/skillPracticeScopes.js';
+
 export function validQuestPercent(value) {
   if (typeof value !== 'number' && !(typeof value === 'string' && value.trim())) return null;
   const score = Number(value);
@@ -19,6 +21,54 @@ export function summarizeQuestScores(students) {
   }
   return Array.from(groups, ([id, group]) => ({ id, avg: Math.round(group.total / group.count), count: group.count, belowThreshold: group.belowThreshold }))
     .sort((a,b) => a.avg - b.avg || a.id.localeCompare(b.id));
+}
+
+export function summarizeSkillScores(students = []) {
+  if (!Array.isArray(students) || students.length === 0) {
+    return SKILL_PRACTICE_SCOPES.map(scope => ({
+      id: scope.id,
+      name: scope.name,
+      english: scope.english,
+      scope: scope.scope,
+      avg: null,
+      count: 0,
+      totalEntries: 0,
+      belowThreshold: 0,
+      hasEvidence: false,
+    }));
+  }
+
+  return SKILL_PRACTICE_SCOPES.map(scope => {
+    let totalScore = 0;
+    let scoreCount = 0;
+    let belowThreshold = 0;
+    const studentIds = new Set();
+
+    for (const student of students) {
+      const progress = student?.questProgress || {};
+      for (const questId of scope.questIds) {
+        const val = validQuestPercent(progress[questId]?.pct);
+        if (val !== null) {
+          totalScore += val;
+          scoreCount++;
+          studentIds.add(student.id || student.student_id);
+          if (val < 70) belowThreshold++;
+        }
+      }
+    }
+
+    return {
+      id: scope.id,
+      name: scope.name,
+      english: scope.english,
+      scope: scope.scope,
+      avg: scoreCount > 0 ? Math.round(totalScore / scoreCount) : null,
+      count: studentIds.size,
+      totalEntries: scoreCount,
+      belowThreshold,
+      hasEvidence: scoreCount > 0,
+    };
+  });
 }
 
 export const REMEDIAL_PATHWAYS = Object.freeze({
