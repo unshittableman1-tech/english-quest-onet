@@ -1556,13 +1556,24 @@ export default function TeacherDashboard({ initialTab = 'overview' }) {
                 <button
                   type="button"
                   onClick={() => {
-                    downloadStudentImportTemplate();
-                    showToast('📥 ดาวน์โหลดแบบฟอร์มเรียบร้อยแล้ว');
+                    downloadStudentImportTemplate('แบบฟอร์มนำเข้านักเรียน_EnglishQuest_มาตรฐาน.csv', 'standard');
+                    showToast('📥 ดาวน์โหลดแบบฟอร์มมาตรฐานเรียบร้อยแล้ว');
                   }}
                   className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-emerald-950/30 transition-all active:scale-95 cursor-pointer"
-                  title="ดาวน์โหลดแบบฟอร์ม Excel / CSV ตัวอย่าง"
+                  title="ดาวน์โหลดแบบฟอร์ม Excel / CSV มาตรฐาน"
                 >
-                  <UIIcon value={"📥"} /> แบบฟอร์ม Excel
+                  <UIIcon value={"📥"} /> แบบฟอร์มมาตรฐาน
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    downloadStudentImportTemplate('แบบฟอร์มนำเข้านักเรียน_EnglishQuest_แยกคำนำหน้า.csv', 'detailed');
+                    showToast('📥 ดาวน์โหลดแบบฟอร์มแยกคำนำหน้าชื่อเรียบร้อยแล้ว');
+                  }}
+                  className="px-3.5 py-2 bg-teal-700 hover:bg-teal-600 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-teal-950/30 transition-all active:scale-95 cursor-pointer"
+                  title="ดาวน์โหลดแบบฟอร์ม Excel / CSV แยกคำนำหน้าชื่อ"
+                >
+                  <UIIcon value={"📥"} /> แบบฟอร์มแยกคำนำหน้า
                 </button>
                 <button
                   onClick={() => setShowExportModal(true)}

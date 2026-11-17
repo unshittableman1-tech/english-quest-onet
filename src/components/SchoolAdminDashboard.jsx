@@ -1092,17 +1092,28 @@ export default function SchoolAdminDashboard({ onBackToTeacher, embedded = false
                 <p className="font-mono text-emerald-300">student_id, name, class, number</p>
                 <p className="text-slate-400">หรือภาษาไทย: <span className="font-mono">รหัสนักเรียน, ชื่อ-นามสกุล, ชั้น, เลขที่</span></p>
                 <p className="text-slate-400">หากแยกคอลัมน์ ใช้หัวข้อ คำนำหน้า, ชื่อ และ นามสกุล ระบบจะรวมเป็นชื่อที่แสดง โปรดตรวจตัวอย่างก่อนนำเข้า</p>
-                <div className="pt-2 flex justify-start">
+                <div className="pt-2 flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() => {
-                      downloadStudentImportTemplate();
-                      showToast('📥 ดาวน์โหลดแบบฟอร์มเรียบร้อยแล้ว');
+                      downloadStudentImportTemplate('แบบฟอร์มนำเข้านักเรียน_EnglishQuest_มาตรฐาน.csv', 'standard');
+                      showToast('📥 ดาวน์โหลดแบบฟอร์มมาตรฐานเรียบร้อยแล้ว');
                     }}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors cursor-pointer shadow-md"
                   >
                     <Download size={14} />
-                    <span>📥 ดาวน์โหลดแบบฟอร์ม Excel / CSV ตัวอย่าง</span>
+                    <span>📥 แบบฟอร์มมาตรฐาน (ชื่อรวม)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      downloadStudentImportTemplate('แบบฟอร์มนำเข้านักเรียน_EnglishQuest_แยกคำนำหน้า.csv', 'detailed');
+                      showToast('📥 ดาวน์โหลดแบบฟอร์มแยกคำนำหน้าชื่อเรียบร้อยแล้ว');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs transition-colors cursor-pointer shadow-md"
+                  >
+                    <Download size={14} />
+                    <span>📥 แบบฟอร์มแยกคำนำหน้า (คำนำหน้า/ชื่อ/นามสกุล)</span>
                   </button>
                 </div>
               </div>

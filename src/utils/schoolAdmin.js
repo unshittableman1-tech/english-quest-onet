@@ -585,6 +585,7 @@ export function parseStudentCSV(csvText) {
   for (let i = startIndex; i < lines.length; i += 1) {
     const cols = lines[i];
     if (cols.length === 0 || cols.every((c) => !c)) continue;
+    if (cols[0] && (String(cols[0]).trim().startsWith('#') || String(cols[0]).trim().startsWith('//'))) continue;
 
     let studentId = '';
     let name = '';

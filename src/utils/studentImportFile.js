@@ -142,12 +142,22 @@ export const STUDENT_IMPORT_TEMPLATE_CSV = '\uFEFF' + [
   'BNS-60102,ด.ญ. ฟ้าใส เรียนดี,ป.6/1,2',
   'BNS-60103,ด.ช. ตะวัน ขยันมั่นเพียร,ป.6/1,3',
   'BNS-60104,ด.ญ. มุกดา สดใส,ป.6/1,4',
-  'BNS-60105,ด.ช. อารีย์ สุขเจริญ,ป.6/1,5',
+  'BNS-60201,ด.ช. อารีย์ สุขเจริญ,ป.6/2,1',
 ].join('\r\n');
 
-export function downloadStudentImportTemplate(filename = 'แบบฟอร์มนำเข้านักเรียน_EnglishQuest.csv') {
+export const STUDENT_IMPORT_TEMPLATE_DETAILED_CSV = '\uFEFF' + [
+  'รหัสนักเรียน,คำนำหน้าชื่อ,ชื่อ,นามสกุล,ชั้น,เลขที่',
+  'BNS-60101,ด.ช.,ภูผา,สมบูรณ์,ป.6/1,1',
+  'BNS-60102,ด.ญ.,ฟ้าใส,เรียนดี,ป.6/1,2',
+  'BNS-60103,ด.ช.,ตะวัน,ขยันมั่นเพียร,ป.6/1,3',
+  'BNS-60104,ด.ญ.,มุกดา,สดใส,ป.6/1,4',
+  'BNS-60201,ด.ช.,อารีย์,สุขเจริญ,ป.6/2,1',
+].join('\r\n');
+
+export function downloadStudentImportTemplate(filename = 'แบบฟอร์มนำเข้านักเรียน_EnglishQuest.csv', format = 'standard') {
   if (typeof document === 'undefined') return;
-  const blob = new Blob([STUDENT_IMPORT_TEMPLATE_CSV], { type: 'text/csv;charset=utf-8;' });
+  const content = format === 'detailed' ? STUDENT_IMPORT_TEMPLATE_DETAILED_CSV : STUDENT_IMPORT_TEMPLATE_CSV;
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;

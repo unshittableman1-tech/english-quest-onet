@@ -7,6 +7,7 @@ import { createDemoStudent, DEMO_RANKING_STUDENTS } from '../data/demoFixtures';
 import { submitQuestToServer, addXPToServer, syncStudentProgressToServer } from './studentProgressApi';
 import { recordQuestMistake, reviewQuestMistake } from './questReviewGate';
 import { normalizeClassName } from './studentImportFile';
+import { parseStudentCSV } from './schoolAdmin';
 import { submitPretestAttempt, stagePretestAttempt, clearPendingPretest } from './pretestPersistence';
 
 const PREFIX = 'eq_onet_';
@@ -742,75 +743,14 @@ export async function exportStudentsCSV() {
 }
 
 export async function parseCSVData(csvText) {
-  const lines = csvText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-  if (lines.length === 0) return [];
-  
-  const firstLine = lines[0].toLowerCase();
-  let startIndex = 0;
-  let idIdx = -1, nameIdx = -1, classIdx = -1, numberIdx = -1;
-
-  if (firstLine.includes('ชื่อ') || firstLine.includes('name') || firstLine.includes('student_id')) {
-    startIndex = 1;
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/^"|"$/g, ''));
-    headers.forEach((h, idx) => {
-      if (h.includes('student_id') || h.includes('รหัส') || h === 'id') idIdx = idx;
-      else if (h.includes('name') || h.includes('ชื่อ')) nameIdx = idx;
-      else if (h.includes('class') || h.includes('ชั้น') || h.includes('ห้อง')) classIdx = idx;
-      else if (h.includes('number') || h.includes('เลขที่') || h.includes('ลำดับ')) numberIdx = idx;
-    });
-  }
-  
-  const results = [];
-  for (let i = startIndex; i < lines.length; i++) {
-    const cols = [];
-    let curr = '';
-    let inQuotes = false;
-    for (let c of lines[i]) {
-      if (c === '"') inQuotes = !inQuotes;
-      else if (c === ',' && !inQuotes) { cols.push(curr); curr = ''; }
-      else curr += c;
-    }
-    cols.push(curr);
-    
-    const cleanCols = cols.map(c => c.trim().replace(/^"|"$/g, ''));
-    
-    if (cleanCols.length >= 3) {
-      let studentId = '', name = '', className = '', number = '';
-      
-      if (idIdx !== -1 && nameIdx !== -1 && classIdx !== -1 && numberIdx !== -1) {
-        studentId = cleanCols[idIdx] || '';
-        name = cleanCols[nameIdx] || '';
-        className = cleanCols[classIdx] || '';
-        number = cleanCols[numberIdx] || '';
-      } else if (cleanCols.length >= 4 && !isNaN(cleanCols[0]) && isNaN(cleanCols[1])) {
-        number = cleanCols[0];
-        name = cleanCols[1];
-        className = cleanCols[3];
-      } else if (cleanCols.length >= 4 && isNaN(cleanCols[0]) && isNaN(cleanCols[1])) {
-        studentId = cleanCols[0];
-        name = cleanCols[1];
-        className = cleanCols[2];
-        number = cleanCols[3];
-      } else {
-        name = cleanCols[0];
-        className = cleanCols[1];
-        number = cleanCols[2];
-      }
-      
-      className = normalizeClassName(className);
-      
-      if (name && className && number) {
-        results.push({
-          student_id: studentId,
-          name: name,
-          class: className,
-          number: number.toString(),
-          role: 'student'
-        });
-      }
-    }
-  }
-  return results;
+  const rows = parseStudentCSV(csvText);
+  return rows.map(r => ({
+    student_id: r.student_id,
+    name: r.name,
+    class: r.class,
+    number: String(r.number),
+    role: 'student'
+  }));
 }
 
 // ── Reset Data ────────────────────────────────────────────────
