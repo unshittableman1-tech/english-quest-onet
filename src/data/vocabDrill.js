@@ -156,6 +156,28 @@ const cultureIllustrations = [
   ['mothers-new-year', 'ภาพการอวยพรปีใหม่ด้วยของขวัญและดาวประดับ'],
 ].map(([slug, imageAlt]) => ({ image: `/learning/culture_festivals/${slug}-v1.png`, imageAlt }));
 
+// Words in the two supplied handout pages; a separate deck preserves existing card IDs and history.
+const onetHandoutVerbRows = [
+  ['jump','กระโดด'], ['swim','ว่ายน้ำ'], ['draw','วาดภาพ'], ['paint','ระบายสี'], ['cut','ตัด'],
+  ['push','ผลัก'], ['pull','ดึง'], ['sit','นั่ง'], ['stand','ยืน'], ['run','วิ่ง'], ['walk','เดิน'],
+  ['climb','ปีน'], ['throw','ขว้าง'], ['catch','จับสิ่งที่เคลื่อนมา'], ['carry','ถือหรือแบกไป'], ['kick','เตะ'], ['hold','จับหรือถือไว้'],
+  ['eat','กิน'], ['drink','ดื่ม'], ['cook','ทำอาหาร'], ['wash','ล้าง'], ['clean','ทำความสะอาด'],
+  ['brush','แปรงฟันหรือผม'], ['comb','หวีผม'], ['sleep','นอน'], ['wake up','ตื่นนอน'], ['take a bath','อาบน้ำในอ่าง'],
+  ['get dressed','แต่งตัว'], ['eat breakfast','กินอาหารเช้า'], ['do homework','ทำการบ้าน'], ['go to school','ไปโรงเรียน'], ['go home','กลับบ้าน'],
+  ['study','เรียนหรือศึกษา'], ['learn','เรียนรู้'], ['teach','สอน'], ['read','อ่าน'], ['write','เขียน'], ['spell','สะกดคำ'],
+  ['remember','จำ'], ['forget','ลืม'], ['ask','ถาม'], ['answer','ตอบ'], ['think','คิด'], ['know','รู้'], ['understand','เข้าใจ'],
+  ['smile','ยิ้ม'], ['cry','ร้องไห้'], ['laugh','หัวเราะ'], ['love','รัก'], ['like','ชอบ'], ['hate','เกลียด'],
+  ['angry','โกรธ'], ['sad','เศร้า'], ['happy','มีความสุข'], ['worry','กังวล'], ['excited','ตื่นเต้น'], ['surprised','ประหลาดใจ'], ['proud','ภูมิใจ'],
+  ['say','กล่าวคำพูด'], ['tell','บอกเล่า'], ['talk','สนทนา'], ['speak','พูดหรือใช้ภาษา'], ['call','โทรหาหรือเรียก'],
+  ['shout','ตะโกน'], ['whisper','กระซิบ'], ['greet','ทักทาย'],
+];
+const handoutFeelingAdjectives = new Set(['angry','sad','happy','excited','surprised','proud']);
+const handoutVerbsDeck = learningDeck('onet_handout_verbs_v1', onetHandoutVerbRows, [], {
+  sourceScope:'user_supplied_student_handout_verbs', cardMetadata:{learningOnly:true},
+});
+handoutVerbsDeck.cards = handoutVerbsDeck.cards.map(card => handoutFeelingAdjectives.has(card.back)
+  ? { ...card, hint:'คำคุณศัพท์แสดงความรู้สึก เช่น ใช้ตามหลัง am / is / are' } : card);
+
 // Learning phrases from the supplied student handout, kept together as one deck.
 const onetQuestionPhraseRows = [
   ['Read the sentences.', 'อ่านประโยค'],
@@ -217,6 +239,7 @@ const decisivePairRows = [
 ];
 
 const NEW_DECKS = {
+  onet_handout_verbs: handoutVerbsDeck,
   onet_question_phrases: learningDeck('onet_question_phrases_v1', onetQuestionPhraseRows, [], {
     sourceScope: 'user_supplied_student_handout_page_11',
     cardMetadata: { learningOnly: true },
@@ -562,6 +585,7 @@ export const VOCAB_CATEGORIES = [
   { id: 'profile', name: 'ข้อมูลส่วนตัว (My Profile)', icon: '👤', tone: 'sky', group: 'words', questId: 'about_myself', missionId: 'about_profile_flip' },
   { id: 'family_words', name: 'ครอบครัว (Family Words)', icon: '👪', tone: 'rose', group: 'words', questId: 'family', missionId: 'family_relation_flip' },
   { id: 'classroom_words', name: 'โรงเรียนและห้องเรียน (Classroom Words)', icon: '📚', tone: 'mint', group: 'words', questId: 'school', missionId: 'school_object_flip' },
+  { id: 'onet_handout_verbs', presentation: 'text', name: 'คำกริยาและความรู้สึก ป.6', icon: '🏃', tone: 'mint', group: 'quest_verbs', deckId: 'onet_handout_verbs', sourceNote: 'รวมคำจากเอกสารที่ให้มาเพื่อฝึกคำศัพท์ คำบอกความรู้สึกบางคำเป็นคำคุณศัพท์' },
   { id: 'quest_verbs_classroom', name: 'อ่านโจทย์และเรียนในห้อง', icon: '📖', tone: 'sky', group: 'quest_verbs', deckId: 'quest_verbs_classroom' },
   { id: 'quest_verbs_communication', name: 'สนทนาและความรู้สึก', icon: '💬', tone: 'rose', group: 'quest_verbs', deckId: 'quest_verbs_communication' },
   { id: 'quest_verbs_daily', name: 'กิจวัตรและสุขภาพ', icon: '🧼', tone: 'peach', group: 'quest_verbs', deckId: 'quest_verbs_daily' },

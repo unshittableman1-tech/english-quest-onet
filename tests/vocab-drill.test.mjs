@@ -18,9 +18,9 @@ test('every Vocab Drill category uses an existing illustrated PNG thumbnail', as
     await access(fileURLToPath(new URL(`../public${artwork}`, import.meta.url)));
   }
 });
-test('54 vocab categories resolve exact decks without an unrelated mission fallback', () => {
-  assert.equal(VOCAB_CATEGORIES.length, 54);
-  assert.equal(new Set(VOCAB_CATEGORIES.map(c => c.id)).size, 54);
+test('55 vocab categories resolve exact decks without an unrelated mission fallback', () => {
+  assert.equal(VOCAB_CATEGORIES.length, 55);
+  assert.equal(new Set(VOCAB_CATEGORIES.map(c => c.id)).size, 55);
   for (const cat of VOCAB_CATEGORIES) {
     assert.ok(VOCAB_GROUPS.some(g => g.id === cat.group));
     const mission = getDrillMission(cat);
@@ -247,7 +247,7 @@ test('illustrated cards retain their visuals and explicit text decks have access
     assert.ok(cards.every(card => card.image && card.imageAlt), `${category.id} must not contain text-only cards`);
     await Promise.all(cards.map(card => access(fileURLToPath(new URL(`../public${card.image}`, import.meta.url)))));
   }
-  assert.equal(total, 861);
+  assert.equal(total, 927);
 });
 test('cleanSpeechText sanitizes emojis, flags, arrows and glosses for speech output', async () => {
   const { cleanSpeechText } = await import('../src/utils/useSpeech.js');

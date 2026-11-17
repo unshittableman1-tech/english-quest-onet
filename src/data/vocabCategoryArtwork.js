@@ -3,6 +3,7 @@ export const VOCAB_CATEGORY_ARTWORK = Object.freeze({
   ...Object.fromEntries(PDF_VOCABULARY_CATEGORIES.map(category => [category.id, '/learning/verbs/read-v1.png'])),
   exam_commands: '/learning/verbs/read-v1.png',
   onet_question_phrases: '/learning/verbs/ask-v1.png',
+  onet_handout_verbs: '/learning/verbs/run-v1.png',
   decisive_pairs: '/learning/verbs/choose-v1.png',
   profile: '/learning/verbs/speak-v1.png',
   family_words: '/learning/verbs/visit-v1.png',
