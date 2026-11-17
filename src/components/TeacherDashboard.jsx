@@ -1248,7 +1248,15 @@ export default function TeacherDashboard({ initialTab = 'overview' }) {
         {/* Tab Body */}
         <main className="flex-1 p-4 md:p-6 max-w-7xl w-full mx-auto space-y-6">
           {activeTab === 'student_management' && canManageSchoolStudents(currentTeacher, displaySchool.id) && <SchoolAdminDashboard key={displaySchool.id} embedded schoolContext={displaySchool} onChanged={() => refresh({silent:true}).catch(()=>{})} />}
-          {activeTab === 'practice_review' && <TeacherPracticeReview schoolId={displaySchool.id} showToast={showToast} />}
+          {activeTab === 'practice_review' && (
+            <TeacherPracticeReview
+              schoolId={displaySchool.id}
+              schoolName={displaySchool.name}
+              schoolCode={displaySchool.code}
+              activeClass={activeClass}
+              showToast={showToast}
+            />
+          )}
           {activeTab === 'pretest_review' && canManageSchoolStudents(currentTeacher, displaySchool.id) && <PretestTeacherPreview />}
           {activeTab === 'vocabulary_report' && <TeacherVocabularyReport key={displaySchool.id} schoolId={displaySchool.id} students={filteredStudents} />}
           {/* Tab: Overview */}
