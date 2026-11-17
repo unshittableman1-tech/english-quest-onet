@@ -9,6 +9,7 @@ import SpeedRushGame from './games/SpeedRushGame';
 import AudioDetectiveGame from './games/AudioDetectiveGame';
 import HeadsUpCharades from './HeadsUpCharades';
 import { VOCAB_CATEGORIES, VOCAB_GROUPS, getDrillMission, getDrillCards, filterVocabCategories } from '../data/vocabDrill';
+import { PDF_VOCABULARY_SUMMARY } from '../data/pdfVocabulary';
 import { getVocabCategoryArtwork } from '../data/vocabCategoryArtwork';
 import { QUEST_PALETTES } from '../utils/questPalette';
 import { useApp } from '../App';
@@ -69,6 +70,8 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
   const guestCoverage = useRef({});
   const [query, setQuery] = useState('');
   const [filterTab, setFilterTab] = useState('all');
+  const [selectedGroup, setSelectedGroup] = useState('all');
+  const [pdfExpanded, setPdfExpanded] = useState(false);
   const [topThirtyOpen, setTopThirtyOpen] = useState(false);
   const topThirtyAvailable = import.meta.env.DEV && ['127.0.0.1', 'localhost', '[::1]'].includes(window.location.hostname);
   const dialog = useRef(null);
@@ -250,8 +253,8 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
         recs.push({
           category: cat,
           tagClass: 'tag-hot',
-          tagLabel: '🔥 ออกสอบบ่อย O-NET',
-          reason: 'หมวดสำคัญที่พบในข้อสอบ O-NET ป.6 ทุกปี แนะนำให้ฝึกเป็นอันดับแรก',
+          tagLabel: '🎯 หมวดแนะนำ',
+          reason: 'เลือกหมวดนี้เพื่อเริ่มฝึกคำศัพท์และรูปแบบโจทย์',
         });
         break;
       }
@@ -265,8 +268,8 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
           recs.push({
             category: cat,
             tagClass: 'tag-hot',
-            tagLabel: '🔥 ออกสอบบ่อย O-NET',
-            reason: 'หมวดหลักประจำสนามสอบ O-NET ฝึกซ้ำเพื่อความชำนาญสูงสุด',
+            tagLabel: '🎯 หมวดแนะนำ',
+            reason: 'เลือกฝึกคำศัพท์และรูปแบบโจทย์ในหมวดนี้',
           });
           break;
         }
@@ -293,7 +296,7 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
             category: cat,
             tagClass: 'tag-review',
             tagLabel: '⏰ ถึงเวลาทบทวน',
-            reason: `ฝึกไปเมื่อ ${days} วันก่อน ทวนซ้ำวันนี้เพื่อเปลี่ยนเป็นความจำระยะยาว`,
+            reason: `ฝึกไปเมื่อ ${days} วันก่อน กลับมาทบทวนอีกครั้งได้`,
           });
         }
       }
@@ -337,10 +340,13 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
   }, [baseCategories, filterTab, recCategoryIds, history, weakWordsMap]);
 
   const allCount = VOCAB_CATEGORIES.length;
-  const practicedCategories = Object.keys(history.categories).length;
+  const practicedCategories = VOCAB_CATEGORIES.filter(cat => history.categories[cat.id]?.sessions > 0).length;
   const unpracticedCount = allCount - practicedCategories;
   const reviewCount = VOCAB_CATEGORIES.filter(c => weakWordsMap[c.id] > 0 || (history.categories[c.id] && daysSince(history.categories[c.id].lastPracticedAt) >= 3)).length;
   const totalSessions = Object.values(history.categories).reduce((sum, item) => sum + item.sessions, 0);
+  const visibleCategories = selectedGroup === 'all' ? categories : categories.filter(cat => cat.group === selectedGroup);
+  const groups = [...VOCAB_GROUPS.filter(group => group.id !== 'pdf_vocabulary'), ...VOCAB_GROUPS.filter(group => group.id === 'pdf_vocabulary')];
+  const shortGroupNames = { quest_verbs:'กริยาใน Quest', words:'คำศัพท์ใกล้ตัว', communication:'การสื่อสาร', culture:'วัฒนธรรม', grammar:'ไวยากรณ์', exam_intelligence:'ถอดรหัส O-NET', pdf_vocabulary:'ชุดคำศัพท์ ป.6' };
   return <main className="vocab-hub">
     <header className="vocab-header">
       {onBack && <button type="button" className="vocab-icon-button" onClick={onBack} aria-label="กลับแผนที่" title="กลับแผนที่"><ArrowLeft size={20} /></button>}
@@ -351,13 +357,11 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
     {canSyncVocabulary(student) && <StudentVocabularyAssignments student={student} wordHistory={wordHistory} onEvidence={handleEvidence} />}
     {creditPilotAvailable && <section className="top30-entry" aria-label="ทดลองแต้มคำศัพท์"><div><strong>แต้มคำศัพท์ช่วยอ่าน · {creditAccount.state?.balance ?? '…'} แต้ม</strong><span>ฝึกชุดเดิมครบ 3 ขั้น แล้วใช้แต้มแปลคำที่ต้องการ</span></div><button type="button" onClick={() => setCreditPilotOpen(true)}>ดูกระเป๋าแต้มและลองแปลคำ →</button></section>}
     {topThirtyAvailable && <section className="top30-entry" aria-label="Top 30 อ่านโจทย์ให้เข้าใจ"><div><strong>Top 30 · อ่านโจทย์ให้เข้าใจ</strong><span>ก่อนเรียน A · หลังเรียน B · ติดตาม C รวม 90 ข้อ</span></div><button type="button" onClick={() => setTopThirtyOpen(true)}>เปิดชุดฝึก →</button></section>}
-    <section className="vocab-overview" aria-label="ภาพรวม Vocab Adventure">
-      <div><strong>{VOCAB_CATEGORIES.length}</strong><span>หมวดคำศัพท์</span></div>
-      <div><strong>{DRILL_MODES.length}</strong><span>รูปแบบเกม</span></div>
+    <section className="vocab-overview" aria-label="ความคืบหน้าของฉัน">
       <div><strong>{practicedCategories}</strong><span>หมวดที่เคยฝึก</span></div>
       <div><strong>{totalSessions}</strong><span>รอบสะสม</span></div>
+      <div><strong>{dailyData.totalXP} / {DAILY_XP_CAP}</strong><span>XP ทบทวนวันนี้</span></div>
     </section>
-    <section className="vocab-daily" aria-label="โควตา XP ประจำวัน"><div><UIIcon value="🎁" /><strong>XP ทบทวนวันนี้</strong></div><span>{dailyData.totalXP} / {DAILY_XP_CAP} XP</span></section>
     {historySaveFailed && <p role="alert">บันทึกประวัติการฝึกในเครื่องไม่สำเร็จ</p>}
     <p className="vocab-evidence-note">ผลรายคำบันทึกในเบราว์เซอร์นี้{student?.isDemo ? ' · Demo เก็บชั่วคราวจนรีเฟรช' : ' แยกตามผู้เรียนและโรงเรียน'} · การตอบถูกในแบบฝึกยังไม่ใช่การยืนยันความเชี่ยวชาญ</p>
     {canSyncVocabulary(student) && <p className="vocab-evidence-note" role="status">{cloudStatus === 'error' ? 'ยังส่งผลให้ครูไม่ได้ · เก็บคิวไว้ในเครื่องและจะลองใหม่เมื่อเชื่อมต่อ' : wordHistory.events.some(event => event.cloudPending) ? 'กำลังรอส่งผลฝึกให้ครู…' : cloudStatus === 'synced' ? 'ส่งผลฝึกให้ครูแล้ว' : 'ผลฝึกใหม่จะส่งให้ครู · ประวัติเก่าในเครื่องยังไม่ส่งย้อนหลัง'} <button type="button" onClick={() => setSyncRevision(previous => previous + 1)}>ลองส่งอีกครั้ง</button></p>}
@@ -365,8 +369,8 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
     {recommendations.length > 0 && (
       <section className="vocab-recommendations" aria-labelledby="vocab-rec-title">
         <div className="vocab-recommendations-header">
-          <h2 id="vocab-rec-title">🎯 หมวดแนะนำสำหรับคุณ (Next Recommendations)</h2>
-          <p className="vocab-recommendations-subtitle">เลือกฝึกตามแนวข้อสอบ O-NET, เควสต์ที่เรียน, และการทวนซ้ำเพื่อความแม่นยำ</p>
+          <h2 id="vocab-rec-title">🎯 เลือกฝึกกันต่อ</h2>
+          <p className="vocab-recommendations-subtitle">หมวดที่น่าลองและหมวดที่เคยฝึก</p>
         </div>
         <div className="vocab-recommendations-grid">
           {recommendations.map(rec => {
@@ -407,6 +411,11 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
       </section>
     )}
 
+    <label className="vocab-search"><Search size={19} aria-hidden="true" /><input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="ค้นหาหมวด คำศัพท์ หรือคำแปล" aria-label="ค้นหาหมวด คำศัพท์ หรือคำแปล" /></label>
+    <div className="vocab-group-filter" role="group" aria-label="เลือกกลุ่มคำศัพท์">
+      <button type="button" aria-pressed={selectedGroup === 'all'} onClick={() => setSelectedGroup('all')}>ทุกกลุ่ม</button>
+      {groups.map(group => <button key={group.id} type="button" aria-pressed={selectedGroup === group.id} onClick={() => { setSelectedGroup(group.id); if (group.id === 'pdf_vocabulary') setPdfExpanded(true); }}>{shortGroupNames[group.id] || group.name}</button>)}
+    </div>
     {/* Filter Pills Bar */}
     <div className="vocab-filter-bar" role="tablist" aria-label="ตัวกรองหมวดคำศัพท์">
       <button
@@ -458,10 +467,10 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
       )}
     </div>
 
-    <label className="vocab-search"><Search size={19} aria-hidden="true" /><input type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="ค้นหาหมวด คำศัพท์ หรือคำแปล" aria-label="ค้นหาหมวด คำศัพท์ หรือคำแปล" /></label>
-    {VOCAB_GROUPS.map(group => {
-      const groupCategories = categories.filter(cat => cat.group === group.id);
+    {groups.map(group => {
+      const groupCategories = visibleCategories.filter(cat => cat.group === group.id);
       if (!groupCategories.length) return null;
+      if (group.id === 'pdf_vocabulary' && !pdfExpanded && !query.trim() && filterTab === 'all') return <section key={group.id} className="vocab-pdf-collection" aria-labelledby="vocab-pdf-title"><div><span>📚 คลังคำศัพท์</span><h2 id="vocab-pdf-title">ชุดคำศัพท์ ป.6</h2><p>{groupCategories.length} ชุด · {PDF_VOCABULARY_SUMMARY.uniqueWords} คำ/วลี</p></div><button type="button" onClick={() => { setSelectedGroup('pdf_vocabulary'); setPdfExpanded(true); }}>เลือกชุดคำศัพท์ <ArrowRight size={16} aria-hidden="true" /></button></section>;
       return <section key={group.id} className="vocab-group" aria-labelledby={`vocab-group-${group.id}`}><h2 id={`vocab-group-${group.id}`}>{group.name}</h2>{group.description && <p className="vocab-evidence-note">{group.description}</p>}<div className="vocab-category-grid">
         {groupCategories.map(cat => {
           const count = getDrillCards(cat).length;
@@ -483,13 +492,13 @@ export default function VocabDrillHub({ onBack, onAddXP, initialQuestId = null }
                 <span className="vocab-badge-weak">⚠️ มี {weakWordsMap[cat.id]} คำต้องซ่อม</span>
               )}
             </div>
-            <span className="vocab-category-history">{practice ? <small>ล่าสุด {formatVocabPracticeDate(practice.lastPracticedAt)}</small> : <small>เริ่มฝึกสะสม Mastery Stars</small>}</span>
+            {practice?.sessions > 0 && <span className="vocab-category-history"><small>ล่าสุด {formatVocabPracticeDate(practice.lastPracticedAt)}</small></span>}
             <span className="vocab-category-meta">{count ? `${count} รายการ` : 'ยังไม่พร้อม'}<ArrowRight size={16} aria-hidden="true" /></span>
           </button>;
         })}
       </div></section>;
     })}
-    {!categories.length && <p className="vocab-empty" role="status">ไม่พบหมวดคำศัพท์<button onClick={() => setQuery('')}>ล้างการค้นหา</button></p>}
+    {!visibleCategories.length && <p className="vocab-empty" role="status">ไม่พบหมวดคำศัพท์<button onClick={() => { setQuery(''); setFilterTab('all'); setSelectedGroup('all'); }}>ล้างตัวกรอง</button></p>}
     {selectedCategory && !activeMode && <dialog ref={dialog} className="vocab-dialog" style={paletteStyle(selectedCategory.tone)} aria-labelledby="vocab-dialog-title" onCancel={closeSelection} onClick={e => { if (e.target === e.currentTarget) closeSelection(); }}>
       <header><div><img className="vocab-category-artwork" src={getVocabCategoryArtwork(selectedCategory.id)} alt="" aria-hidden="true" /><h2 id="vocab-dialog-title">{selectedCategory.name}</h2></div><button type="button" className="vocab-icon-button" onClick={closeSelection} aria-label="ปิดหน้าต่าง" title="ปิดหน้าต่าง"><X size={20} /></button></header>
       {selectedCategory.sourceNote && <p className="vocab-evidence-note">{selectedCategory.sourceNote}</p>}

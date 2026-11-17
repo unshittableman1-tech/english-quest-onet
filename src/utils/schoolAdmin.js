@@ -557,17 +557,25 @@ export function parseStudentCSV(csvText) {
   let hasHeader = false;
   let idIdx = -1;
   let nameIdx = -1;
+  let fullNameIdx = -1;
+  let prefixIdx = -1;
+  let surnameIdx = -1;
   let classIdx = -1;
   let numberIdx = -1;
 
   headerCols.forEach((col, idx) => {
-    if (col.includes('id') || col.includes('รหัส') || col.includes('student_id')) idIdx = idx;
+    const key = col.normalize('NFC').replace(/[\s_.\-\/]/g, '');
+    if (['คำนำหน้า','คำนำหน้าชื่อ','prefix','title','honorific','nametitle'].includes(key)) prefixIdx = idx;
+    else if (['นามสกุล','สกุล','lastname','surname','familyname'].includes(key)) surnameIdx = idx;
+    else if (['ชื่อสกุล','ชื่อนามสกุล','ชื่อและนามสกุล','fullname','studentname'].includes(key)) fullNameIdx = idx;
+    else if (['ชื่อ','ชื่อตัว','firstname','givenname','name'].includes(key)) nameIdx = idx;
+    else if (col.includes('id') || col.includes('รหัส') || col.includes('student_id')) idIdx = idx;
     else if (col.includes('name') || col.includes('ชื่อ')) nameIdx = idx;
     else if (col.includes('class') || col.includes('ชั้น') || col.includes('ห้อง')) classIdx = idx;
     else if (col.includes('number') || col.includes('เลขที่') || col.includes('ลำดับ')) numberIdx = idx;
   });
 
-  if (nameIdx !== -1 && classIdx !== -1) {
+  if ((nameIdx !== -1 || fullNameIdx !== -1) && classIdx !== -1) {
     hasHeader = true;
   }
 
@@ -585,7 +593,12 @@ export function parseStudentCSV(csvText) {
 
     if (hasHeader) {
       studentId = idIdx !== -1 ? cols[idIdx] || '' : '';
-      name = nameIdx !== -1 ? cols[nameIdx] || '' : '';
+      const fullName = fullNameIdx !== -1 ? (cols[fullNameIdx] || '').trim() : '';
+      const givenName = nameIdx !== -1 ? (cols[nameIdx] || '').trim() : '';
+      const surname = surnameIdx !== -1 ? (cols[surnameIdx] || '').trim() : '';
+      const prefix = prefixIdx !== -1 ? (cols[prefixIdx] || '').trim() : '';
+      name = fullName || [givenName, surname].filter(Boolean).join(' ');
+      if (prefix && name && !name.startsWith(prefix)) name = `${prefix} ${name}`;
       className = classIdx !== -1 ? cols[classIdx] || '' : '';
       number = numberIdx !== -1 ? cols[numberIdx] || '' : '';
     } else {

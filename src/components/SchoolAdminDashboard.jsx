@@ -1091,6 +1091,7 @@ export default function SchoolAdminDashboard({ onBackToTeacher, embedded = false
                 </div>
                 <p className="font-mono text-emerald-300">student_id, name, class, number</p>
                 <p className="text-slate-400">หรือภาษาไทย: <span className="font-mono">รหัสนักเรียน, ชื่อ-นามสกุล, ชั้น, เลขที่</span></p>
+                <p className="text-slate-400">หากแยกคอลัมน์ ใช้หัวข้อ คำนำหน้า, ชื่อ และ นามสกุล ระบบจะรวมเป็นชื่อที่แสดง โปรดตรวจตัวอย่างก่อนนำเข้า</p>
                 <div className="pt-2 flex justify-start">
                   <button
                     type="button"

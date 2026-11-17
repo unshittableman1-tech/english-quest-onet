@@ -31,18 +31,17 @@ export default function StudentVocabularyAssignments({ student, wordHistory, onE
     return task.words.filter(word => !answered.has(word.id));
   };
   if (activeTask && checking) return <VocabularyQuickCheck embedded key={activeTask.attemptId} title={activeTask.title} cards={activeTask.remaining.map(cardFor)} distractorCards={distractorCards} onBack={close} onEvidence={observation => onEvidence({ ...observation, observationId: `${activeTask.attemptId}:${observation.observationId}`, assignmentId: activeTask.id })} />;
-  return <section className="vocab-word-progress" aria-label="งานจากครู">
-    <h2 className="text-xl font-bold">งานจากครู</h2>
-    <p className="vocab-evidence-note">ตอบครบทุกคำแล้วระบบจะส่งงานเมื่อเชื่อมต่อสำเร็จ · ผลเป็นการฝึก ไม่คิด XP และไม่เปลี่ยน Boss</p>
-    <button type="button" onClick={() => setRevision(previous => previous + 1)}>รีเฟรชงานจากครู</button>
-    {status === 'loading' && <p role="status">กำลังโหลดงาน…</p>}
-    {status === 'error' && <p role="alert">ยังโหลดงานไม่ได้ กรุณาลองใหม่ งานที่บันทึกในคิวจะไม่ถูกลบ</p>}
+  return <section className="vocab-word-progress vocab-assignments" aria-label="งานจากครู">
+    <div className="vocab-assignments-heading"><div><span>📬 มุมงานของฉัน</span><h2>งานจากครู</h2></div>{status === 'ready' && <button type="button" onClick={() => setRevision(previous => previous + 1)}>รีเฟรช</button>}</div>
+    {status === 'loading' && <p role="status">กำลังโหลดงานจากครู…</p>}
+    {status === 'error' && <div className="vocab-assignments-error" role="alert"><p>ยังโหลดงานจากครูไม่ได้ กรุณาลองใหม่ งานที่บันทึกในคิวจะไม่ถูกลบ</p><button type="button" onClick={() => setRevision(previous => previous + 1)}>ลองอีกครั้ง</button></div>}
     {status === 'ready' && !tasks.length && <p>ยังไม่มีงานจากครู</p>}
+    {status === 'ready' && tasks.length > 0 && <p className="vocab-evidence-note">ตอบครบทุกคำแล้วระบบจะส่งงานเมื่อเชื่อมต่อสำเร็จ · ผลเป็นการฝึก ไม่คิด XP และไม่เปลี่ยน Boss</p>}
     {!activeTask && tasks.map(task => <article key={task.id} className="my-3 rounded-xl border p-3">
       <h3>{task.title}</h3><p>{labels[task.status]} · ครูได้รับ {task.answered}/{task.total} คำ</p>
       {task.dueAt && <p>กำหนดส่ง {new Date(task.dueAt).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok' })}</p>}
       {pendingFor(task).length > 0 && <p role="status">มี {pendingFor(task).length} คำรอส่ง กรุณาเปิดหน้านี้ไว้จนส่งสำเร็จ</p>}
-      <button type="button" onClick={() => { setPageSize(20); setActiveTask(task); }}>เปิดชุดเรียน / ดูงาน</button>
+      <button type="button" onClick={() => { setPageSize(20); setActiveTask(task); }}>{task.status === 'submitted' ? 'ดูงานที่ส่งแล้ว' : 'เริ่มทำงาน / ดูชุดเรียน'}</button>
     </article>)}
     {activeTask && <article>
       <h3>{activeTask.title}</h3><p>{activeTask.instructions}</p>
